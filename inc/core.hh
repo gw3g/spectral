@@ -28,8 +28,20 @@ struct master {
     k0=_k0; k=_k; // reset K
     return K2;
   };
-  //virtual double rho() = 0;
 };
 
 /*--------------------------------------------------------------------*/
+
+struct rho11100 : master {
+  double integrand_re(double,double);
+  rho11100(int _m, int _n, int _s[3]) : master(_m,n,_s) {}
+};
+
+struct rho11110 : master {
+  rho11110(int _m, int _n, int _s[3]) : master(_m,n,_s) {}
+};
+
+struct rho11111 : master {
+  rho11111(int _m, int _n, int _s[3]) : master(_m,n,_s) {}
+};
 

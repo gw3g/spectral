@@ -1,8 +1,9 @@
-#include "core.h"
+#include "core.hh"
 #include <iostream>
 double k0, k;
 
 using namespace std;
+
 
 int main() {
   master *Rho;
@@ -21,4 +22,7 @@ int main() {
   cout << (*Rho)(2.,1.) << endl;
   cout << (*Rho)(2.,2.) << endl;
   cout << k0 << ", " << k << endl;
+  cout << (*Rho)(-1.,3.) << endl;
+
+  cout << "\nThermal\n" << f(.0,-1) << endl;
 }
