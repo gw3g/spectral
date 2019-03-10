@@ -1,5 +1,5 @@
 CC	= g++
-CFLAGS	= -lm
+CFLAGS	= -lm -lgsl -lgslcblas
 SDIR	= src
 ODIR	= build
 OUT	= out
