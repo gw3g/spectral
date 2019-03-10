@@ -38,8 +38,8 @@ struct integrate { // func(x) over [0,1]
 };
 /*--------------------------------------------------------------------*/
 // runner, eps is relative
-//#include <iostream>
-//using namespace std;
+#include <iostream>
+using namespace std;
 
 template <typename F>
 double go(integrate<F> &I, double eps=1.e-6) {

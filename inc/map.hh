@@ -20,7 +20,7 @@ struct Finite : map {
     dxdt = tmax*2.*(b-a)*Q*cosh(t*tmax)/( (1.+Q)*(1.+Q) );
     del = (b-a)*Q/(1.+Q);
     return ( // trick to avoid cancellation errors
-        funk( a+del , b-a-del )+
+        funk( a+del , del )+
         funk( b-del , del ) 
         )*dxdt;
   }
@@ -36,7 +36,7 @@ struct SemiInf : map {
     double x, dxdt, Q = exp(2.*sinh(((1.-2.*t)*tmax)));
     x = a*(1.+Q);
     dxdt = tmax*4.*a*Q*cosh(((1.-2.*t)*tmax));
-    return funk(x,0)*dxdt;
+    return funk(x)*dxdt;
   }
   SemiInf(F &_func, double _a) :
     funk(_func) { a=_a; }

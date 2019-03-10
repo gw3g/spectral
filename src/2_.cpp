@@ -37,6 +37,7 @@ struct rho11010 : master {
       res = pow(p/k0,(R->n))*f(p,(R->s)[1])*f(k0-p,(R->s)[4]);
       return (((double)(R->s)[0])*exp(k0)-1.)*res;
     }
+    double operator ()(double p) { return (*this)(p,k0-p); };
   };
   double eval();
   region ii;
@@ -62,7 +63,7 @@ double rho11010::eval() {
       res += go(i1);
       S = new SemiInf<region>(ii,kp);
       integrate<map> i2(*S);
-      res -= go(i2);
+      res += go(i2);
     }
   return res;
 }

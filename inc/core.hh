@@ -45,3 +45,6 @@ master* _11010(int, int, int *);
 master* _11020(int, int, int *);
 master* _10120(int, int, int *);
 
+// Type.III
+master* _11011(int, int, int *);
+
