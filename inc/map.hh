@@ -33,10 +33,9 @@ struct SemiInf : map {
   //double a, tmax=4.;
   F &funk;
   double operator ()(double t) {
-    double x, dxdt, Q = exp(2.*sinh(((1.-2.*t)*tmax)));
-    x = a*(1.+Q);
-    dxdt = tmax*4.*a*Q*cosh(((1.-2.*t)*tmax));
-    return funk(x)*dxdt;
+    double dxdt, del = a*exp(2.*sinh(((1.-2.*t)*tmax)));
+    dxdt = tmax*4.*del*cosh(((1.-2.*t)*tmax));
+    return funk(a+del,del)*dxdt;
   }
   SemiInf(F &_func, double _a) :
     funk(_func) { a=_a; }

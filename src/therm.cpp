@@ -9,13 +9,13 @@
 
 double nB( double x ) {
   // Bose-Einstein
-  if (x>0) {double e=exp(-x); return e/(1.-e);}
+  if (x>10.) {double e=exp(-x); return e/(1.-e);}
   else return 1./expm1(x) ;
 };
 
 double nF( double x ) {
   // Fermi-Dirac
-  if (x>0) {double e=exp(-x); return e/(1.+e);}
+  if (x>10) {double e=exp(-x); return e/(1.+e);}
   else return 1./(exp(x)+1.);
 };
 

@@ -2,20 +2,20 @@
 #include "trapezoid.hh"
 #include "map.hh"
 
-struct rho11020 : master {
+struct rho11020 : Master {
   double eval();
-  rho11020(int _m, int _n, int _s[3]) : master(_m,_n,_s) {}
+  rho11020(int _m, int _n, int _s[3]) : Master(_m,_n,_s) {}
 };
 // function(s) for MAIN
-master* _11020(int m, int n, int s[3]) {
-  master *R =  new rho11020(m,n,s); return R;
+Master* _11020(int m, int n, int s[3]) {
+  Master *R =  new rho11020(m,n,s); return R;
 }
-master* _10120(int m, int n, int s[3]) {
+Master* _10120(int m, int n, int s[3]) {
   int s_new[3]; // swap: s_2 <-> s_3
   s_new[0] = s[0];
   s_new[1] = s[1];
   s_new[2] = s[0]*s[1]*s[2];
-  master *R =  new rho11020(m,n,s_new); return R;
+  Master *R =  new rho11020(m,n,s_new); return R;
 }
 
 double rho11020::eval() {
@@ -29,9 +29,9 @@ double rho11020::eval() {
 
 /*--------------------------------------------------------------------*/
 
-struct rho11010 : master {
+struct rho11010 : Master {
   struct region {
-    master *R;
+    Master *R;
     double operator ()(double p, double xp) {
       double res;
       res = pow(p/k0,(R->n))*f(p,(R->s)[1])*f(k0-p,(R->s)[4]);
@@ -42,13 +42,13 @@ struct rho11010 : master {
   double eval();
   region ii;
   map *S; 
-  rho11010(int _m, int _n, int _s[3]) : master(_m,_n,_s) {
+  rho11010(int _m, int _n, int _s[3]) : Master(_m,_n,_s) {
     ii.R = this;
   }
 };
 // function for MAIN
-master* _11010(int m, int n, int s[3]) {
-  master *R =  new rho11010(m,n,s); return R;
+Master* _11010(int m, int n, int s[3]) {
+  Master *R =  new rho11010(m,n,s); return R;
 }
 
 double rho11010::eval() {
