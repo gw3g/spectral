@@ -1,10 +1,10 @@
 r0=12*16*pi
 
 # to remove the LC divergence, multiply by..
-fac(k0,k) = ((k0-k)/(k0+k))
+fac(k0,k) = ((k0-k)*(k0-k))
 
 set xl 'k0/T'
-set yl "192 {/Symbol p} x {/Symbol r} k_-/k_+"
+set yl "192 {/Symbol p} x {/Symbol r} (4k_-^2)"
 
 set yr [-.1:1.1]
 set xr [.005:140]

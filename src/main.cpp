@@ -10,17 +10,18 @@
 #include <cstring>
 #include <cmath>
 double k0, k;
-int s[] = {+1,+1,+1};
+int s[] = {-1,+1,+1};
 
 using namespace std;
 
 ofstream fout;
 int Print_k0(Master*,double);
 void config(Master *rho);
+char PM(int i) { if (i<0) return '-'; else return '+'; }
 
 int main() {
   Master *rho;
-  rho = _11011(0,0,s);
+  rho = _11020(0,0,s);
   Print_k0(rho,10.);
   Print_k0(rho,1.);
   Print_k0(rho,.1);
@@ -43,7 +44,7 @@ void config(Master *rho) {
 int Print_k0(Master *rho, double k_curr) {
   int N_k0;
   double res, s, k0_min, k0_max;
-  char *prefix=(char*)"out/data/diagram3_+++_";
+  char *prefix=(char*)"out/data/diagram2_-++";
   char  suffix[20];
   char  filename[50];
 
@@ -51,10 +52,11 @@ int Print_k0(Master *rho, double k_curr) {
   //signal( SIGALRM, sigalrm_handler );
   //elapsed=0; alarm(10);
   cout << "Creating table for k = " << k <<  " ..." << endl;
+  //string si = (string)PM(rho->s[0])+PM(rho->s[1])+PM(rho->s[2]);
 
   // filename
   strcpy(filename,prefix);
-  sprintf(suffix,"{k=%g}.dat",k);
+  sprintf(suffix,"_{k=%g}.dat",k);
   strcat(filename,suffix);
   fout.open(filename);
 

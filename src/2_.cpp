@@ -2,6 +2,31 @@
 #include "trapezoid.hh"
 #include "map.hh"
 
+double F(int nu, int sA, int sB) {
+  // here F_m for m={0,1,2}
+  double res=0.;
+  res += f(km,sA)*f(kp,sB)/kp;
+  res -= f(kp,sA)*f(km,sB)/km;
+  res *= ((double)sA*sB)*exp(k0)-1.; // = F_0
+  if (nu>0) {
+    res *= k0;
+    res += ( 2.-exp(kp)*((double)(sA+sB)) )*f(kp,sA)*f(kp,sB);
+    res += sgn(km)*( f(fabs(km),sA)+f(fabs(km),sB) ); // = F_1
+  }
+  if (nu>1) {
+    res *= k0;
+    res -= (km>0)?k:0.;
+    res += 2.*(( kp-fabs(km)-lga( (exp(kp)-sB)/(exp(fabs(km))-sB) ) ));
+    res += f(fabs(km),sB)*( k0 + f(fabs(km),sA)*exp(fabs(km))*km*((double)(sB-sA)) )*sgn(km);
+    res -= f(fabs(kp),sB)*( k0 + f(fabs(kp),sA)*exp(fabs(kp))*kp*((double)(sB-sA)) ); // = F_2
+  }
+
+  res *= -.0625*OOFP/k; // coeff = 1/16
+  return res;
+}
+
+/*--------------------------------------------------------------------*/
+
 struct rho11020 : Master {
   double eval();
   rho11020(int _m, int _n, int _s[3]) : Master(_m,_n,_s) {}
@@ -18,13 +43,7 @@ Master* _10120(int m, int n, int s[3]) {
   Master *R =  new rho11020(m,n,s_new); return R;
 }
 
-double rho11020::eval() {
-  double res=0.;
-  res += f(km,s[1])*f(kp,s[4])/kp;
-  res -= f(kp,s[1])*f(km,s[4])/km;
-  res *= -K2*.0625*( ((double)s[0])*exp(k0)-1. )/k; // coeff = 1/16
-  return res*OOFP*I(n,s[2]);
-}
+double rho11020::eval() { return F(m,s[1],s[4])*I(n,s[2]); }
 
 
 /*--------------------------------------------------------------------*/
