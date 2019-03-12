@@ -32,6 +32,7 @@ double bf(double e, int X) {
 };
 
 double I(int n, int s_) {
+  // tadpole
   double res;
   res = gsl_sf_zeta_int(n+2)/(2.*M_PI*M_PI);
   for (int i=n+1;i>0;i--) res*=(double)i;

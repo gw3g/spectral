@@ -46,7 +46,7 @@ double go(integrate<F> &I, double eps=1.e-6) {
   const int iMax=10; // max number of iterations
   double res, old;
   for (int i=0;i<iMax;i++) {
-    res = I.next(); cout << "Step: " << i << "  \
+    res = I.next(); //cout << "Step: " << i << "  \
           Result = "<< res << endl;
     if (i>5)
       if (abs(res-old)<eps*abs(old)||(res<1e-7&&old<1e-7))

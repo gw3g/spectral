@@ -21,7 +21,9 @@ void config(Master *rho);
 int main() {
   Master *rho;
   rho = _11011(0,0,s);
+  Print_k0(rho,10.);
   Print_k0(rho,1.);
+  Print_k0(rho,.1);
   //cout << k0 << ", " << k << endl;
   //cout << (*rho)(-1.,3.) << endl;
 }

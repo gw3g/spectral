@@ -54,6 +54,7 @@ struct rho11011 : Master {
   H0 h0;
   H1 h1;
   G0 g0;
+  double h0m, h0n, h1m, h1n, g0m, g0n, g1m, g1n;
   map *S; 
   rho11011(int _m, int _n, int _s[3]) : Master(_m,_n,_s) {
    // g0m = new G0(m,s[1],s[4]);
@@ -66,8 +67,13 @@ Master* _11011(int m, int n, int s[3]) {
 
 double rho11011::eval() {
   double res=0.;
-  res += h0.val(0,s[1],s[4]);
-  return res;
+  h0m=h0.val(m,s[1],s[4]); h0n=h0.val(n,s[2],s[5]);
+  h1m=h1.val(m,s[1],s[4]); h1n=h1.val(n,s[2],s[5]);
+  g0m=g0.val(m,s[1],s[4]); g0n=g0.val(n,s[2],s[5]);
+  g1m=pow(.5*k0,m);        g1n=pow(.5*k0,n);
+  res += -(2.*g1m-g0m)*h0n+g1m*h1n;
+  res += -(2.*g1n-g0n)*h0m+g1n*h1m;
+  return -res*K2*.25*pow(OOFP,3);
 }
 
 /*--------------------------------------------------------------------*/
