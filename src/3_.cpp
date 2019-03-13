@@ -70,10 +70,10 @@ double rho11011::eval() {
   h0m=h0.val(m,s[1],s[4]); h0n=h0.val(n,s[2],s[5]);
   h1m=h1.val(m,s[1],s[4]); h1n=h1.val(n,s[2],s[5]);
   g0m=g0.val(m,s[1],s[4]); g0n=g0.val(n,s[2],s[5]);
-  g1m=pow(.5*k0,m);        g1n=pow(.5*k0,n);
+  g1m=pow(.5,m);        g1n=pow(.5,n);
   res += -(2.*g1m-g0m)*h0n+g1m*h1n;
   res += -(2.*g1n-g0n)*h0m+g1n*h1m;
-  return -res*K2*.25*pow(OOFP,3);
+  return -res*.25*pow(OOFP,3);
 }
 
 /*--------------------------------------------------------------------*/
@@ -153,30 +153,60 @@ double G0::operator ()(double p)
   // raw integrand, function of p
 {
   double res;
-  res  = f(p,sA)+f(p,sB);
-  res *= lga( (p-km)*(p+kp)/((p-kp)*(km+p)) ); 
+  if (nu==0) {
+    res  = f(p,sA)+f(p,sB);
+    res *= lga( (p-km)*(p+kp)/((p-kp)*(km+p)) ); 
+  } else 
+  if (nu==1) {
+    res  = f(p,sB)*lga( (p-km)*(p+kp)/((p-kp)*(km+p)) ); 
+    res += (p/k0)*( f(p,sA)-f(p,sB) )*lga( kp*kp*(km*km-p*p) /( km*km*(kp*kp-p*p) ) );
+  }
   return res/k;
 };
 
 double G0::operator ()(double p, double del) 
   // for singularities, del parametrises p-s
+  // TODO: tify up if-elses
 {
   double res, h;
-  res  = f(p,sA)+f(p,sB);
-  res /= k;
   h = .1*fabs(kp-fabs(km));
   // singularities @ (s-h,s+h) are assisted:
   // ( s={abs(km),kp} for p>0 )
-  if (fabs(p-kp)<h) // close to p=kp singularity
-    return res*lga( (p-km)*(p+kp)/(del*(km+p)) );
-  else if (( (fabs(p-fabs(km)))<h&&(p>fabs(km)/2.) )) {
-    if (km>0.)
-      // close to p=km singularity
-      return res*lga( del*(p+kp)/((p-kp)*(km+p)) );
-    else // close to p=-km
-      return res*lga( (p-km)*(p+kp)/((p-kp)*del) ); }
-  else // "safe" (or p=0 singularity)
-    return (*this)(p); 
+  if (nu==0) {
+    res  = f(p,sA)+f(p,sB);
+    if (fabs(p-kp)<h) // close to p=kp singularity
+      res *= lga( (p-km)*(p+kp)/(del*(km+p)) );
+    else if (( (fabs(p-fabs(km)))<h&&(p>fabs(km)/2.) )) {
+      if (km>0.)  // close to p=km singularity
+        res *= lga( del*(p+kp)/((p-kp)*(km+p)) );
+      else // close to p=-km
+        res *= lga( (p-km)*(p+kp)/((p-kp)*del) ); 
+    }
+    else // "safe" (or p=0 singularity)
+      return (*this)(p); 
+    res /= k; return res;
+  } else
+  if (nu==1) {
+    res  = 0.;
+    if (fabs(p-kp)<h) {// close to p=kp singularity, del=(kp-p)
+      res += f(p,sB)*lga( (p-km)*(p+kp)/(del*(km+p)) );
+      res += (p/k0)*( f(p,sA)-f(p,sB) )*lga( kp*kp*(p-km)*(p+km)/(km*km*del*(kp+p)) );
+    }
+    else if (( (fabs(p-fabs(km)))<h&&(p>fabs(km)/2.) )) {
+      if (km>0.) { // close to p=km singularity, del=(km-p)
+        res += f(p,sB)*lga( del*(p+kp)/((p-kp)*(km+p)) );
+        res += (p/k0)*( f(p,sA)-f(p,sB) )*lga( kp*kp*del*(p+km)/(km*km*(p-kp)*(kp+p)) );
+      }
+      else {// close to p=-km, del=(km+p)
+        res += f(p,sB)*lga( (p-km)*(p+kp)/((p-kp)*del) );
+        res += (p/k0)*( f(p,sA)-f(p,sB) )*lga( kp*kp*(p-km)*del/(km*km*(p-kp)*(p+kp)) ); 
+      }
+    }
+    else // "safe" (or p=0 singularity)
+      return (*this)(p); 
+    res /= k; return res;
+  } 
+  return 0;
 };
 
 double G0::val(int _nu, int _sA, int _sB)

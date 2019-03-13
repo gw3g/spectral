@@ -10,7 +10,7 @@
 #include <cstring>
 #include <cmath>
 double k0, k;
-int s[] = {-1,+1,+1};
+int s[] = {+1,-1,+1};
 
 using namespace std;
 
@@ -21,10 +21,11 @@ char PM(int i) { if (i<0) return '-'; else return '+'; }
 
 int main() {
   Master *rho;
-  rho = _11020(0,0,s);
-  Print_k0(rho,10.);
-  Print_k0(rho,1.);
+  rho = _11011(1,0,s);
+  Print_k0(rho,.004);
   Print_k0(rho,.1);
+  Print_k0(rho,1.);
+  Print_k0(rho,10.);
   //cout << k0 << ", " << k << endl;
   //cout << (*rho)(-1.,3.) << endl;
 }
@@ -44,7 +45,7 @@ void config(Master *rho) {
 int Print_k0(Master *rho, double k_curr) {
   int N_k0;
   double res, s, k0_min, k0_max;
-  char *prefix=(char*)"out/data/diagram2_-++";
+  char *prefix=(char*)"out/data/diagram3_+-+_10";
   char  suffix[20];
   char  filename[50];
 
@@ -71,7 +72,7 @@ int Print_k0(Master *rho, double k_curr) {
 
   for (int i=0;i<N_k0;i++) { 
     //percentage=(float)i/((float)N_k0);
-    fout << k0 << "    " << (*rho)(k0,k) << endl;
+    fout << k0 << "    " << (*rho)(k0,k)*K2 << endl;
     k0*=s; 
   }
   cout << "Saved to file [" << filename << "]" << endl;
