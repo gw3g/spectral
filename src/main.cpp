@@ -10,7 +10,7 @@
 #include <cstring>
 #include <cmath>
 double k0, k;
-int s[] = {+1,-1,+1};
+int s[] = {+1,+1,+1};
 
 using namespace std;
 
@@ -21,13 +21,13 @@ char PM(int i) { if (i<0) return '-'; else return '+'; }
 
 int main() {
   Master *rho;
-  rho = _11011(1,0,s);
-  Print_k0(rho,.004);
-  Print_k0(rho,.1);
-  Print_k0(rho,1.);
-  Print_k0(rho,10.);
+  rho = _11100(0,0,s);
+  //Print_k0(rho,.004);
+  //Print_k0(rho,.1);
+  //Print_k0(rho,1.);
+  //Print_k0(rho,10.);
   //cout << k0 << ", " << k << endl;
-  //cout << (*rho)(-1.,3.) << endl;
+  cout << (*rho)(1.1,1.) << endl;
 }
 
 void config(Master *rho) {

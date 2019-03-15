@@ -25,3 +25,4 @@ To get the value of the function, one can simply call:
 * include OPE in masters
 * 2D integrator
 
+Remarks: should I be using Finite(F &func, a, b) in map.hh?

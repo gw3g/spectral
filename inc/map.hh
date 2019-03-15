@@ -14,7 +14,7 @@ struct map {
 template <typename F>
 struct Finite : map {
   //double a, b, tmax=4.;
-  F &funk;
+  F funk;
   double operator ()(double t) {
     double dxdt, del, Q = exp(-2.*sinh(t*tmax));
     dxdt = tmax*2.*(b-a)*Q*cosh(t*tmax)/( (1.+Q)*(1.+Q) );
@@ -24,20 +24,20 @@ struct Finite : map {
         funk( b-del , del ) 
         )*dxdt;
   }
-  Finite(F &_func, double _a, double _b) :
+  Finite(F _func, double _a, double _b) :
     funk(_func) { a=_a; b=_b; }
 };
 
 template <typename F>
 struct SemiInf : map {
   //double a, tmax=4.;
-  F &funk;
+  F funk;
   double operator ()(double t) {
     double dxdt, del = a*exp(2.*sinh(((1.-2.*t)*tmax)));
     dxdt = tmax*4.*del*cosh(((1.-2.*t)*tmax));
     return funk(a+del,del)*dxdt;
   }
-  SemiInf(F &_func, double _a) :
+  SemiInf(F _func, double _a) :
     funk(_func) { a=_a; }
 };
 

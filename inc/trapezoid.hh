@@ -55,3 +55,27 @@ double go(integrate<F> &I, double eps=1.e-6) {
   }
   return 0.;
 }
+
+// for 2D integration
+struct inner {
+  double _x;
+  double (*func)(double,double);
+  double operator ()(double y) { return func(_x,y); }
+};
+
+struct outer {
+  inner f2;
+  double operator ()(double x) {
+    f2._x = x;
+    integrate<inner> I(f2);
+    return go(I);
+  }
+};
+
+template <typename F>
+double integrate_2d(F _func) {
+  outer f1;
+  f1.f2.func = _func;
+  integrate<outer> I(f1);
+  return go(I);
+}

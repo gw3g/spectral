@@ -122,11 +122,14 @@ double H1::operator ()(double p)
 
 double H1::operator ()(double p, double del)
 {
-  double res;
-  res  = pow(p/k0,nu)*f(p,sA)*f(k0-p,sB);
-  if      (fabs(p-km)<.1*k) { res *= lga(k*k/( (p-kp)*del )); }
-  else if (fabs(p-kp)<.1*k) { res *= lga(k*k/( (p-km)*del )); }
-  else                      { return (*this)(p); }
+  double res, pp, pm; // pi_+=(p-k_+), pi_-=...
+  res  = pow(p/k0,nu)*f(p,sA)*f(k0-p,sB)  ;
+  pp   = (fabs(p-km)<.1*k) ? del : (p-km) ;
+  pm   = (fabs(p-kp)<.1*k) ? del : (p-kp) ;
+  res *= lga(k*k/(pp*pm));
+  //if      (fabs(p-km)<.1*k) { res *= lga(k*k/( (p-kp)*del )); }
+  //else if (fabs(p-kp)<.1*k) { res *= lga(k*k/( (p-km)*del )); }
+  //else                      { return (*this)(p); }
   return (((double)sA*sB)*exp(k0)-1.)*res/k;
 }
 

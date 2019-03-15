@@ -7,6 +7,7 @@
 double  f(double,int),
        fb(double,int);
 double I(int,int); // tadpole
+double fff(double *, int , int , int *);
 
 /*--------------------------------------------------------------------*/
 
@@ -47,4 +48,7 @@ Master* _10120(int, int, int *);
 
 // type.III
 Master* _11011(int, int, int *);
+
+// type.IV
+Master* _11100(int, int, int *);
 
