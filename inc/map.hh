@@ -35,9 +35,15 @@ struct SemiInf : map {
   double operator ()(double t) {
     double dxdt, del = a*exp(2.*sinh(((1.-2.*t)*tmax)));
     dxdt = tmax*4.*del*cosh(((1.-2.*t)*tmax));
-    return funk(a+del,del)*dxdt;
+    return funk(a+del,del)*fabs(dxdt);
   }
   SemiInf(F _func, double _a) :
     funk(_func) { a=_a; }
 };
+
+// helpers:
+template<typename F>
+Finite<F> make(F f,double a, double b) { return Finite<F>(f,a,b); }
+template<typename F>
+SemiInf<F> make(F f,double a) { return SemiInf<F>(f,a); }
 

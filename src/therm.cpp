@@ -48,7 +48,8 @@ double fff(double pqr[3], int m, int n, int s[3]) {
    */
   double p=pqr[0], q=pqr[1], r=pqr[2], res;
   double fp=f(p,s[0]), fq=f(q,s[1]), fr= f(r,s[2]);
-  res = 1. + fp + fq + fr + fp*fr + fq*fr + fp*fq;
+  //res = 1. + fp + fq + fr + fp*fr + fq*fr + fp*fq;
+  res = ( ((double) s[0]*s[1]*s[2])*exp(k0)-1. )*fp*fq*fr;
   //res = ( ((double) s0)*exp(k0)-1. )*f(p,sa)*f(q,sb)*f(r,s0*sa*sb);
   res*= pow(k0,-m-n)*pow(p,m)*pow(q,n) ;
   //if ( (p>0)&&(q>0)&&(r>0)&&(k0>k) ) {res-=1.;} // subtract vacuum

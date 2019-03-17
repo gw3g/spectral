@@ -42,7 +42,7 @@ struct integrate { // func(x) over [0,1]
 using namespace std;
 
 template <typename F>
-double go(integrate<F> &I, double eps=1.e-6) {
+double go(integrate<F> &I, double eps=1.e-4) {
   const int iMax=10; // max number of iterations
   double res, old;
   for (int i=0;i<iMax;i++) {
@@ -55,27 +55,29 @@ double go(integrate<F> &I, double eps=1.e-6) {
   }
   return 0.;
 }
-
+/*
 // for 2D integration
+template <typename F>
 struct inner {
   double _x;
-  double (*func)(double,double);
-  double operator ()(double y) { return func(_x,y); }
+  F *func;
+  double operator ()(double y) { return (*func)(_x,y); }
 };
 
+template <typename F>
 struct outer {
-  inner f2;
+  inner<F> f2;
   double operator ()(double x) {
     f2._x = x;
-    integrate<inner> I(f2);
+    integrate<inner<F>> I(f2);
     return go(I);
   }
 };
 
 template <typename F>
-double integrate_2d(F _func) {
-  outer f1;
+double integrate_2d(F *_func) {
+  outer<F> f1;
   f1.f2.func = _func;
-  integrate<outer> I(f1);
+  integrate<outer<F>> I(f1);
   return go(I);
-}
+}*/

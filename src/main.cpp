@@ -23,11 +23,11 @@ int main() {
   Master *rho;
   rho = _11100(0,0,s);
   //Print_k0(rho,.004);
-  //Print_k0(rho,.1);
-  //Print_k0(rho,1.);
-  //Print_k0(rho,10.);
+  Print_k0(rho,.1);
+  Print_k0(rho,1.);
+  Print_k0(rho,10.);
   //cout << k0 << ", " << k << endl;
-  cout << (*rho)(1.1,1.) << endl;
+  //cout << (*rho)(1.1,1.) << endl;
 }
 
 void config(Master *rho) {
@@ -45,7 +45,7 @@ void config(Master *rho) {
 int Print_k0(Master *rho, double k_curr) {
   int N_k0;
   double res, s, k0_min, k0_max;
-  char *prefix=(char*)"out/data/diagram3_+-+_10";
+  char *prefix=(char*)"out/data/diagram4_+++_00";
   char  suffix[20];
   char  filename[50];
 
@@ -62,8 +62,8 @@ int Print_k0(Master *rho, double k_curr) {
   fout.open(filename);
 
   // Here are some parameters that can be changed:
-  N_k0=1000; 
-  k0_min=1e-2;
+  N_k0=20; 
+  k0_min=k+1e-2;
   k0_max=1e2;
   // don't change anything after that.
 
@@ -72,7 +72,9 @@ int Print_k0(Master *rho, double k_curr) {
 
   for (int i=0;i<N_k0;i++) { 
     //percentage=(float)i/((float)N_k0);
-    fout << k0 << "    " << (*rho)(k0,k)*K2 << endl;
+    res = (*rho)(k0,k);
+    cout << k0 << "    " << res << endl;
+    fout << k0 << "    " << res << endl;
     k0*=s; 
   }
   cout << "Saved to file [" << filename << "]" << endl;

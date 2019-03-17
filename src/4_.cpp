@@ -12,53 +12,40 @@ double W_iv(double p, double q) {
 }
 
 /*--------------------------------------------------------------------*/
-struct region {
-  Master *R;
-  int _s[3]={(R->s)[0],(R->s)[1],(R->s)[2]};
-  int _m = R->m;
-  int _n = R->n;
-  virtual double func(double,double) = 0;
-  double operator ()(double x,double y) {return func(x,y);};
-};
-
-template<typename F>
-Finite<F> make(F f,double a, double b) {
-  return Finite<F>(f,a,b);
-}
-
-template<typename F>
-SemiInf<F> make(F f,double a) {
-  return SemiInf<F>(f,a);
-}
-/*
-struct above_LC_1A : region {
-  double func(double x, double y) {
-  return make([&](double p, double pd) { 
-  return make([&](double q, double qd) {
-      double pqr[3] = {p,q,k0-p-q};
-      return W_iv(p,q)*fff(pqr,_m,_n,_s);
-  },//  q_min,  q_max
-        kp-p,   p     )(y);
-  },//  p_min,  p_max
-        .5*kp,  km    )(x);
-  };
-};*/
 
 struct rho11100 : Master {
   double eval();
-  double above_LC_1A(double,double);
-  //double above_LC_2A(double,double);
+  double integrand(double,double); // supported on [0,1]x[0,1]
+
+  struct inner {
+    rho11100 *R;
+    double _x; // x-dependence "stands by"
+    double operator ()(double y) { return (R->integrand)(_x,y); }
+  };
+  struct outer {
+    inner f2;
+    double operator ()(double x) {
+      f2._x = x;
+      integrate<inner> I(f2); // do the y-integral
+      return go(I);
+    };
+  };
+  double quad() {
+    outer f1;
+    f1.f2.R = this;
+    integrate<outer> I(f1); // do the x-integral
+    return go(I)-K2/8.;
+  }
 
   rho11100(int _m, int _n, int _s[3]) : Master(_m,_n,_s) {
-    //reg = new above_LC_1A();
-    //(*reg).R = this;
-    //above_LC_1A.R = this;
   }
 };
 // function for MAIN
 Master* _11100(int m, int n, int s[3]) {
   Master *R =  new rho11100(m,n,s); return R;
 }
+
+/*--------------------------------------------------------------------*/
 
 double rho11100::eval() {
   double res=0.;
@@ -69,25 +56,45 @@ double rho11100::eval() {
   //return -res*.25*pow(OOFP,3);
   //res += integrate_2d(i);
   //prt = above_LC_1A;
-  //res += integrate_2d(above_LC_1A);
-  //res += above_LC_1A(.4,.3);
+  res += quad();
+  //res += quad((*reg).func);
+  //res += (*reg).func(.4,.3);
+  //res += (double)reg.mm;
   //res += above_LC_2A(.2,.04);
   //res += above_LC_1A(.4,.3);
+  //res += (*reg)();
   return res;
 }
 
 
-double rho11100::above_LC_1A(double x, double y) 
+double rho11100::integrand(double x, double y) 
 {
   int _s[3]={(this->s)[0],(this->s)[1],(this->s)[2]};
   int _m = this->m;
   int _n = this->n;
-  return make([&](double p, double pd) { 
-  return make([&](double q, double qd) {
-      double pqr[3] = {p,q,k0-p-q};
+  double res=0.; 
+  /*res+=
+   make([&](double p, double pd) { return make([&](double q, double qd) {
+      double r = k0-p-q; r= (fabs(r)<min(k,fabs(km))*1e-2) ? qd : r;
+      double pqr[3] = {p,q,r};
       return W_iv(p,q)*fff(pqr,_m,_n,_s);
-  },//  q_min,  q_max
-        kp-p,   p     )(y);
-  },//  p_min,  p_max
-        .5*kp,  km    )(x);
+  },  max(0.,km-p), km  )(y); },  0.,kp    )(x);
+  res+=
+   make([&](double q, double qd) { return make([&](double p, double pd) {
+      double r = k0-p-q; r= (fabs(r)<min(k,fabs(km))*1e-2) ? qd : r;
+      double pqr[3] = {p,q,r};
+      return W_iv(p,q)*fff(pqr,_m,_n,_s);
+  },  km-q,   kp     )(y); }, 0.,  km    )(x);*/
+  /*res+=
+   make([&](double q, double qd) { return make([&](double p, double pd) {
+      q= (fabs(q)<k*1e-2) ? pd : q;
+      double pqr[3] = {p,q,k0-p-q};
+      return 3.*W_iv(p,q)*fff(pqr,_m,_n,_s);
+  },  km, kp-q     )(y); }, -k0, .0    )(x);*/
+  res+=
+   make([&](double q, double qd) { return make([&](double p, double pd) {
+      double pqr[3] = {p,q,k0-p-q};
+      return 3.*W_iv(p,q)*fff(pqr,_m,_n,_s);
+  },  km, kp-q     )(y); }, -km,km    )(x);
+  return res;
 }
