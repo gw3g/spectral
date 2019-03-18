@@ -42,14 +42,14 @@ struct integrate { // func(x) over [0,1]
 using namespace std;
 
 template <typename F>
-double go(integrate<F> &I, double eps=1.e-4) {
+double go(integrate<F> &I, double eps=1.e-2) {
   const int iMax=10; // max number of iterations
   double res, old;
   for (int i=0;i<iMax;i++) {
     res = I.next(); //cout << "Step: " << i << "  \
           Result = "<< res << endl;
     if (i>5)
-      if (abs(res-old)<eps*abs(old)||(res<1e-7&&old<1e-7))
+      if (abs(res-old)<eps||(res<1e-7&&old<1e-7))
         return res;
     old=res;
   }

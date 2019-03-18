@@ -7,7 +7,7 @@
 //
 //
 struct map {
-  double a, b, tmax=4.;
+  double a, b, tmax=3.6;
   virtual double operator ()(double t) = 0; // t is the new var
 };
 

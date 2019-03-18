@@ -40,13 +40,13 @@ double I(int n, int s_) {
   return res;
 }
 
-double fff(double pqr[3], int m, int n, int s[3]) {
+double fff(double p, double q, double r, int m, int n, int s[3]) {
   /*
    * [gain - loss] term, collected into
    * one factor via detailed balance.
    *
    */
-  double p=pqr[0], q=pqr[1], r=pqr[2], res;
+  double res;
   double fp=f(p,s[0]), fq=f(q,s[1]), fr= f(r,s[2]);
   //res = 1. + fp + fq + fr + fp*fr + fq*fr + fp*fq;
   res = ( ((double) s[0]*s[1]*s[2])*exp(k0)-1. )*fp*fq*fr;

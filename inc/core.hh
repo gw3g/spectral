@@ -7,7 +7,9 @@
 double  f(double,int),
        fb(double,int);
 double I(int,int); // tadpole
-double fff(double *, int , int , int *);
+double fff(double , double, double, int , int , int *);
+
+void print_integrand(int m, int n, int s[3]);
 
 /*--------------------------------------------------------------------*/
 
