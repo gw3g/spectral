@@ -56,7 +56,7 @@ struct rho11111 : Master {
     outer f1;
     f1.f2.R = this;
     integrate<outer> I(f1); // do the x-integral
-    res += go(I) + ( (k0>k) ? -K2/8. : 0. );
+    res += go(I);
     return res*pow(OOFP,3);
   }
 
@@ -78,12 +78,78 @@ double rho11111::integrand(double x, double y) {
   //double pqr[3];
   if (k0>k) {
 
-  res+=
+  res+= // 1A
+   make([&](double p, double pd) { return make([&](double q, double qd) {
+         double temp = 0.;
+         if (k0>3.*k) {
+          temp +=  W_vi(p,q)*fff(p,q,k0-p-q,_m,_n,_s);
+          temp +=  W_vi(q,p)*fff(q,p,k0-p-q,_m,_n,_s);
+          } 
+          return temp;
+  },  kp-p, p  )(y); },  .5*kp, km    )(x);
+
+  res+= // 1B,  pq := p-q, TODO
+   make([&](double r, double rd) { return make([&](double pq, double pqd) {
+      double temp = 0.;
+      double p = .5*(pq-r+k0), q = .5*(-pq-r+k0);
+      //temp += W_vi(p,q)*fff(p,q,r,_m,_n,_s);
+      //temp += W_vi(q,p)*fff(q,p,r,_m,_n,_s);
+      return .5*temp;
+  },  0., 2.*km-k0+r )(y); }, k0-min(kp,2.*km),kp    )(x); 
+
+  res+= // 1D, TODO
+   make([&](double p, double pd) { return make([&](double q, double qd) {
+         return 0.;
+  },  kp-p, km  )(y); },  max(k,km), kp    )(x);
+
+  res+= // 2A
+   make([&](double p, double pd) { return make([&](double q, double qd) {
+      double temp = 0.;
+      temp += W_vi(p,q)*fff(p,q,k0-p-q,_m,_n,_s);
+      temp += W_vi(q,p)*fff(q,p,k0-p-q,_m,_n,_s);
+      return temp;
+  },  km-p  )(y); },  kp )(x);
+
+  /*res+= // 2A, not necessary to split ?
+   make([&](double p, double pd) { return make([&](double q, double qd) {
+      double temp = 0.;
+      temp += W_vi(p,q)*fff(p,q,k0-p-q,_m,_n,_s);
+      temp += W_vi(q,p)*fff(q,p,k0-p-q,_m,_n,_s);
+      return temp;
+  },  km-p  )(y); },  kp+km  )(x);*/
+
+  res+= // 2C
+   make([&](double p, double pd) { return make([&](double q, double qd) {
+      double temp = 0.;
+      temp += W_vi(p,q)*fff(p,q,k0-p-q,_m,_n,_s);
+      temp += W_vi(q,p)*fff(q,p,k0-p-q,_m,_n,_s);
+      return temp;
+  },  km-p  )(y); },  km,kp )(x);
+
+  ///
+  res+= // 4A?
    make([&](double p, double pd) { return make([&](double q, double qd) {
       return W_vi(p,q)*fff(p,q,k0-p-q,_m,_n,_s);
   },  kp  )(y); },  kp    )(x);
 
+  res+= // 4B?
+   make([&](double p, double pd) { return make([&](double q, double qd) {
+      double temp = 0.;
+      temp += W_vi(p,q)*fff(p,q,k0-p-q,_m,_n,_s);
+      temp += W_vi(q,p)*fff(q,p,k0-p-q,_m,_n,_s);
+      return temp;
+  },  km,kp  )(y); },  kp    )(x);
+
+  res+=
+   make([&](double p, double pd) { return make([&](double q, double qd) {
+      double temp = 0.;
+      temp += W_vi(p,q)*fff(p,q,k0-p-q,_m,_n,_s);
+      temp += W_vi(q,p)*fff(q,p,k0-p-q,_m,_n,_s);
+      return temp;
+  },  kp,km-p  )(y); },  -k    )(x);
+
   } else {
     res += 0.;
   }
+  return res;
 }
