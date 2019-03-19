@@ -10,7 +10,7 @@
 #include <cstring>
 #include <cmath>
 double k0, k;
-int s[] = {1,-1,1};
+int s[] = {-1,-1,-1};
 
 using namespace std;
 
@@ -25,10 +25,10 @@ int main() {
 
   //k0 = 50.1; k = 10.0;
   //print_integrand(0,0,s);
-  //Print_k0(rho,.004);
+  Print_k0(rho,.004);
   Print_k0(rho,.1);
-  //Print_k0(rho,1.);
-  //Print_k0(rho,10.);
+  Print_k0(rho,1.);
+  Print_k0(rho,10.);
   //cout << k0 << ", " << k << endl;
   //cout << (rho->integrand)(1.1,1.) << endl;
 }
@@ -48,7 +48,7 @@ void config(Master *rho) {
 int Print_k0(Master *rho, double k_curr) {
   int N_k0;
   double res, s, k0_min, k0_max;
-  char *prefix=(char*)"out/data/diagram4_+++_00";
+  char *prefix=(char*)"out/data/diagram4_---_00";
   char  suffix[20];
   char  filename[50];
 

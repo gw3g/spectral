@@ -8,13 +8,11 @@ double W_iv(double p, double q) {
   double r=k0-p-q;
   return (  fabs(p-kp)-fabs(p-km)+
             fabs(q-kp)-fabs(q-km)+
-            fabs(r-kp)-fabs(r-km)-min(k0,k) )/(2.*k);
-}
+            fabs(r-kp)-fabs(r-km)-min(k0,k) )/(2.*k); }
 
 /*--------------------------------------------------------------------*/
 
 struct rho11100 : Master {
-  double eval();
   double integrand(double,double); // supported on [0,1]x[0,1]
 
   struct inner {
@@ -30,7 +28,7 @@ struct rho11100 : Master {
       return go(I);
     };
   };
-  double quad() {
+  double eval() {
     double res;
     outer f1;
     f1.f2.R = this;
@@ -38,8 +36,7 @@ struct rho11100 : Master {
     res += go(I) + ( (k0>k) ? -K2/8. : 0. );
     return res*pow(OOFP,3);
   }
-
-  rho11100(int _m, int _n, int _s[3]) : Master(_m,_n,_s) {
+rho11100(int _m, int _n, int _s[3]) : Master(_m,_n,_s) {
   }
 };
 // function for MAIN
@@ -66,26 +63,6 @@ void print_integrand(int m, int n, int s[3]) {
 }
 
 /*--------------------------------------------------------------------*/
-
-double rho11100::eval() {
-  double res=0.;
-  //double p = 1.9, q= 1.3;
-  //double pqr[3] = {p,q,k0-p-q};
-  //int cut[3] = {s[0],s[1],s[2]};
-  //res += fff(pqr,m,n,cut);
-  //return -res*.25*pow(OOFP,3);
-  //res += integrate_2d(i);
-  //prt = above_LC_1A;
-  res += quad();
-  //res += quad((*reg).func);
-  //res += (*reg).func(.4,.3);
-  //res += (double)reg.mm;
-  //res += above_LC_2A(.2,.04);
-  //res += above_LC_1A(.4,.3);
-  //res += (*reg)();
-  return res;
-}
-
 
 double rho11100::integrand(double x, double y) 
 {
