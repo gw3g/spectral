@@ -75,10 +75,10 @@ double rho11111::integrand(double x, double y) {
   int _m = this->m;
   int _n = this->n;
   double res=0.; 
-  //double pqr[3];
+
   if (k0>k) {
 
-  res+= // 1A
+  res += // 1A
    make([&](double p, double pd) { return make([&](double q, double qd) {
          double temp = 0.;
          if (k0>3.*k) {
@@ -86,16 +86,17 @@ double rho11111::integrand(double x, double y) {
           temp +=  W_vi(q,p)*fff(q,p,k0-p-q,_m,_n,_s);
           } 
           return temp;
-  },  kp-p, p  )(y); },  .5*kp, km    )(x);
+  },  kp-p, p  )(y); },  .5*kp, km    )(x);//*/
 
-  res+= // 1B,  pq := p-q, TODO
-   make([&](double r, double rd) { return make([&](double pq, double pqd) {
+  res += // 1B
+   make([&](double q, double qd) { return make([&](double p, double pd) {
       double temp = 0.;
-      double p = .5*(pq-r+k0), q = .5*(-pq-r+k0);
-      //temp += W_vi(p,q)*fff(p,q,r,_m,_n,_s);
-      //temp += W_vi(q,p)*fff(q,p,r,_m,_n,_s);
-      return .5*temp;
-  },  0., 2.*km-k0+r )(y); }, k0-min(kp,2.*km),kp    )(x); 
+      double pm = km-p, qm = km-q;
+      if (pm<1e-1*( min(km,kp-q)-max(km-q,q) )) { pm = pd; }
+      temp += lga(p*q/(kp*qm))*fff(p,q,k0-p-q,_m,_n,_s)/(k0-p-q);
+      temp += lga(p*q/(kp*qm))*fff(q,p,k0-p-q,_m,_n,_s)/(k0-p-q);
+      return temp;
+  },  max(km-q,q), min(km,kp-q) )(y); }, 0.,min(km,.5*kp)   )(x);//*/
 
   res+= // 1D, TODO
    make([&](double p, double pd) { return make([&](double q, double qd) {
@@ -104,49 +105,54 @@ double rho11111::integrand(double x, double y) {
 
   res+= // 2A
    make([&](double p, double pd) { return make([&](double q, double qd) {
-      double temp = 0.;
-      temp += W_vi(p,q)*fff(p,q,k0-p-q,_m,_n,_s);
-      temp += W_vi(q,p)*fff(q,p,k0-p-q,_m,_n,_s);
+      double temp = 0., r = k0-p-q;
+      temp += W_vi(p,q)*fff(p,q,r,_m,_n,_s)/r;
+      temp += W_vi(q,p)*fff(q,p,r,_m,_n,_s)/r;
       return temp;
-  },  km-p  )(y); },  kp )(x);
+  },  km-p  )(y); },  kp )(x); //*/
 
-  /*res+= // 2A, not necessary to split ?
+  res+= // 2B
+   make([&](double p, double pd) { return make([&](double q, double qd) {
+      double temp = 0., r = k0-p-q;
+      double pp = kp-p, qp = kp-q;
+      if (qp<1e-1*k) { qp = pd; }
+      //temp += W_vi(p,q)*fff(p,q,r,_m,_n,_s)/r;
+      //temp += W_vi(q,p)*fff(q,p,r,_m,_n,_s)/r;
+      temp += lga(p*q/(pp*qp))*fff(p,q,r,_m,_n,_s)/r;
+      temp += lga(p*q/(pp*qp))*fff(q,p,r,_m,_n,_s)/r;
+      return temp;
+  },  km-p,kp-p  )(y); },  kp )(x); //*
+
+
+  /*res+= // 2C
+   make([&](double p, double pd) { return make([&](double q, double qd) {
+      double temp = 0., r = k0-p-q;
+      temp += W_vi(p,q)*fff(p,q,r,_m,_n,_s)/r;
+      temp += W_vi(q,p)*fff(q,p,r,_m,_n,_s)/r;
+      return temp;
+  },  km-p  )(y); },  km,kp )(x); //*/
+
+  res+= // 4A
+   make([&](double p, double pd) { return make([&](double q, double qd) {
+      double r = k0-p-q;
+      return W_vi(p,q)*fff(p,q,r,_m,_n,_s)/r;
+  },  kp  )(y); },  kp    )(x); //*/
+
+  /*res+= // 4B?
+   make([&](double p, double pd) { return make([&](double q, double qd) {
+      double temp = 0., r = k0-p-q;
+      temp += W_vi(p,q)*fff(p,q,r,_m,_n,_s)/r;
+      temp += W_vi(q,p)*fff(q,p,r,_m,_n,_s)/r;
+      return temp;
+  },  km,kp  )(y); },  kp    )(x); //*/
+
+  /*res+=
    make([&](double p, double pd) { return make([&](double q, double qd) {
       double temp = 0.;
       temp += W_vi(p,q)*fff(p,q,k0-p-q,_m,_n,_s);
       temp += W_vi(q,p)*fff(q,p,k0-p-q,_m,_n,_s);
       return temp;
-  },  km-p  )(y); },  kp+km  )(x);*/
-
-  res+= // 2C
-   make([&](double p, double pd) { return make([&](double q, double qd) {
-      double temp = 0.;
-      temp += W_vi(p,q)*fff(p,q,k0-p-q,_m,_n,_s);
-      temp += W_vi(q,p)*fff(q,p,k0-p-q,_m,_n,_s);
-      return temp;
-  },  km-p  )(y); },  km,kp )(x);
-
-  ///
-  res+= // 4A?
-   make([&](double p, double pd) { return make([&](double q, double qd) {
-      return W_vi(p,q)*fff(p,q,k0-p-q,_m,_n,_s);
-  },  kp  )(y); },  kp    )(x);
-
-  res+= // 4B?
-   make([&](double p, double pd) { return make([&](double q, double qd) {
-      double temp = 0.;
-      temp += W_vi(p,q)*fff(p,q,k0-p-q,_m,_n,_s);
-      temp += W_vi(q,p)*fff(q,p,k0-p-q,_m,_n,_s);
-      return temp;
-  },  km,kp  )(y); },  kp    )(x);
-
-  res+=
-   make([&](double p, double pd) { return make([&](double q, double qd) {
-      double temp = 0.;
-      temp += W_vi(p,q)*fff(p,q,k0-p-q,_m,_n,_s);
-      temp += W_vi(q,p)*fff(q,p,k0-p-q,_m,_n,_s);
-      return temp;
-  },  kp,km-p  )(y); },  -k    )(x);
+  },  kp,km-p  )(y); },  -k    )(x);*/
 
   } else {
     res += 0.;

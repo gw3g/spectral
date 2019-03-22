@@ -66,7 +66,7 @@ int Print_k0(Master *rho, double k_curr) {
 
   // Here are some parameters that can be changed:
   N_k0=100; 
-  k0_min=1e-2;
+  k0_min=k+1e-2;
   k0_max=1e2;
   // don't change anything after that.
 
