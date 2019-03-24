@@ -44,7 +44,7 @@ Master* _11100(int m, int n, int s[3]) {
   Master *R =  new rho11100(m,n,s); return R;
 }
 
-#include <fstream>
+/*#include <fstream>
 using namespace std;
 void print_integrand(int m, int n, int s[3]) {
   ofstream fout;
@@ -60,7 +60,7 @@ void print_integrand(int m, int n, int s[3]) {
       fout << x << "    " << y << "    " << (  (R->integrand)(x,y)  ) << endl; }
   }
   fout.close(); 
-}
+}//*/
 
 /*--------------------------------------------------------------------*/
 

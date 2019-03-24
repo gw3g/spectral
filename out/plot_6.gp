@@ -3,7 +3,7 @@ r0= 64*pi
 set xl 'k0/T'
 set yl "64 {/Symbol p} K^2 x {/Symbol r}/T^2"
 
-set yr [-200.1:200.1]
+set yr [-10.1:1.1]
 set xr [.005:140]
 set log x
 

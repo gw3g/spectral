@@ -40,6 +40,12 @@ double I(int n, int s_) {
   return res;
 }
 
+double ff(double p, double l, int s1, int s4) {
+  int s0=s1*s4;
+  double fp=f(p,s1), fl=f(l,s4), f0=f(p+l,s0);
+  return ((double)s0)*fp*fl/f0;
+}
+
 double fff(double p, double q, double r, int m, int n, int s[3]) {
   /*
    * [gain - loss] term, collected into
