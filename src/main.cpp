@@ -23,19 +23,19 @@ int main() {
   Master *rho;
   rho = _11111(0,0,s);
 
-  //k0 = 30.1; k = 1.0;
+  //k0 = 60.5; k = 1.0;
   //print_integrand(0,0,s);
   //Print_k0(rho,.004);
   //Print_k0(rho,.1);
   Print_k0(rho,1.);
-  Print_k0(rho,10.);
+  //Print_k0(rho,10.);
   //cout << k0 << ", " << k << endl;
 }
 
 void config(Master *rho) {
   // a small function: prints m,n,etc
-  cout << "m=" << rho->m << endl;
-  cout << "n=" << rho->m << endl;
+  cout << "m =" << rho->m << endl;
+  cout << "n =" << rho->m << endl;
   cout << "s0=" << rho->s[0] << 
       " ,  s1=" << rho->s[1] <<
       " ,  s2=" << rho->s[2] <<
@@ -65,7 +65,7 @@ int Print_k0(Master *rho, double k_curr) {
 
   // Here are some parameters that can be changed:
   N_k0=50; 
-  k0_min=k+1e-2;
+  k0_min=5e1;
   k0_max=1e2;
   // don't change anything after that.
 
