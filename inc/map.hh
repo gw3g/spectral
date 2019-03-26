@@ -7,7 +7,7 @@
 //
 //
 struct map {
-  double a, b, tmax=3.;
+  double a, b, tmax=3.5;
   virtual double operator ()(double t) = 0; // t is the new var
 };
 
@@ -33,11 +33,11 @@ struct SemiInf : map {
   //double a, tmax=4.;
   F funk;
   double operator ()(double t) {
-    //double dxdt, del = a*exp(2.*sinh(((1.-2.*t)*tmax)));
-    //dxdt = tmax*4.*del*cosh(((1.-2.*t)*tmax));
-    double tt = (1.-2.*t)*tmax;
-    double dxdt, del = a*exp( tt - exp( -tt ) );
-    dxdt = tmax*2.*del*(1.+exp(-tt));
+    double dxdt, del = a*exp(2.*sinh(((1.-2.*t)*tmax)));
+    dxdt = tmax*4.*del*cosh(((1.-2.*t)*tmax));
+    //double tt = (1.-2.*t)*tmax;
+    //double dxdt, del = a*exp( tt - exp( -tt ) );
+    //dxdt = tmax*2.*del*(1.+exp(-tt));
     return funk(a+del,del)*fabs(dxdt);
   }
   SemiInf(F _func, double _a) :

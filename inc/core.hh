@@ -3,6 +3,12 @@
 #define clp(x,a,b) max(a,min(b,x))
 #define OOFP 0.0795774715459476678844418816863
 
+template<typename T>
+inline T SQR(const T x) {return x*x;}
+
+template<typename T>
+inline T CUBE(const T x) {return x*SQR(x);}
+
 // thermal distribution functions
 double  f(double,int),
        fb(double,int);
