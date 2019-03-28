@@ -7,13 +7,14 @@
 //
 //
 struct map {
-  double a, b, tmax=3.5;
+  double a, b;//, tmax;
   virtual double operator ()(double t) = 0; // t is the new var
 };
 
 template <typename F>
 struct Finite : map {
   //double a, b, tmax=4.;
+  double tmax = 3.7;
   F funk;
   double operator ()(double t) {
     double dxdt, del, Q = exp(-2.*sinh(t*tmax));
@@ -31,14 +32,24 @@ struct Finite : map {
 template <typename F>
 struct SemiInf : map {
   //double a, tmax=4.;
+  double tmax = 4.;
   F funk;
   double operator ()(double t) {
-    double dxdt, del = a*exp(2.*sinh(((1.-2.*t)*tmax)));
-    dxdt = tmax*4.*del*cosh(((1.-2.*t)*tmax));
+    //double dxdt, del = a*exp(2.*sinh(((1.-2.*t)*tmax)));
+    //dxdt = tmax*4.*del*cosh(((1.-2.*t)*tmax));
     //double tt = (1.-2.*t)*tmax;
     //double dxdt, del = a*exp( tt - exp( -tt ) );
-    //dxdt = tmax*2.*del*(1.+exp(-tt));
-    return funk(a+del,del)*fabs(dxdt);
+    //dxdt = -tmax*2.*del*(1.+exp(-tt));
+    //return funk(a+del,del)*fabs(dxdt);
+    
+    double dxdt, 
+           del1 = a*exp(2.*sinh((+t*tmax))),
+           del2 = a*exp(2.*sinh((-t*tmax)));
+    dxdt = tmax*2.*cosh((t*tmax));
+    return 
+       ( funk(a+del1,del1)*fabs(del1)
+      + funk(a+del2,del2)*fabs(del2)
+      )*fabs(dxdt);
   }
   SemiInf(F _func, double _a) :
     funk(_func) { a=_a; }

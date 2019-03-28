@@ -88,9 +88,7 @@ double rho11100::integrand(double x, double y)
       double temp = 0.;
       temp += W_iv(p,q)*fff(p,q,k0-p-q,_m,_n,_s);
       temp += W_iv(q,p)*fff(q,p,k0-p-q,_m,_n,_s);
-      return temp;
-  },  km, kp-q     )(y); }, -k0, .0    )(x);
-
+      return temp; },  km, kp-q     )(y); }, -k0, .0    )(x); 
   res+=
    make([&](double q, double qd) { return make([&](double p, double pd) {
       double temp = 0.;

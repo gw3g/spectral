@@ -10,7 +10,7 @@
 #include <cstring>
 #include <cmath>
 double k0, k;
-int s[] = {1,1,1};
+int s[] = {+1,+1,+1};
 
 using namespace std;
 
@@ -23,12 +23,12 @@ int main() {
   Master *rho;
   rho = _11111(0,0,s);
 
-  //k0 = 60.5; k = 1.0;
+  //k0 = 10.1; k = 10.;
   //print_integrand(0,0,s);
   //Print_k0(rho,.004);
   //Print_k0(rho,.1);
-  Print_k0(rho,1.);
-  //Print_k0(rho,10.);
+  //Print_k0(rho,1.);
+  Print_k0(rho,10.);
   //cout << k0 << ", " << k << endl;
 }
 
@@ -64,8 +64,8 @@ int Print_k0(Master *rho, double k_curr) {
   fout.open(filename);
 
   // Here are some parameters that can be changed:
-  N_k0=50; 
-  k0_min=5e1;
+  N_k0=100; 
+  k0_min=k+1e-2;
   k0_max=1e2;
   // don't change anything after that.
 
