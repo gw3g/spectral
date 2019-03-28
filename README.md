@@ -23,6 +23,8 @@ To get the value of the function, one can simply call:
 
 * type 4,5,6
 * include OPE in masters
-* 2D integrator
+* 2D integrator {Trapezoidal,GSL Gauss-Konrad}
+* organise include files better
+* cuda implementation for high accuracy?
 
 Remarks: should I be using Finite(F &func, a, b) in map.hh?
