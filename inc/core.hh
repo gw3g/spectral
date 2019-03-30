@@ -1,3 +1,7 @@
+#include <cmath>
+#include <iostream>
+using namespace std;
+
 #define sgn(x) (double) ((x>0)-(x<0))
 #define lga(x) log(fabs(x))
 #define clp(x,a,b) max(a,min(b,x))
@@ -12,11 +16,12 @@ inline T CUBE(const T x) {return x*SQR(x);}
 // thermal distribution functions
 double  f(double,int),
        fb(double,int);
+
 double I(int,int); // tadpole
 double ff(double , double, int , int);
 double fff(double , double, double, int , int , int *);
 
-void print_integrand(int m, int n, int s[3]);
+void print_integrand(int m, int n, int s[3]); // for checking
 
 /*--------------------------------------------------------------------*/
 

@@ -1,6 +1,9 @@
-#include "trapezoid.hh"
 #include "core.hh"
+#include "quad.hh"
+//#include "trapezoid.hh"
 #include "map.hh"
+
+using namespace std;
 
 //W_VI
 double W_vi(double p, double q) {
@@ -329,10 +332,10 @@ double rho11111::integrand(double x, double y) {
       double qm = km-q, qp = kp-q;
       double pm = km-p, pp = kp-p;
       double h = 2.*fabs(k-pq);
-      qm = (fabs(qm)<1e-1*h) ? rd/2. : qm;
-      pm = (fabs(pm)<1e-1*h) ? rd/2. : pm;
-      qp = (fabs(qp)<1e-1*h) ? rd/2. : qp;
-      pp = (fabs(pp)<1e-1*h) ? rd/2. : pp;
+      //qm = (fabs(qm)<1e-1*h) ? rd/2. : qm;
+      //pm = (fabs(pm)<1e-1*h) ? rd/2. : pm;
+      //qp = (fabs(qp)<1e-1*h) ? rd/2. : qp;
+      //pp = (fabs(pp)<1e-1*h) ? rd/2. : pp;
 
       temp += F_14(p,k0-p)*(.5+f(q,s2))*lga( qm*qp/(q*q) );
       temp += F_14(q,k0-q)*(.5+f(p,s2))*lga( pm*pp/(p*p) );
@@ -347,10 +350,10 @@ double rho11111::integrand(double x, double y) {
       double pm = km-p, pp = kp-p;
       double h = fabs( min(k,km)-fabs(pq-k) );
 
-      pp = (fabs(pp)<1e-1*h) ? rd/2. : pp;
-      qm = (fabs(qm)<1e-1*h) ? rd/2. : qm;
-      pm = (fabs(pm)<1e-1*h) ? rd/2. : pm;
-      qp = (fabs(qp)<1e-1*h) ? rd/2. : qp;
+      //pp = (fabs(pp)<1e-1*h) ? rd/2. : pp;
+      //qm = (fabs(qm)<1e-1*h) ? rd/2. : qm;
+      //pm = (fabs(pm)<1e-1*h) ? rd/2. : pm;
+      //qp = (fabs(qp)<1e-1*h) ? rd/2. : qp;
 
       temp += lga( pp*qp/(q*p) )*( F_123(p,q,r) + F_123(q,p,r) );
       temp += 4.*lga( q*(k0-q)/(qp*qm) )*F_14(p,k0-p)*(.5+f(r,s3)); // virtual

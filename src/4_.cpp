@@ -1,5 +1,5 @@
-
 #include "core.hh"
+//#include "quad.hh"
 #include "trapezoid.hh"
 #include "map.hh"
 
@@ -29,12 +29,31 @@ struct rho11100 : Master {
     };
   };
   double eval() {
-    double res;
+    double res, err;
     outer f1;
     f1.f2.R = this;
-    integrate<outer> I(f1); // do the x-integral
-    res += go(I) + ( (k0>k) ? -K2/8. : 0. );
-    return res*pow(OOFP,3);
+   integrate<outer> I(f1); // do the x-integral
+    res = go(I) + ( (k0>k) ? -K2/8. : 0. );
+  /*double epsabs = 1e-3, epsrel = 0;
+size_t limit = 1e5;
+
+  quad wsp1(limit);
+  quad wsp2(limit);
+
+  auto outer = make_gsl_function( [&](double x) {
+    double inner_result, inner_abserr;
+    auto inner = make_gsl_function( [&](double y) {
+        return (this->integrand)(x,y);
+        } );
+    gsl_integration_qag(inner, .0,1., epsabs, epsrel, 
+                         limit, 6, wsp1, &inner_result, &inner_abserr );
+    return inner_result;
+  } );
+  gsl_integration_qag(  outer, .0,1., epsabs, epsrel, 
+                         limit, 6, wsp2, &res, &err  );
+
+    return (( res + ( (k0>k) ? -K2/8. : 0. ) ))*CUBE(OOFP);*/
+    return (( res ))*CUBE(OOFP);
   }
 rho11100(int _m, int _n, int _s[3]) : Master(_m,_n,_s) {
   }

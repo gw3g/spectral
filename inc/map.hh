@@ -1,10 +1,10 @@
+#include <cmath>
 /*--------------------------------------------------------------------*/
 // implement variable changes:
 //
 //  map_Linear,   [0,1] -> [a,b]
 //  map_Finite,   [0,1] -> [a,b] for endpoint singularities
 //  map_SemiInf,  [0,1] -> [a,+inf] (or [-inf,a] if a<0)
-//
 //
 struct map {
   double a, b;//, tmax;
@@ -14,7 +14,7 @@ struct map {
 template <typename F>
 struct Finite : map {
   //double a, b, tmax=4.;
-  double tmax = 3.7;
+  double tmax = 3.6;
   F funk;
   double operator ()(double t) {
     double dxdt, del, Q = exp(-2.*sinh(t*tmax));
@@ -32,7 +32,7 @@ struct Finite : map {
 template <typename F>
 struct SemiInf : map {
   //double a, tmax=4.;
-  double tmax = 4.;
+  double tmax = 3.8;
   F funk;
   double operator ()(double t) {
     //double dxdt, del = a*exp(2.*sinh(((1.-2.*t)*tmax)));
