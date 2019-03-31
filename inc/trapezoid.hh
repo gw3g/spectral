@@ -41,7 +41,7 @@ struct integrate { // func(x) over [0,1]
 //using namespace std;
 
 template <typename F>
-double go(integrate<F> &I, double eps=1e-2) {
+double go(integrate<F> &I, double eps=1e-1) {
   const int iMax=10; // max number of iterations
   double res, old;
   for (int i=0;i<iMax;i++) {

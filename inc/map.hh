@@ -14,7 +14,7 @@ struct map {
 template <typename F>
 struct Finite : map {
   //double a, b, tmax=4.;
-  double tmax = 3.6;
+  double tmax = 3.2;
   F funk;
   double operator ()(double t) {
     double dxdt, del, Q = exp(-2.*sinh(t*tmax));
@@ -32,7 +32,7 @@ struct Finite : map {
 template <typename F>
 struct SemiInf : map {
   //double a, tmax=4.;
-  double tmax = 3.8;
+  double tmax = 3.5;
   F funk;
   double operator ()(double t) {
     //double dxdt, del = a*exp(2.*sinh(((1.-2.*t)*tmax)));
