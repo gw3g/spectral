@@ -63,7 +63,7 @@ int Print_k0(Master *rho, double k_curr) {
   fout.open(filename);
 
   // Here are some parameters that can be changed:
-  N_k0=10; 
+  N_k0=30; 
   k0_min=k+1e-2;
   k0_max=1e+2;
   // don't change anything after that.
