@@ -22,7 +22,7 @@ int main() {
   Master *rho;
   rho = _11111(0,0,s);
 
-  k0 = 1.1; k = 1.;
+  k0 = 3.1; k = 1.;
   print_integrand(0,0,s);
   //Print_k0(rho,.004);
   //Print_k0(rho,.1);
