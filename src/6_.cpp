@@ -208,7 +208,7 @@ double rho11111::integrand(double x, double y) {
   _1A =
   make([&](double p, double pd) { // [.5kp,km]
        pm = km-p; pp = kp-p;
-       pm = (fabs(pm)<1e-1*fabs(km-.5*kp)) ? pd : pm; // p=km (!)
+       //pm = (fabs(pm)<1e-1*fabs(km-.5*kp)) ? pd : pm; // p=km (!)
        return make([&](double q, double qd) { // [kp-p,p]
           double temp = 0., r=k0-p-q;
           qm = km-q; qp = kp-q;
@@ -216,8 +216,8 @@ double rho11111::integrand(double x, double y) {
             temp +=  lga(pp*qp/(pm*qm))*(
                                           F_123(p,q,r) // 1A[p,q]
                                         + F_123(q,p,r) // 1A[q,p]
-                                        + F_345(p,q,r)
-                                        + F_345(q,p,r)
+                                        + F_345(r,p,q)
+                                        + F_345(r,q,p)
                                         );
           };
           return .5*temp/r;
@@ -233,8 +233,8 @@ double rho11111::integrand(double x, double y) {
           temp += lga(p*q/(pm*qm))*(
                                        F_123(p,q,r) // 1B[p,q]
                                      + F_123(q,p,r) // 1B[q,p]
-                                     + F_345(p,q,r)
-                                     + F_345(q,p,r)
+                                     + F_345(r,p,q)
+                                     + F_345(r,q,p)
                                      );
           return .5*temp/r;
   },  km-p,min(p,kp-p) )(y); }, .5*km,km   )(x);//*/
@@ -280,10 +280,10 @@ double rho11111::integrand(double x, double y) {
         double temp = 0., r = k0-p-q;
         qm = km-q; qp = kp-q;
         temp += lga(pm*qm/(pp*qp))*(
-                                          F_123(p,q,r) // 2A[p,q]
-                                        + F_123(q,p,r) // 2A[q,p]
-                                        + F_345(p,q,r)
-                                        + F_345(q,p,r)
+                                     F_123(p,q,r) // 2A[p,q]
+                                   + F_123(q,p,r) // 2A[q,p]
+                                   + F_345(r,p,q)
+                                   + F_345(r,q,p)
                                    );
         return .5*temp/r;
   },  km-p  )(y); },  kp )(x); //*/
@@ -298,8 +298,8 @@ double rho11111::integrand(double x, double y) {
         temp += lga(p*q/(pp*qp))*(
                                           F_123(p,q,r) // 2B[p,q]
                                         + F_123(q,p,r) // 2B[q,p]
-                                        + F_345(p,q,r)
-                                        + F_345(q,p,r)
+                                        + F_345(r,p,q)
+                                        + F_345(r,q,p)
                                  );
         return .5*temp/r;
   },  km-p,kp-p  )(y); },  kp )(x); //*/
@@ -352,8 +352,8 @@ double rho11111::integrand(double x, double y) {
           temp += lga(pm*qm/(pp*qp))*(
                                        F_123(p,q,r) // 4A[p,q]
                                      + F_123(q,p,r) // 4A[q,p]
-                                     + F_345(p,q,r)
-                                     + F_345(q,p,r)
+                                     + F_345(r,p,q)
+                                     + F_345(r,q,p)
                                      );
           return .5*temp/r;
   },  p  )(y); },  kp    )(x); //*/
@@ -531,6 +531,7 @@ double rho11111::integrand(double x, double y) {
     //return _4D;
   }
 
+  //res += _2A + _2B + _2C + _4A ;
   res += _1A + _1B + _1D + _2A + _2B + _2C + _2D + _4A + _4B + _4D;
 
   } else {
