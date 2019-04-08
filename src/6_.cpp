@@ -334,8 +334,10 @@ double rho11111::integrand(double x, double y) {
           double l=k0-p, p2=p*p, l2=l*l;
           double v=k0-q, q2=q*q, v2=v*v;
           //temp += lga( q_*(k0-q)/(qp*qm) )*(.5+f(r,s3))*( F_14(p,k0-p) + F_25(p,k0-p) );
-          temp += ( pow(q/k0,n) + pow(v/k0,n) )*F_14(p,l)*( (.5+f(r,s3))*lga( q_*v/( qp*qm ) ) ); // 2D[p,q]
-          temp += ( pow(q/k0,m) + pow(v/k0,m) )*F_25(p,l)*( (.5+f(r,s3))*lga( q_*v/( qp*qm ) ) ); // 3D[p,q]
+          temp += ( pow(q/k0,n)*F_14(p,l) + pow(v/k0,n)*F_14(l,p) )*( (.5+f(r,s3))*lga( q_*v/( qp*qm ) ) ); // 2D[p,q]
+          temp += ( pow(q/k0,m)*F_25(p,l) + pow(v/k0,m)*F_25(l,p) )*( (.5+f(r,s3))*lga( q_*v/( qp*qm ) ) ); // 3D[p,q]
+          //temp += ( pow(q/k0,n) + pow(v/k0,n) )*F_14(p,l)*( (.5+f(r,s3))*lga( q_*v/( qp*qm ) ) ); // 2D[p,q]
+          //temp += ( pow(q/k0,m) + pow(v/k0,m) )*F_25(p,l)*( (.5+f(r,s3))*lga( q_*v/( qp*qm ) ) ); // 3D[p,q]
           return .5*temp/r;
   },  km-p, 0.  )(y); },  km,kp    )(x); //*/
 
@@ -391,8 +393,10 @@ double rho11111::integrand(double x, double y) {
             temp += pow(l/k0,n)*F_14(v,q)*( (.5+f(p,s5))*lga( pm*qm/(p*q) ) + (.5+f(r,s3))*lga( qm*l/(pp*q) ) - 0.*(.5+f(l,s5))*lga( pp*qp/(l*v) ) );
             temp += pow(l/k0,m)*F_25(v,q)*( (.5+f(p,s4))*lga( pm*qm/(p*q) ) + (.5+f(r,s3))*lga( qm*l/(pp*q) ) - 0.*(.5+f(l,s4))*lga( pp*qp/(l*v) ) );
 
-            temp += ( pow(l/k0,n) + pow(p/k0,n) )*F_14(v,q)*( (.5+f(r,s3))*lga( l*p/( pp*pm ) ) ); // 2D[v,l]
-            temp += ( pow(l/k0,m) + pow(p/k0,m) )*F_25(v,q)*( (.5+f(r,s3))*lga( l*p/( pp*pm ) ) ); // 3D[l,v]
+            temp += ( pow(l/k0,n)*F_14(v,q) + pow(p/k0,n)*F_14(q,v) )*( (.5+f(r,s3))*lga( l*p/( pp*pm ) ) ); // 2D[v,l]
+            temp += ( pow(l/k0,m)*F_25(v,q) + pow(p/k0,m)*F_25(v,q) )*( (.5+f(r,s3))*lga( l*p/( pp*pm ) ) ); // 3D[l,v]
+            //temp += ( pow(l/k0,n) + pow(p/k0,n) )*F_14(v,q)*( (.5+f(r,s3))*lga( l*p/( pp*pm ) ) ); // 2D[v,l]
+            //temp += ( pow(l/k0,m) + pow(p/k0,m) )*F_25(v,q)*( (.5+f(r,s3))*lga( l*p/( pp*pm ) ) ); // 3D[l,v]
             return .5*temp/r;
     },  k0+km-q,k0  )(y); },  km,kp    )(x);
   //
