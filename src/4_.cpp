@@ -1,6 +1,6 @@
 #include "core.hh"
-//#include "quad.hh"
-#include "trapezoid.hh"
+#include "quad.hh"
+//#include "trapezoid.hh"
 #include "map.hh"
 
 //W_IV
@@ -15,7 +15,7 @@ double W_iv(double p, double q) {
 struct rho11100 : Master {
   double integrand(double,double); // supported on [0,1]x[0,1]
 
-  struct inner {
+  /*struct inner {
     rho11100 *R;
     double _x; // x-dependence "stands by"
     double operator ()(double y) { return (R->integrand)(_x,y); }
@@ -27,14 +27,14 @@ struct rho11100 : Master {
       integrate<inner> I(f2); // do the y-integral
       return go(I);
     };
-  };
+  };//*/
   double eval() {
     double res, err;
-    outer f1;
-    f1.f2.R = this;
-   integrate<outer> I(f1); // do the x-integral
-    res = go(I) + ( (k0>k) ? -K2/8. : 0. );
-  /*double epsabs = 1e-3, epsrel = 0;
+    //outer f1;
+    //f1.f2.R = this;
+   //integrate<outer> I(f1); // do the x-integral
+    //res = go(I) + ( (k0>k) ? -K2/8. : 0. );
+  double epsabs = 1e-2, epsrel = 0;
 size_t limit = 1e5;
 
   quad wsp1(limit);
@@ -45,14 +45,14 @@ size_t limit = 1e5;
     auto inner = make_gsl_function( [&](double y) {
         return (this->integrand)(x,y);
         } );
-    gsl_integration_qag(inner, .0,1., epsabs, epsrel, 
+    gsl_integration_qag(inner, .0+1e-10,1., epsabs, epsrel, 
                          limit, 6, wsp1, &inner_result, &inner_abserr );
     return inner_result;
   } );
-  gsl_integration_qag(  outer, .0,1., epsabs, epsrel, 
+  gsl_integration_qag(  outer, .0+1e-10,1., epsabs, epsrel, 
                          limit, 6, wsp2, &res, &err  );
 
-    return (( res + ( (k0>k) ? -K2/8. : 0. ) ))*CUBE(OOFP);*/
+    return (( res + ( (k0>k) ? -K2/8. : 0. ) ))*CUBE(OOFP);//*/
     return (( res ))*CUBE(OOFP);
   }
 rho11100(int _m, int _n, int _s[3]) : Master(_m,_n,_s) {
@@ -188,5 +188,6 @@ double rho11100::integrand(double x, double y)
 
 
   }
-  return res;
+  if ( isinf(res)||isnan(res) ) { return 0.;}
+  else { return res; }
 }
