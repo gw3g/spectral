@@ -20,11 +20,11 @@ char PM(int i) { if (i<0) return '-'; else return '+'; }
 
 int main() {
   Master *rho;
-  rho = _11111(1,1,s);
+  rho = _11111(0,0,s);
   config(rho);
 
-  //k0 = 3.1; k = 1.;
-  //print_integrand(0,0,s);
+  //k0 = 10.1; k = 1.;
+  //print_integrand(2,0,s);
   //Print_k0(rho,.004);
   //Print_k0(rho,.1);
   Print_k0(rho,1.);
@@ -64,8 +64,8 @@ int Print_k0(Master *rho, double k_curr) {
   fout.open(filename);
 
   // Here are some parameters that can be changed:
-  N_k0=50; 
-  k0_min=3.*k+1e-2;
+  N_k0=100; 
+  k0_min=10.+1e-2;
   k0_max=1e+2;
   // don't change anything after that.
 

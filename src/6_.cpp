@@ -329,7 +329,7 @@ double rho11111::integrand(double x, double y) {
       pm = km-p; pp = kp-p;
       pm = (fabs(pm)<1e-1*k) ? pd : pm; // p=km (!)
       pp = (fabs(pp)<1e-1*k) ? pd : pp; // p=kp (!)
-      return make([&](double q, double qd) { // [km-p,+inf)
+      return make([&](double q, double qd) { // (-inf,km-p]
           double temp = 0., r = k0-p-q;
           qm = km-q; qp = kp-q;
           double l=k0-p, v=k0-q;
@@ -341,6 +341,7 @@ double rho11111::integrand(double x, double y) {
           temp += pow(q/k0,m)*F_25(p,l)*( (.5+f(q,s1))*lga( pm*qm/(p*q) )
                                         + (.5+f(r,s3))*lga( pm*v/(qp*p) )
           // (**)                       - (.5+f(v,s4))*lga( pp*qp/(l*v) )
+                                        //+ K2/(8.*q*q) 
                                         ); // 3C[q,p]
 
           temp += pow(v/k0,n)*F_14(l,p)*( (.5+f(q,s5))*lga( pm*qm/(p*q) )
@@ -348,6 +349,8 @@ double rho11111::integrand(double x, double y) {
                                         ); // from (*)
           temp += pow(v/k0,m)*F_25(l,p)*( (.5+f(q,s4))*lga( pm*qm/(p*q) )
                                         + (.5+f(r,s3))*lga( pm*v/(qp*p) )
+                                        //+ K2/(8.*v*v) 
+          //                              + K2/(8.*v*v) 
                                         ); //      (**)
 
           return .5*temp/r;
