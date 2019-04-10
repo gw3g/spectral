@@ -14,7 +14,7 @@ struct map {
 template <typename F>
 struct Finite : map {
   //double a, b, tmax=4.;
-  double tmax = 3.5;
+  double tmax = 3.2;
   F funk;
   double operator ()(double t) {
     double dxdt, del, Q = exp(-2.*sinh(t*tmax));
@@ -32,7 +32,7 @@ struct Finite : map {
 template <typename F>
 struct SemiInf : map {
   //double a, tmax=4.;
-  double tmax = 3.1;
+  double tmax = 20., tmin = -3.5;
   F funk;
   double operator ()(double t) {
     //double dxdt, del = a*exp(2.*sinh(((1.-2.*t)*tmax)));
@@ -42,14 +42,22 @@ struct SemiInf : map {
     //dxdt = -tmax*2.*del*(1.+exp(-tt));
     //return funk(a+del,del)*fabs(dxdt);
     
-    double dxdt, 
+    /*double dxdt, 
            del1 = a*exp(2.*sinh((+t*tmax))),
            del2 = a*exp(2.*sinh((-t*tmax)));
     dxdt = tmax*2.*cosh((t*tmax));
     return 
        ( funk(a+del1,del1)*fabs(del1)
        + funk(a+del2,del2)*fabs(del2)
-      )*fabs(dxdt);
+      )*fabs(dxdt);//*/
+    
+    double
+           del1 = a*exp( +t*tmax - exp(-t*tmax)),
+           del2 = a*exp( +t*tmin - exp(-t*tmin));
+    return 
+       ( funk(a+del1,del1)*fabs(del1*(1.+exp(-t*tmax)))*tmax
+       + funk(a+del2,del2)*fabs(del2*(1.+exp(-t*tmin)))*fabs(tmin)
+      );
   }
   SemiInf(F _func, double _a) :
     funk(_func) { a=_a; }

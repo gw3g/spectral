@@ -53,7 +53,7 @@ size_t limit = 1e5;
                          limit, 6, wsp2, &res, &err  );
 
     return (( res + ( (k0>k) ? -K2/8. : 0. ) ))*CUBE(OOFP);//*/
-    return (( res ))*CUBE(OOFP);
+    //return (( res ))*CUBE(OOFP);
   }
 rho11100(int _m, int _n, int _s[3]) : Master(_m,_n,_s) {
   }
