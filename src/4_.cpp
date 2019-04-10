@@ -93,23 +93,23 @@ double rho11100::integrand(double x, double y)
   if (k0>k) {
 
   res+=
-   make([&](double p, double pd) { return make([&](double q, double qd) {
+   remap([&](double p, double pd) { return remap([&](double q, double qd) {
       return W_iv(p,q)*fff(p,q,k0-p-q,_m,_n,_s);
   },  0., k0-p  )(y); },  km,kp    )(x);
 
   res+=
-   make([&](double p, double pd) { return make([&](double q, double qd) {
+   remap([&](double p, double pd) { return remap([&](double q, double qd) {
       return W_iv(p,q)*fff(p,q,k0-p-q,_m,_n,_s);
   },  km-p,   kp     )(y); }, 0.,  km    )(x);
 
   res+=
-   make([&](double q, double qd) { return make([&](double p, double pd) {
+   remap([&](double q, double qd) { return remap([&](double p, double pd) {
       double temp = 0.;
       temp += W_iv(p,q)*fff(p,q,k0-p-q,_m,_n,_s);
       temp += W_iv(q,p)*fff(q,p,k0-p-q,_m,_n,_s);
       return temp; },  km, kp-q     )(y); }, -k0, .0    )(x); 
   res+=
-   make([&](double q, double qd) { return make([&](double p, double pd) {
+   remap([&](double q, double qd) { return remap([&](double p, double pd) {
       double temp = 0.;
       temp += W_iv(p,q)*fff(p,q,k0-p-q,_m,_n,_s);
       temp += W_iv(q,p)*fff(q,p,k0-p-q,_m,_n,_s);
@@ -117,7 +117,7 @@ double rho11100::integrand(double x, double y)
   },  km, kp-q     )(y); }, -k0    )(x);
 
   res+= // pq := p-q,
-   make([&](double r, double rd) { return make([&](double pq, double pqd) {
+   remap([&](double r, double rd) { return remap([&](double pq, double pqd) {
       double temp = 0.;
       double p = .5*(pq-r+k0), q = .5*(-pq-r+k0);
       temp += W_iv(p,q)*fff(p,q,r,_m,_n,_s);
@@ -125,7 +125,7 @@ double rho11100::integrand(double x, double y)
       return .5*temp;
   },  0.,k0-2.*km-r )(y); }, -k0,0.    )(x); 
   res+= // pq := p-q,
-   make([&](double r, double rd) { return make([&](double pq, double pqd) {
+   remap([&](double r, double rd) { return remap([&](double pq, double pqd) {
       double temp = 0.;
       double p = .5*(pq-r+k0), q = .5*(-pq-r+k0);
       temp += W_iv(p,q)*fff(p,q,r,_m,_n,_s);
@@ -136,7 +136,7 @@ double rho11100::integrand(double x, double y)
   } else { // Below the LC:
 
   res+=
-   make([&](double q, double qd) { return make([&](double p, double pd) {
+   remap([&](double q, double qd) { return remap([&](double p, double pd) {
       double temp = 0.;
       temp += W_iv(p,q)*fff(p,q,k0-p-q,_m,_n,_s);
       temp += W_iv(q,p)*fff(q,p,k0-p-q,_m,_n,_s);
@@ -144,7 +144,7 @@ double rho11100::integrand(double x, double y)
   },  km, kp-q     )(y); }, km    )(x);
 
   res+=
-   make([&](double p, double pd) { return make([&](double q, double qd) {
+   remap([&](double p, double pd) { return remap([&](double q, double qd) {
       double temp = 0.;
       temp += W_iv(p,q)*fff(p,q,k0-p-q,_m,_n,_s);
       temp += W_iv(q,p)*fff(q,p,k0-p-q,_m,_n,_s);
@@ -152,7 +152,7 @@ double rho11100::integrand(double x, double y)
   },  kp-p, 0.     )(y); }, kp    )(x);
 
   res+= // pq := p-q,
-   make([&](double r, double rd) { return make([&](double pq, double pqd) {
+   remap([&](double r, double rd) { return remap([&](double pq, double pqd) {
       double temp = 0.;
       double p = .5*(pq-r+k0), q = .5*(-pq-r+k0);
       temp += W_iv(p,q)*fff(p,q,r,_m,_n,_s);
@@ -161,7 +161,7 @@ double rho11100::integrand(double x, double y)
   },  0.,kp )(y); }, km    )(x); 
 
   res+= // pq := p-q,
-   make([&](double r, double rd) { return make([&](double pq, double pqd) {
+   remap([&](double r, double rd) { return remap([&](double pq, double pqd) {
       double temp = 0.;
       double p = .5*(pq-r+k0), q = .5*(-pq-r+k0);
       temp += W_iv(p,q)*fff(p,q,r,_m,_n,_s);
@@ -170,7 +170,7 @@ double rho11100::integrand(double x, double y)
   },  km, 0. )(y); }, kp    )(x); 
 
   res+=
-   make([&](double p, double pd) { return make([&](double q, double qd) {
+   remap([&](double p, double pd) { return remap([&](double q, double qd) {
       double temp = 0.;
       temp += W_iv(p,q)*fff(p,q,k0-p-q,_m,_n,_s);
       temp += W_iv(q,p)*fff(q,p,k0-p-q,_m,_n,_s);
@@ -178,7 +178,7 @@ double rho11100::integrand(double x, double y)
   },  0.,p-kp     )(y); }, kp    )(x);
 
   res+=
-   make([&](double q, double qd) { return make([&](double p, double pd) {
+   remap([&](double q, double qd) { return remap([&](double p, double pd) {
       double temp = 0.;
       temp += W_iv(p,q)*fff(p,q,k0-p-q,_m,_n,_s);
       temp += W_iv(q,p)*fff(q,p,k0-p-q,_m,_n,_s);

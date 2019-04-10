@@ -65,7 +65,7 @@ struct SemiInf : map {
 
 // helpers:
 template<typename F>
-Finite<F> make(F f,double a, double b) { return Finite<F>(f,a,b); }
+Finite<F> remap(F f,double a, double b) { return Finite<F>(f,a,b); }
 template<typename F>
-SemiInf<F> make(F f,double a) { return SemiInf<F>(f,a); }
+SemiInf<F> remap(F f,double a) { return SemiInf<F>(f,a); }
 

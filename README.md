@@ -21,6 +21,7 @@ To get the value of the function, one can simply call:
 
 ## Todo
 
+* deal w/ divergence by expanding log.
 * type 5 + star
 * include OPE in masters
 * organise include files better
