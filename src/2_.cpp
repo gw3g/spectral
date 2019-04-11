@@ -29,7 +29,7 @@ double F(int nu, int sA, int sB) {
 
 struct rho11020 : Master {
   double eval();
-  rho11020(int _m, int _n, int _s[3]) : Master(_m,_n,_s) {}
+  rho11020(int _m, int _n, int _s[3]) : Master(_m,_n,_s) { type=2; }
 };
 // function(s) for MAIN
 Master* _11020(int m, int n, int s[3]) {

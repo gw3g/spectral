@@ -33,6 +33,7 @@ extern double k0, k; // external 4-momentum
 struct Master {
   int s[6]; // statistical configuration
   int m, n; // p^n.q^m
+  int type; // = {1..6}
   virtual double eval()=0;
   Master(int _m, int _n, int _s[3])
     : m(_m), n(_n) {

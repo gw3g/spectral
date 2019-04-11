@@ -19,6 +19,15 @@ To get the value of the function, one can simply call:
 (*rho)(k0,k)
 ```
 
+## Data files
+
+Output from main functions is stored under `out/data`.
+Naming convention is
+```
+diag.[type]{k=[k/T]}.([s0][s1][s2]).[m][n].dat
+```
+where `[...]` takes the value specified within the square brackets.
+
 ## Todo
 
 * deal w/ divergence by expanding log.

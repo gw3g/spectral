@@ -35,7 +35,7 @@ struct rho11100 : Master {
    //integrate<outer> I(f1); // do the x-integral
     //res = go(I) + ( (k0>k) ? -K2/8. : 0. );
   double epsabs = 1e-2, epsrel = 0;
-size_t limit = 1e5;
+  size_t limit = 1e5;
 
   quad wsp1(limit);
   quad wsp2(limit);
@@ -55,8 +55,7 @@ size_t limit = 1e5;
     return (( res + ( (k0>k) ? -K2/8. : 0. ) ))*CUBE(OOFP);//*/
     //return (( res ))*CUBE(OOFP);
   }
-rho11100(int _m, int _n, int _s[3]) : Master(_m,_n,_s) {
-  }
+  rho11100(int _m, int _n, int _s[3]) : Master(_m,_n,_s) { type=4; }
 };
 // function for MAIN
 Master* _11100(int m, int n, int s[3]) {

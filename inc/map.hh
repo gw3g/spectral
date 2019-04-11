@@ -20,10 +20,14 @@ struct Finite : map {
     double dxdt, del, Q = exp(-2.*sinh(t*tmax));
     dxdt = tmax*2.*(b-a)*Q*cosh(t*tmax)/( (1.+Q)*(1.+Q) );
     del = (b-a)*Q/(1.+Q);
-    return ( // trick to avoid cancellation errors
+    double res = ( // trick to avoid cancellation errors
         funk( a+del , del )+
         funk( b-del , del ) 
         )*dxdt;
+
+    //if ( isinf(res)||isnan(res) ) { return 0.;}
+    //else 
+      return res;
   }
   Finite(F _func, double _a, double _b) :
     funk(_func) { a=_a; b=_b; }
@@ -32,8 +36,8 @@ struct Finite : map {
 template <typename F>
 struct SemiInf : map {
   //double a, tmax=4.;
-  //double tmax = 20., tmin = -3.5;
-  double tmax = 3.8;
+  double tmax = 15., tmin = -3.7;
+  //double tmax = 3.8;
   F funk;
   double operator ()(double t) {
     //double dxdt, del = a*exp(2.*sinh(((1.-2.*t)*tmax)));
@@ -43,20 +47,25 @@ struct SemiInf : map {
     //dxdt = -tmax*2.*del*(1.+exp(-tt));
     //return funk(a+del,del)*fabs(dxdt);
     
-    double dxdt, 
+    /*double dxdt, 
            del1 = a*exp(2.*sinh((+t*tmax))),
            del2 = a*exp(2.*sinh((-t*tmax)));
     dxdt = tmax*2.*cosh((t*tmax));
-    return 
+    double res = 
        ( funk(a+del1,del1)*fabs(del1)
        + funk(a+del2,del2)*fabs(del2)
       )*fabs(dxdt);//*/
     
-    /*double del1 = a*exp( +t*tmax - exp(-t*tmax)),
+    double del1 = a*exp( +t*tmax - exp(-t*tmax)),
            del2 = a*exp( +t*tmin - exp(-t*tmin));
 
-    return funk(a+del1,del1)*fabs(del1*(1.+exp(-t*tmax)))*fabs(tmax)
-         + funk(a+del2,del2)*fabs(del2*(1.+exp(-t*tmin)))*fabs(tmin)  ;*/
+    double res =
+           funk(a+del1,del1)*fabs(del1*(1.+exp(-t*tmax)))*fabs(tmax)
+         + funk(a+del2,del2)*fabs(del2*(1.+exp(-t*tmin)))*fabs(tmin)  ;//*/
+
+    //if ( isinf(res)||isnan(res) ) { return 0.;}
+    //else 
+      return res;
   }
   SemiInf(F _func, double _a) :
     funk(_func) { a=_a; }

@@ -56,9 +56,7 @@ struct rho11011 : Master {
   G0 g0;
   double h0m, h0n, h1m, h1n, g0m, g0n, g1m, g1n;
   map *S; 
-  rho11011(int _m, int _n, int _s[3]) : Master(_m,_n,_s) {
-   // g0m = new G0(m,s[1],s[4]);
-  }
+  rho11011(int _m, int _n, int _s[3]) : Master(_m,_n,_s) { type=3; }
 };
 // function for MAIN
 Master* _11011(int m, int n, int s[3]) {

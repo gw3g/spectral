@@ -6,10 +6,11 @@
  */
 #include "core.hh"
 #include <fstream>
-#include <cstring>
+#include <string>
 
 double k0, k;
 int s[] = {+1,+1,+1};
+char s_name[] = {'-','+'};
 
 using namespace std;
 
@@ -23,12 +24,12 @@ int main() {
   rho = _11111(0,0,s);
   config(rho);
 
-  //k0 = 100.1; k = .1;
+  //k0 = 10.1; k = 1.;
   //print_integrand(0,0,s);
   //Print_k0(rho,.004);
-  Print_k0(rho,.1);
+  //Print_k0(rho,.1);
   Print_k0(rho,1.);
-  Print_k0(rho,10.);
+  //Print_k0(rho,10.);
   //cout << k0 << ", " << k << endl;
 }
 
@@ -47,25 +48,26 @@ void config(Master *rho) {
 int Print_k0(Master *rho, double k_curr) {
   int N_k0;
   double res, s, k0_min, k0_max;
-  char *prefix=(char*)"out/data/diag.6.bbb.00";
-  char  suffix[20];
-  char  filename[50];
-
   k=k_curr;
-  //signal( SIGALRM, sigalrm_handler );
-  //elapsed=0; alarm(10);
-  cout << "Creating table for k = " << k <<  " ..." << endl;
-  //string si = (string)PM(rho->s[0])+PM(rho->s[1])+PM(rho->s[2]);
 
   // filename
-  strcpy(filename,prefix);
-  sprintf(suffix,"_{k=%g}.dat",k);
-  strcat(filename,suffix);
-  fout.open(filename);
+  char k_name[20];
+  sprintf(k_name,"{k=%g}",k);
+  string fname = "out/data/diag."
+               + to_string(rho->type)
+               + string(k_name)
+               + ".("+s_name[(rho->s[0]+1)/2]+
+                      s_name[(rho->s[1]+1)/2]+
+                      s_name[(rho->s[2]+1)/2]+")."
+               + to_string(rho->m)+to_string(rho->n)
+               + ".dat";
+
+  cout << "Creating table for k = " << k <<  " ..." << endl;
+  fout.open(fname);
 
   // Here are some parameters that can be changed:
-  N_k0=1000; 
-  k0_min=k+1e-2;
+  N_k0=100; 
+  k0_min=50.+1e-2;
   k0_max=1e+2;
   // don't change anything after that.
 
@@ -79,7 +81,7 @@ int Print_k0(Master *rho, double k_curr) {
     fout << k0 << "    " << res << endl;
     k0*=s; 
   }
-  cout << "Saved to file [" << filename << "]" << endl;
+  cout << "Saved to file [" << fname << "]" << endl;
   fout.close();
 
   return 0;
