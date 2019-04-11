@@ -38,10 +38,11 @@ double W_vi(double p, double q) {
 
 struct rho11111 : Master {
   double integrand(double,double); // supported on [0,1]x[0,1]
-  double F_123(double,double,double);
-  double F_345(double,double,double);
-  double F_14(double,double);
-  double F_25(double,double);
+
+  double F_123(double,double,double); // Cut: f1f2f3/f0   \_ real
+  double F_345(double,double,double); //      f3f4f5/f0   /
+  double F_14(double,double);         //        f1f4/f0   \_ virtual
+  double F_25(double,double);         //        f2f5/f0   /
 
   /*struct inner {
     rho11111 *R;
@@ -62,23 +63,23 @@ struct rho11111 : Master {
     //f1.f2.R = this;
     //integrate<outer> I(f1); // do the x-integral
     //res = go(I);
-  double epsabs = 1e-2, epsrel = 1e-2;
-  size_t limit = 1e5;
+    double epsabs = 1e-2, epsrel = 1e-2;
+    size_t limit = 1e5;
 
-  quad wsp1(limit);
-  quad wsp2(limit);
+    quad wsp1(limit);
+    quad wsp2(limit);
 
-  auto outer = make_gsl_function( [&](double x) {
-    double inner_result, inner_abserr;
-    auto inner = make_gsl_function( [&](double y) {
-        return (this->integrand)(x,y);
-             //return (this->integrand)(.5*(1.-x),y)+(this->integrand)(1.-.5*x,y);
-        } );
-    gsl_integration_qag(inner, .0+1e-10,1., epsabs, epsrel, 
-                         limit, 6, wsp1, &inner_result, &inner_abserr );
-    return inner_result;
-  } );
-  gsl_integration_qag(  outer, .0+1e-10,1., epsabs, epsrel, 
+    auto outer = make_gsl_function( [&](double x) 
+    {
+      double inner_result, inner_abserr;
+      auto inner = make_gsl_function( [&](double y) {
+            return (this->integrand)(x,y);
+          } );
+      gsl_integration_qag( inner, .0+1e-10,1., epsabs, epsrel, 
+                           limit, 6, wsp1, &inner_result, &inner_abserr );
+      return inner_result;
+    } );
+    gsl_integration_qag( outer, .0+1e-10,1., epsabs, epsrel, 
                          limit, 6, wsp2, &res, &err  );//*/
 
     //return ( res -k0*k0/8. )*CUBE(OOFP);

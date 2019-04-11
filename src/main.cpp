@@ -9,7 +9,7 @@
 #include <cstring>
 
 double k0, k;
-int s[] = {+1,-1,-1};
+int s[] = {+1,+1,+1};
 
 using namespace std;
 
@@ -23,12 +23,12 @@ int main() {
   rho = _11111(0,0,s);
   config(rho);
 
-  //k0 = 10.1; k = 1.;
-  //print_integrand(2,0,s);
+  //k0 = 100.1; k = .1;
+  //print_integrand(0,0,s);
   //Print_k0(rho,.004);
-  //Print_k0(rho,.1);
+  Print_k0(rho,.1);
   Print_k0(rho,1.);
-  //Print_k0(rho,10.);
+  Print_k0(rho,10.);
   //cout << k0 << ", " << k << endl;
 }
 
@@ -47,7 +47,7 @@ void config(Master *rho) {
 int Print_k0(Master *rho, double k_curr) {
   int N_k0;
   double res, s, k0_min, k0_max;
-  char *prefix=(char*)"out/data/diagram6_+++_00";
+  char *prefix=(char*)"out/data/diag.6.bbb.00";
   char  suffix[20];
   char  filename[50];
 
@@ -64,8 +64,8 @@ int Print_k0(Master *rho, double k_curr) {
   fout.open(filename);
 
   // Here are some parameters that can be changed:
-  N_k0=100; 
-  k0_min=10.+1e-2;
+  N_k0=1000; 
+  k0_min=k+1e-2;
   k0_max=1e+2;
   // don't change anything after that.
 

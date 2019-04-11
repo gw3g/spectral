@@ -14,7 +14,7 @@ struct map {
 template <typename F>
 struct Finite : map {
   //double a, b, tmax=4.;
-  double tmax = 3.2;
+  double tmax = 3.5;
   F funk;
   double operator ()(double t) {
     double dxdt, del, Q = exp(-2.*sinh(t*tmax));
@@ -32,7 +32,8 @@ struct Finite : map {
 template <typename F>
 struct SemiInf : map {
   //double a, tmax=4.;
-  double tmax = 20., tmin = -3.5;
+  //double tmax = 20., tmin = -3.5;
+  double tmax = 3.8;
   F funk;
   double operator ()(double t) {
     //double dxdt, del = a*exp(2.*sinh(((1.-2.*t)*tmax)));
@@ -42,7 +43,7 @@ struct SemiInf : map {
     //dxdt = -tmax*2.*del*(1.+exp(-tt));
     //return funk(a+del,del)*fabs(dxdt);
     
-    /*double dxdt, 
+    double dxdt, 
            del1 = a*exp(2.*sinh((+t*tmax))),
            del2 = a*exp(2.*sinh((-t*tmax)));
     dxdt = tmax*2.*cosh((t*tmax));
@@ -51,13 +52,11 @@ struct SemiInf : map {
        + funk(a+del2,del2)*fabs(del2)
       )*fabs(dxdt);//*/
     
-    double
-           del1 = a*exp( +t*tmax - exp(-t*tmax)),
+    /*double del1 = a*exp( +t*tmax - exp(-t*tmax)),
            del2 = a*exp( +t*tmin - exp(-t*tmin));
-    return 
-       ( funk(a+del1,del1)*fabs(del1*(1.+exp(-t*tmax)))*tmax
-       + funk(a+del2,del2)*fabs(del2*(1.+exp(-t*tmin)))*fabs(tmin)
-      );
+
+    return funk(a+del1,del1)*fabs(del1*(1.+exp(-t*tmax)))*fabs(tmax)
+         + funk(a+del2,del2)*fabs(del2*(1.+exp(-t*tmin)))*fabs(tmin)  ;*/
   }
   SemiInf(F _func, double _a) :
     funk(_func) { a=_a; }
@@ -68,4 +67,14 @@ template<typename F>
 Finite<F> remap(F f,double a, double b) { return Finite<F>(f,a,b); }
 template<typename F>
 SemiInf<F> remap(F f,double a) { return SemiInf<F>(f,a); }
-
+/* 
+ * Example of usage with lambda function, changing variables
+ * from p in the range (-1,2) into x over (0,1). The function
+ * is f(p)=p^2 which becomes f(p(x))*dp/dx.
+ *
+ *    auto f = [&](double p, double pd) { return p*p; };
+ *    remap(f, -1., 2. )(x); 
+ *
+ *  The second argument "pd" is not used here. It can cater for
+ *  integrable singularities at the interval endpoints.
+ */
