@@ -93,7 +93,7 @@ Master* _11111(int m, int n, int s[3]) {
   Master *R =  new rho11111(m,n,s); return R;
 }
 
-#include <fstream>
+/*#include <fstream>
 using namespace std;
 void print_integrand(int m, int n, int s[3]) {
   ofstream fout;
@@ -111,7 +111,7 @@ void print_integrand(int m, int n, int s[3]) {
           ) << endl; }
   }
   fout.close(); 
-}
+}//*/
 
 /*--------------------------------------------------------------------*/
 // all the thermal weights for cuts from this topology

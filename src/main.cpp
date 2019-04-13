@@ -24,12 +24,12 @@ int main() {
   rho = _11111(0,0,s);
   config(rho);
 
-  //k0 = 10.1; k = 1.;
+  //k0 = .4; k = 1.;
   //print_integrand(0,0,s);
   //Print_k0(rho,.004);
-  //Print_k0(rho,.1);
+  Print_k0(rho,.1);
   Print_k0(rho,1.);
-  //Print_k0(rho,10.);
+  Print_k0(rho,10.);
   //cout << k0 << ", " << k << endl;
 }
 
@@ -66,9 +66,11 @@ int Print_k0(Master *rho, double k_curr) {
   fout.open(fname);
 
   // Here are some parameters that can be changed:
-  N_k0=100; 
-  k0_min=50.+1e-2;
-  k0_max=1e+2;
+  N_k0=20; 
+  //k0_min=1e-2;
+  //k0_max=1e+2;
+  k0_min=.9*k;
+  k0_max=1.1*k;
   // don't change anything after that.
 
   s=pow(k0_max/k0_min,1./(N_k0-1));
