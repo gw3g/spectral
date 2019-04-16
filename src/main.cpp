@@ -9,7 +9,7 @@
 #include <string>
 
 double k0, k;
-int s[] = {+1,+1,+1};
+int s[] = {+1,-1,-1};
 char s_name[] = {'-','+'};
 
 using namespace std;
@@ -21,10 +21,10 @@ char PM(int i) { if (i<0) return '-'; else return '+'; }
 
 int main() {
   Master *rho;
-  rho = _11111(0,0,s);
+  rho = _11111(2,0,s);
   config(rho);
 
-  //k0 = .4; k = 1.;
+  //k0 = 80.4; k = 10.;
   //print_integrand(0,0,s);
   //Print_k0(rho,.004);
   Print_k0(rho,.1);
@@ -66,11 +66,12 @@ int Print_k0(Master *rho, double k_curr) {
   fout.open(fname);
 
   // Here are some parameters that can be changed:
-  N_k0=20; 
-  //k0_min=1e-2;
-  //k0_max=1e+2;
-  k0_min=.9*k;
-  k0_max=1.1*k;
+  N_k0=100; 
+
+  k0_min=10.+1e-2;
+  k0_max=1e+2;
+  //k0_min=.9*k;
+  //k0_max=1.1*k;
   // don't change anything after that.
 
   s=pow(k0_max/k0_min,1./(N_k0-1));
