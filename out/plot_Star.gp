@@ -12,9 +12,9 @@ set grid
 
 set tit "I_{11110}^{(*)}, (+++)"
 p 'data/diag.7{k=0.004}.(+++).00.dat'   u 1:($2*r0) w lp lt 1 t "k/T=.0",\
-  'data/diag.7{k=0.1}.(+++).00.dat'     u 1:($2*r0) w lp lt 2 t "    .1",\
-  'data/diag.7{k=1}.(+++).00.dat'       u 1:($2*r0) w lp lt 3 t "    1.",\
-  'data/diag.7{k=10}.(+++).00.dat'      u 1:($2*r0) w lp lt 4 t "    10."
+  'data/diag.7{k=0.1}.(+--).00.dat'     u 1:($2*r0) w lp lt 2 t "    .1",\
+  'data/diag.7{k=1}.(+--).00.dat'       u 1:($2*r0) w lp lt 3 t "    1.",\
+  'data/diag.7{k=10}.(+--).00.dat'      u 1:($2*r0) w lp lt 4 t "    10."
 
 
 pause -1
