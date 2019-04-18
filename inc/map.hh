@@ -7,26 +7,26 @@
 //  map_SemiInf,  [0,1] -> [a,+inf] (or [-inf,a] if a<0)
 //
 struct map {
-  double a, b;//, tmax;
+  double a, b;//, TMAX;
   virtual double operator ()(double t) = 0; // t is the new var
 };
 
 template <typename F>
 struct Finite : map {
-  //double a, b, tmax=4.;
-  double tmax = 3.4;
+  //double a, b, TMAX=4.;
+  double TMAX = 3.5;
   F funk;
   double operator ()(double t) {
-    double dxdt, del, Q = exp(-2.*sinh(t*tmax));
-    dxdt = tmax*2.*(b-a)*Q*cosh(t*tmax)/( (1.+Q)*(1.+Q) );
+    double dxdt, del, Q = exp(-2.*sinh(t*TMAX));
+    dxdt = TMAX*2.*(b-a)*Q*cosh(t*TMAX)/( (1.+Q)*(1.+Q) );
     del = (b-a)*Q/(1.+Q);
     double res = ( // trick to avoid cancellation errors
         funk( a+del , del )+
         funk( b-del , del ) 
         )*dxdt;
 
-    //if ( isinf(res)||isnan(res) ) { return 0.;}
-    //else 
+    if ( isinf(res)||isnan(res) ) { return 0.;}
+    else 
       return res;
   }
   Finite(F _func, double _a, double _b) :
@@ -35,36 +35,38 @@ struct Finite : map {
 
 template <typename F>
 struct SemiInf : map {
-  //double a, tmax=4.;
-  double tmax = 18., tmin = -3.5;
-  //double tmax = 3.8;
+  //double a, TMAX=4.;
+  double TMAX = 24.,  // the large-k0 result is very sensitive to this\
+                         should be ~20 for k0~100T
+         TMIN = -3.5;
+  //double TMAX = 3.8;
   F funk;
   double operator ()(double t) {
-    //double dxdt, del = a*exp(2.*sinh(((1.-2.*t)*tmax)));
-    //dxdt = tmax*4.*del*cosh(((1.-2.*t)*tmax));
-    //double tt = (1.-2.*t)*tmax;
+    //double dxdt, del = a*exp(2.*sinh(((1.-2.*t)*TMAX)));
+    //dxdt = TMAX*4.*del*cosh(((1.-2.*t)*TMAX));
+    //double tt = (1.-2.*t)*TMAX;
     //double dxdt, del = a*exp( tt - exp( -tt ) );
-    //dxdt = -tmax*2.*del*(1.+exp(-tt));
+    //dxdt = -TMAX*2.*del*(1.+exp(-tt));
     //return funk(a+del,del)*fabs(dxdt);
     
     /*double dxdt, 
-           del1 = a*exp(2.*sinh((+t*tmax))),
-           del2 = a*exp(2.*sinh((-t*tmax)));
-    dxdt = tmax*2.*cosh((t*tmax));
+           del1 = a*exp(2.*sinh((+t*TMAX))),
+           del2 = a*exp(2.*sinh((-t*TMAX)));
+    dxdt = TMAX*2.*cosh((t*TMAX));
     double res = 
        ( funk(a+del1,del1)*fabs(del1)
        + funk(a+del2,del2)*fabs(del2)
       )*fabs(dxdt);//*/
     
-    double del1 = a*exp( +t*tmax - exp(-t*tmax)),
-           del2 = a*exp( +t*tmin - exp(-t*tmin));
+    double del1 = a*exp( +t*TMAX - exp(-t*TMAX)),
+           del2 = a*exp( +t*TMIN - exp(-t*TMIN));
 
     double res =
-           funk(a+del1,del1)*fabs(del1*(1.+exp(-t*tmax)))*fabs(tmax)
-         + funk(a+del2,del2)*fabs(del2*(1.+exp(-t*tmin)))*fabs(tmin)  ;//*/
+           funk(a+del1,del1)*fabs(del1*(1.+exp(-t*TMAX)))*fabs(TMAX)
+         + funk(a+del2,del2)*fabs(del2*(1.+exp(-t*TMIN)))*fabs(TMIN)  ;//*/
 
-    //if ( isinf(res)||isnan(res) ) { return 0.;}
-    //else 
+    if ( isinf(res)||isnan(res) ) { return 0.;}
+    else 
       return res;
   }
   SemiInf(F _func, double _a) :

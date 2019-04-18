@@ -53,8 +53,9 @@ struct rho11111 : Master {
     gsl_integration_qag( outer, .0+1e-16,1., epsabs, epsrel, 
                          limit, 6, wsp2, &res, &err  );//*/
 
-    return ( res /(K2)
-           + ( (m==1)&&(n==1) ? -k0*k0/8. : 0. ) 
+    return ( res
+           + K2*( (m==1)&&(n==1) ? -1./8. : 0. ) 
+           + K2*( (m==2)&&(n==0) ? +11./16. -.5 : 0. ) 
         )*CUBE(OOFP);
   }
 
@@ -355,7 +356,8 @@ double rho11111::integrand(double x, double y) {
           temp += pow(q/k0,m)*F_25(p,l)*( (m==2) ? K2/(8.*q*q) : 0.); // Case: m=2
           temp += pow(v/k0,m)*F_25(l,p)*( (m==2) ? K2/(8.*v*v) : 0.);
           return .5*temp/r;
-  },  km-p, 0.  )(y); },  km,kp    )(x); //*/\
+  },  km-p, 0.  )(y); },  km,kp    )(x); //*/
+  //\
   return _2D;
 
   //  #] from '2','3'\
@@ -389,9 +391,12 @@ double rho11111::integrand(double x, double y) {
           pm = km-p; pp = kp-p;
           double l = k0-p, v=k0-q;
           double LL = lga( pp*pm/(l*p) );//-K2/(4.*p*p);
-          LL = ( fabs(p/k0)>1e6 ) ? (K2/SQR(2.*p))*( 1.+ k0/p + (k*k+7.*k0*k0)/(8.*p*p) 
-              + k0*(k*k+3.*k0*k0)/(4.*CUBE(p)) )
-          : LL;
+          LL = ( fabs(p/k0)>1e6 ) ? (K2/SQR(2.*p))*(
+                                                    1.+ k0/p
+                                                    + (k*k+7.*k0*k0)/(8.*p*p)
+                                                    + k0*(k*k+3.*k0*k0)/(4.*CUBE(p))
+                                                   ) : LL;
+
           temp += pow(p/k0,n)*F_14(q,v)*( (+f(fabs(p),s2))*lga( pm*qm/(p*q) )
                                         + (-f(fabs(r),s3))*lga( qm*l/(pp*q) )
                                         + .5*LL
@@ -705,16 +710,16 @@ double rho11111::integrand(double x, double y) {
                                     ); //      (**)
 
       temp -= pow(l/k0,n)*F_14(v,q)*( (.5+f(l,s2))*lga( pm*qm/(l*v) )
-                                    + (.5+f(r,s3))*lga( pp*q/(qm*l) )
+                                    - (.5+f(r,s3))*lga( qm*p/(pp*v) )
                                     ); // 4B'[v,l]
       temp -= pow(v/k0,m)*F_25(l,p)*( (.5+f(v,s1))*lga( pm*qm/(l*v) )
-                                    + (.5+f(r,s3))*lga( pp*q/(qm*l) )
+                                    - (.5+f(r,s3))*lga( qm*p/(pp*v) )
                                     ); // 4C'[l,v]
-      temp -= pow(l/k0,n)*F_14(q,v)*( (.5+f(p,s5))*lga( pm*qm/(l*v) )
-                                    + (.5+f(r,s3))*lga( pp*q/(qm*l) )
+      temp -= pow(p/k0,n)*F_14(q,v)*( (.5+f(p,s5))*lga( pm*qm/(l*v) )
+                                    - (.5+f(r,s3))*lga( qm*p/(pp*v) )
                                     );
-      temp -= pow(v/k0,m)*F_25(p,l)*( (.5+f(q,s4))*lga( pm*qm/(l*v) )
-                                    + (.5+f(r,s3))*lga( pp*q/(qm*l) )
+      temp -= pow(q/k0,m)*F_25(p,l)*( (.5+f(q,s4))*lga( pm*qm/(l*v) )
+                                    - (.5+f(r,s3))*lga( qm*p/(pp*v) )
                                     );
       return .25*temp/r;
   },  fabs(pq-k),-km  )(y); }, k+km,k-km  )(x); //*/
@@ -843,65 +848,19 @@ double rho11111::integrand(double x, double y) {
       double p2=p*p, q2=q*q;
       double l=k0-p, l2=l*l,
              v=k0-q, v2=v*v;
-      temp += pow(q/k0,n)*F_14(p,l)*( f(q,s2)-f(r,s3) )*lga(qm/q) ;
-      temp += pow(v/k0,n)*F_14(l,p)*( f(q,s5)-f(r,s3) )*lga(qm/q) ;
-      temp += pow(p/k0,m)*F_25(q,v)*( f(p,s1)-f(r,s3) )*lga(pm/p) ;
-      temp += pow(l/k0,m)*F_25(v,q)*( f(p,s4)-f(r,s3) )*lga(pm/p) ; // 6A[p,q]
-      temp += pow(p/k0,n)*F_14(q,v)*( f(p,s2)-f(r,s3) )*lga(pm/p) ;
-      temp += pow(l/k0,n)*F_14(v,q)*( f(p,s5)-f(r,s3) )*lga(pm/p) ;
-      temp += pow(q/k0,m)*F_25(p,l)*( f(q,s1)-f(r,s3) )*lga(qm/q) ;
-      temp += pow(v/k0,m)*F_25(l,p)*( f(q,s4)-f(r,s3) )*lga(qm/q) ; // 7A[q,p]
+
+            temp += lga(qp*pp/(p*q))*(
+                                       F_123(p,q,r) 
+                                     + F_123(q,p,r) 
+                                     + F_345(r,p,q)
+                                     + F_345(r,q,p)
+                                     );
       return .5*temp/r;
   },  kp-p,km  )(y); },  k    )(x); //*/
   //\
   return _6A;
   //
   _6B =
-  remap([&](double pq, double pqd) { // [k-km,+inf)
-    return remap([&](double r, double rd) { // [km,-km]
-      double temp = 0., p=(k0+pq-r)*.5, q=(k0-pq-r)*.5;
-      qm = km-q, qp = kp-q;
-      pm = km-p, pp = kp-p;
-      double h = 2.*fabs(km);
-      double p2=p*p, q2=q*q,
-             l=k0-p, l2=l*l,
-             v=k0-q, v2=v*v;
-      temp += pow(q/k0,n)*F_14(p,l)*( (.5+f(q,s2))*lga( qm*qp/q2 )
-                                    - (.5+f(v,s5))*lga( qm*qp/v2 ) ); // 6B[p,q]
-      temp += pow(p/k0,m)*F_25(q,v)*( (.5+f(p,s1))*lga( pm*pp/p2 )
-                                    - (.5+f(l,s4))*lga( pm*pp/l2 ) );
-
-      temp += pow(p/k0,n)*F_14(q,v)*( (.5+f(p,s2))*lga( pm*pp/p2 )
-                                    - (.5+f(l,s5))*lga( pm*pp/l2 ) ); // 7B[q,p]
-      temp += pow(q/k0,m)*F_25(p,l)*( (.5+f(q,s1))*lga( qm*qp/q2 )
-                                    - (.5+f(v,s4))*lga( qm*qp/v2 ) );
-      return .25*temp/r;
-  },  km,-km  )(y); }, k-km    )(x); //*/
-  //
-  _6B +=
-  remap([&](double p, double pd) { // [kp,+inf)
-    pm = km-p, pp = kp-p;
-    return remap([&](double q, double qd) { // [km-p,km-p+k0]
-      double temp = 0., r = k0-p-q;
-      qm = km-q, qp = kp-q;
-      double h = fabs( k0 );
-      double p2=p*p, q2=q*q,
-             l=k0-p, l2=l*l,
-             v=k0-q, v2=v*v;
-
-      temp += pow(q/k0,n)*F_14(p,l)*( (.5+f(q,s2))*lga( qm*qp/q2 )
-                                    - (.5+f(v,s5))*lga( qm*qp/v2 ) ); // 6B[p,q]
-      temp += pow(p/k0,m)*F_25(q,v)*( (.5+f(p,s1))*lga( pm*pp/p2 )
-                                    - (.5+f(l,s4))*lga( pm*pp/l2 ) );
-
-      temp += pow(p/k0,n)*F_14(q,v)*( (.5+f(p,s2))*lga( pm*pp/p2 )
-                                    - (.5+f(l,s5))*lga( pm*pp/l2 ) ); // 7B[q,p]
-      temp += pow(q/k0,m)*F_25(p,l)*( (.5+f(q,s1))*lga( qm*qp/q2 )
-                                    - (.5+f(v,s4))*lga( qm*qp/v2 ) );
-      return .5*temp/r;
-  },  km-p,k0+km-p  )(y); },  kp    )(x); //*/
-  //
-  _6B +=
   remap([&](double pq, double pqd) { // [k,k-km]
     return remap([&](double r, double rd) { // [k-pq,pq-k]
       double temp = 0., p=(k0+pq-r)*.5, q=(k0-pq-r)*.5;
@@ -922,7 +881,7 @@ double rho11111::integrand(double x, double y) {
       temp += pow(q/k0,m)*F_25(p,l)*( (.5+f(q,s1))*lga( qm*qp/q2 )
                                     - (.5+f(v,s4))*lga( qm*qp/v2 ) );
       return .25*temp/r;
-  },  k-pq,pq-k  )(y); }, k,k-km    )(x); //*/
+  },  k-pq,pq-k  )(y); }, k    )(x); //*/
   //
   _6C =
   remap([&](double q, double qd) { // (-inf,-k]
@@ -932,21 +891,20 @@ double rho11111::integrand(double x, double y) {
       pm = km-p, pp = kp-p;
       double l=k0-p, v=k0-q;
       double h = fabs( km-q-kp );
-      temp += pow(q/k0,n)*F_14(p,l)*( f(q,s2)-f(r,s3) )*lga(qp/q) ;
-      temp += pow(v/k0,n)*F_14(l,p)*( f(q,s5)-f(r,s3) )*lga(qp/q) ;
-      temp += pow(p/k0,m)*F_25(q,v)*( f(p,s1)-f(r,s3) )*lga(pp/p) ;
-      temp += pow(l/k0,m)*F_25(v,q)*( f(p,s4)-f(r,s3) )*lga(pp/p) ; // 6C[p,q]
-      temp += pow(p/k0,n)*F_14(q,v)*( f(p,s2)-f(r,s3) )*lga(pp/p) ;
-      temp += pow(l/k0,n)*F_14(v,q)*( f(p,s5)-f(r,s3) )*lga(pp/p) ;
-      temp += pow(q/k0,m)*F_25(p,l)*( f(q,s1)-f(r,s3) )*lga(qp/q) ;
-      temp += pow(v/k0,m)*F_25(l,p)*( f(q,s4)-f(r,s3) )*lga(qp/q) ; // 7C[q,p]
+      temp += lga(qm*pm/(p*q))*(
+                                  F_123(p,q,r)
+                                + F_123(q,p,r)
+                                + F_345(r,p,q)
+                                + F_345(r,q,p)
+                               );
       return .5*temp/r;
   },  kp,km-q  )(y); },  -k    )(x); //*/
 
   //  #] from '6'
 
-  res +=
-  _2A + _2B + _4A + _4B + _4D + _5A + _5B + _6A + _6B + _6C;
+      res += _4A;
+  //res +=
+  //_2A + _2B + _4A + _4B + _4D + _5A + _5B + _6A + _6B + _6C;
   }
 
   // still don't have a good way to cater for NaNs
