@@ -10,7 +10,7 @@ struct rho11110 : Master {
   double F_123(double,double,double); // Cut: f1f2f3/f0   }- real
   double F_14(double,double);         //        f1f4/f0   }- virtual
 
-
+  double eval();
   /*struct inner {
     rho11100 *R;
     double _x; // x-dependence "stands by"
@@ -24,38 +24,6 @@ struct rho11110 : Master {
       return go(I);
     };
   };//*/
-  double eval() {
-    // check included cases:
-    if      ( (m==0)&&(n==0) ) {  }
-    else if ( (m==1)&&(n==0) ) {  }
-    else if ( (m==0)&&(n==1) ) {  }
-    else                       { return 0.;}
-
-    double res, err;
-    //outer f1;
-    //f1.f2.R = this;
-   //integrate<outer> I(f1); // do the x-integral
-    //res = go(I) + ( (k0>k) ? -K2/8. : 0. );
-    double epsabs = 1e-2, epsrel = 1e-2;
-    size_t limit = 1e5;
-
-    quad wsp1(limit);
-    quad wsp2(limit);
-
-    auto outer = make_gsl_function( [&](double x) {
-      double inner_result, inner_abserr;
-      auto inner = make_gsl_function( [&](double y) {
-          return (this->integrand)(x,y);
-          } );
-      gsl_integration_qag(inner, .0+1e-10,1., epsabs, epsrel, 
-                         limit, 6, wsp1, &inner_result, &inner_abserr );
-      return inner_result;
-    } );
-    gsl_integration_qag(  outer, .0+1e-10,1., epsabs, epsrel, 
-                          limit, 6, wsp2, &res, &err  );
-
-    return (( res ))*CUBE(OOFP);
-  }
   rho11110(int _m, int _n, int _s[3]) : Master(_m,_n,_s) { type=5; }
 };
 // function for MAIN
@@ -119,6 +87,57 @@ double rho11110::F_14(double p, double l) {
 }
 
 /*--------------------------------------------------------------------*/
+// evaluation step, including the OPE
+
+double rho11110::eval() 
+{
+  double res, err;
+
+  double a1=I(0,(this->s)[1]), b1=I(2,(this->s)[1]), // tadpole ints
+         a2=I(0,(this->s)[2]), b2=I(2,(this->s)[2]),
+         a3=I(0,(this->s)[3]), b3=I(2,(this->s)[3]),
+         a4=I(0,(this->s)[4]), b4=I(2,(this->s)[4]);
+
+  if ( m==0 && n==0 ) { // (0)
+    (this->OPE).T0 = -K2*5./4.;
+    (this->OPE).T2 = +( a1-(a2+a3) )*.25*OOFP;
+    (this->OPE).T4 = +( 3.*b1-(b2+b3) )*(k0*k0+k*k/3.)/SQR(K2)/3.*OOFP;
+  } else
+  if ( m==1 && n==0 ) { // (1)
+  } else
+  if ( m==0 && n==1 ) { // (0,1)
+  } else {
+    cerr << "Case: (m,n)=("<< m << ","<<n<<") out of bounds!\n";
+    return 0.;
+  }
+
+  //outer f1;
+  //f1.f2.R = this;
+  //integrate<outer> I(f1); // do the x-integral
+  //res = go(I) + ( (k0>k) ? -K2/8. : 0. );
+  double epsabs = 1e-2, epsrel = 1e-2;
+  size_t limit = 1e5;
+
+  quad wsp1(limit);
+  quad wsp2(limit);
+
+  auto outer = make_gsl_function( [&](double x) {
+    double inner_result, inner_abserr;
+    auto inner = make_gsl_function( [&](double y) {
+        return (this->integrand)(x,y);
+        } );
+    gsl_integration_qag(inner, .0+1e-10,1., epsabs, epsrel, 
+                       limit, 6, wsp1, &inner_result, &inner_abserr );
+    return inner_result;
+  } );
+  gsl_integration_qag(  outer, .0+1e-10,1., epsabs, epsrel, 
+                        limit, 6, wsp2, &res, &err  );
+
+  return (( res ))*CUBE(OOFP);
+}
+
+/*--------------------------------------------------------------------*/
+// integrand manipulations
 
 double rho11110::integrand(double x, double y) 
 {
