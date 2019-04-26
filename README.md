@@ -31,8 +31,8 @@ where `[...]` takes the value specified within the square brackets.
 ## Todo
 
 * deal w/ divergence by expanding log.
-* type 5 + star
-* include OPE in masters
+* ~~type 5 + star~~ tune integrator
+* ~~include OPE in masters~~ check the T^4
 * organise include files better
 * cuda implementation for high accuracy?
 * check m,n>0 results
