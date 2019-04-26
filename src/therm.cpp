@@ -34,7 +34,7 @@ double bf(double e, int X) {
 double I(int n, int s_) {
   // tadpole
   double res;
-  res = gsl_sf_zeta_int(n+2)/(2.*M_PI*M_PI);
+  res = gsl_sf_zeta_int(n+2)/( 2.*SQR(M_PI) );
   for (int i=n+1;i>0;i--) res*=(double)i;
   res*= (double)s_ + (s_<0?pow(2.,-n-1):0.);
   return res;

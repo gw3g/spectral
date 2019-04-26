@@ -30,10 +30,16 @@ void print_integrand(int m, int n, int s[3]); // for checking
 #define K2 (k0*k0-k*k)
 extern double k0, k; // external 4-momentum
 
+struct Expand {
+  double T0, T2, T4; // coeffs of T^n
+  double operator()() { return T2+T4; };
+};
+
 struct Master {
   int s[6]; // statistical configuration
   int m, n; // p^n.q^m
   int type; // = {1..6}
+  Expand OPE;
   virtual double eval()=0;
   Master(int _m, int _n, int _s[3])
     : m(_m), n(_n) {

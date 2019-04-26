@@ -15,6 +15,7 @@ struct rho11111 : Master {
   double F_14(double,double);         //        f1f4/f0   \_ virtual
   double F_25(double,double);         //        f2f5/f0   /
 
+  double eval();
   /*struct inner {
     rho11111 *R;
     double _x; // x-dependence "stands by"
@@ -28,37 +29,6 @@ struct rho11111 : Master {
       return go(I);
     };
   };//*/
-  double eval() {
-    double res, err;
-    //outer f1;
-    //f1.f2.R = this;
-    //integrate<outer> I(f1); // do the x-integral
-    //res = go(I);
-    double epsabs = 1e-1, epsrel = 1e-1;
-    size_t limit = 1e5;
-
-    quad wsp1(limit);
-    quad wsp2(limit);
-
-    auto outer = make_gsl_function( [&](double x) 
-    {
-      double inner_result, inner_abserr;
-      auto inner = make_gsl_function( [&](double y) {
-            return (this->integrand)(x,y);
-          } );
-      gsl_integration_qag( inner, .0+1e-16,1., epsabs, epsrel, 
-                           limit, 6, wsp1, &inner_result, &inner_abserr );
-      return inner_result;
-    } );
-    gsl_integration_qag( outer, .0+1e-16,1., epsabs, epsrel, 
-                         limit, 6, wsp2, &res, &err  );//*/
-
-    return ( res
-           + K2*( (m==1)&&(n==1) ? -1./8. : 0. ) 
-           + K2*( (m==2)&&(n==0) ? +11./16. -.5 : 0. ) 
-        )*CUBE(OOFP);
-  }
-
   rho11111(int _m, int _n, int _s[3]) : Master(_m,_n,_s) { type=6; }
 };
 // function for MAIN
@@ -158,6 +128,107 @@ double rho11111::F_25(double q, double v) {
 }
 
 /*--------------------------------------------------------------------*/
+// evaluation step, including the OPE
+
+double rho11111::eval() 
+{
+  double res, err;
+
+  double a1=I(0,(this->s)[1]), b1=I(2,(this->s)[1]), // tadpole ints
+         a2=I(0,(this->s)[2]), b2=I(2,(this->s)[2]),
+         a3=I(0,(this->s)[3]), b3=I(2,(this->s)[3]),
+         a4=I(0,(this->s)[4]), b4=I(2,(this->s)[4]),
+         a5=I(0,(this->s)[5]), b5=I(2,(this->s)[5]);
+
+  if ( m==0 && n==0 ) { // (0)
+    (this->OPE).T0 = 0.;
+    (this->OPE).T2 = -( a1+a2+2.*a3+a4+a5 )*.25*OOFP;
+    (this->OPE).T4 = -( (b1+b2+b4+b5)*11.+b3*6.)*(k0*k0+k*k/3.)/SQR(K2)/6.*OOFP;
+  }
+  if ( m==1 && n==1 ) { // (1,1)
+    (this->OPE).T0 = K2/16.;
+    (this->OPE).T2 = 0.;
+    (this->OPE).T4 = -(( (b1+b2+b4+b5)*3.-b3*2.      )*.5*K2-
+                       ( (b1+b2)*9.+b3*2.+(b4+b5)*5. )*k0*k0 )/SQR(K2)/12.*OOFP;
+  }
+  if ( m==2 && n==0 ) { // (2)
+    (this->OPE).T0 = .5*K2*( +11./16. -.5 );
+    (this->OPE).T2 = -( (a2+a3+a4)*k0*k0-(a2+a5)*K2*.25 )*.25/K2*OOFP;
+    (this->OPE).T4 = -(((b1+b4)*3.+(b2+b3+b5)*2.)*.5*K2-
+                       (b2*7.+b3+b4*9.+b5*2.)*k0*k0+
+                       ((b2+b4)*11.+b3 )*k0*k0*(k0*k0+k*k/3.)/K2  )/SQR(K2)/6.*OOFP;
+  }
+  //outer f1;
+  //f1.f2.R = this;
+  //integrate<outer> I(f1); // do the x-integral
+  //res = go(I);
+  double epsabs = 1e-2, epsrel = 1e-2;
+  size_t limit = 1e6;
+
+  quad wsp1(limit);
+  quad wsp2(limit);
+
+  auto outer = make_gsl_function( [&](double x) 
+  {
+    double inner_result, inner_abserr;
+    auto inner = make_gsl_function( [&](double y) {
+          return (this->integrand)(x,y);
+        } );
+    gsl_integration_qag( inner, .0+1e-10,1., epsabs, epsrel,
+                         limit, 6, wsp1, &inner_result, &inner_abserr );
+    return inner_result;
+  } );
+  gsl_integration_qag( outer, .0+1e-10,1., epsabs, epsrel,
+                       limit, 6, wsp2, &res, &err  );//*/
+
+  double temp = 0.;
+  if ( (m==2)&&(n==0) ) {
+    temp += ( (k0>k) ? 1. : 0. );
+    double ep = exp(-fabs(kp)), em = exp(-fabs(km));
+    temp += lga( 
+         (1.-((double)(this->s)[1])*ep)*(1.-((double)(this->s)[2])*ep)/
+        ((1.-((double)(this->s)[1])*em)*(1.-((double)(this->s)[2])*em)) )/k;
+    temp *= 1.;
+  };
+  return ( (  res*pow(k0,m+n)*pow(K2,-(m+n)/2.)
+         //+ k0*k0*temp
+        -(this->OPE).T0
+      )*CUBE(OOFP));// - (this->OPE).T2 )/(this->OPE).T4;
+}
+
+/*--------------------------------------------------------------------*/
+// integrand manipulations
+
+inline double L_div(double p, double l, double pp, double pm) {
+  //double pp = kp-p, pm = km-p, l=k0-p;
+  double res = lga( pp*pm/(l*p) );//-K2/(4.*p*p);
+ /*res = ( fabs(p/k0)>1e4 ) ? (K2/SQR(2.*p))*(  //1. // dangerous!
+                                                //+ k0/p
+                                                //+ (k*k+7.*k0*k0)/(8.*p*p)
+                                                //+ k0*(k*k+3.*k0*k0)/(4.*CUBE(p))
+1 + (pow(k,8) + 46*pow(k,6)*
+       pow(k0,2) + 
+      256*pow(k,4)*pow(k0,4) + 
+      466*pow(k,2)*pow(k0,6) + 
+      511*pow(k0,8))/(1280.*pow(p,8)) + 
+   (3*pow(k,6)*k0 + 
+      31*pow(k,4)*pow(k0,3) + 
+      73*pow(k,2)*pow(k0,5) + 
+      85*pow(k0,7))/(192.*pow(p,7)) + 
+   (pow(k,6) + 29*pow(k,4)*pow(k0,2) + 
+      99*pow(k,2)*pow(k0,4) + 
+      127*pow(k0,6))/(256.*pow(p,6)) + 
+   (k0*pow(pow(k,2) + 3*pow(k0,2),2))/
+    (16.*pow(p,5)) + 
+   (pow(k,4) + 16*pow(k,2)*pow(k0,2) + 
+      31*pow(k0,4))/(48.*pow(p,4)) + 
+   (k0*(pow(k,2) + 3*pow(k0,2)))/
+    (4.*pow(p,3)) + 
+   (pow(k,2) + 7*pow(k0,2))/
+    (8.*pow(p,2)) + k0/p
+                                               ) : res;//*/
+  return res;
+}
 
 double rho11111::integrand(double x, double y) { 
 
@@ -181,13 +252,13 @@ double rho11111::integrand(double x, double y) {
 
   _1A =
   remap([&](double p, double pd) {                      // p=[.5kp,km]
-    pm = km-p; pp = kp-p;
-    pm = (fabs(pm)<1e-1*fabs(km-.5*kp)) ? pd : pm;      // p=km (!)
     return remap([&](double q, double qd) {             // q=[kp-p,p]
       double temp = 0., r=k0-p-q;
+      pm = km-p; pp = kp-p;
       qm = km-q; qp = kp-q;
+      pm = (fabs(pm)<1e-1*fabs(km-k)) ? pd : pm;     // p=km (!)
       if (k0>3.*k) {
-        temp +=  lga(pp*qp/(pm*qm))*(
+        temp +=  lga(pp/pm)*(                         // refl. log
                                       F_123(p,q,r)      // 1A[p,q]
                                     + F_123(q,p,r)      // 1A[q,p]
                                     + F_345(r,p,q)
@@ -195,7 +266,7 @@ double rho11111::integrand(double x, double y) {
                                     );
       };
       return .5*temp/r;
-  },  kp-p,p  )(y); },  .5*kp, km    )(x);              //*/
+  },  kp-p,km  )(y); },  k, km    )(x);              //*/
   //\
   return _1A;
   _1B =
@@ -226,6 +297,7 @@ double rho11111::integrand(double x, double y) {
       //\
       Padding for log singularities:
       double h = fabs( min(k,km)-fabs(pq-k) );        // p=kp,q=km (!!)
+      //double h = fabs( 2.*min(k,km) );        // p=kp,q=km (!!)
       if (pq>k) { pp = (fabs(pp)<1e-1*h) ? rd/2. : pp; }
       if (pq<k) { qm = (fabs(qm)<1e-1*h) ? rd/2. : qm; }
       double lg1 = lga( pp*qp/(p*q) ),
@@ -279,9 +351,12 @@ double rho11111::integrand(double x, double y) {
     return remap([&](double q, double qd) {           // q=(-inf,km-p]
       double temp = 0., r = k0-p-q;
       qm = km-q; qp = kp-q;
+      //double Lp = lga(pm/pp), Lq = lga(qm/qp);
+      //if (+p/k>1e4) { Lp = (k/q)*(1.+.5*k0/p+(k0*k0+k*k/3.)/(4*p*p)); }
+      //if (-q/k>1e4) { Lq = (k/q)*(1.+.5*k0/q+(k0*k0+k*k/3.)/(4*q*p)); }
       temp += lga(pm*qm/(pp*qp))*(
                                    F_123(p,q,r)       // 2A[p,q]
-                                 + F_123(q,p,r)       // 2A[q,p]
+                                 + F_123(q,p,r)       // 3A[q,p]
                                  + F_345(r,p,q)
                                  + F_345(r,q,p)
                                  );
@@ -298,7 +373,7 @@ double rho11111::integrand(double x, double y) {
       qp = kp-q;
       temp += lga(p*q/(pp*qp))*(
                                  F_123(p,q,r)         // 2B[p,q]
-                               + F_123(q,p,r)         // 2B[q,p]
+                               + F_123(q,p,r)         // 3B[q,p]
                                + F_345(r,p,q)
                                + F_345(r,q,p)
                                );
@@ -315,29 +390,27 @@ double rho11111::integrand(double x, double y) {
       double temp = 0., r = k0-p-q;
       qm = km-q; qp = kp-q;
       double l=k0-p, v=k0-q;
-      double LL = lga( qp*qm/(v*q) );//-K2/(4.*p*p);
-      LL = ( fabs(q/k0)>1e6 ) ? (K2/SQR(2.*q))*( 1.+ k0/q + (k*k+7.*k0*k0)/(8.*q*q) 
-           + k0*(k*k+3.*k0*k0)/(4.*CUBE(q)) )
-         : LL;
 
        temp += pow(q/k0,n)*F_14(p,l)*( (-f(fabs(q),s2))*lga( pm*qm/(p*q) )
                                      + (+f(fabs(r),s3))*lga( pm*v/(qp*p) )
-                                     - .5*LL
+                                     - .5*L_div(q,v,qp,qm)
+                                     + ( (n==2) ? K2/(8.*q*q) : 0.)
        // (*)                        - (.5+f(v,s5))*lga( pp*qp/(l*v) )
                                      ); // 2C[p,q]
        temp += pow(q/k0,m)*F_25(p,l)*( (-f(fabs(q),s1))*lga( pm*qm/(p*q) )
                                      + (+f(fabs(r),s3))*lga( pm*v/(qp*p) )
-                                     - .5*LL
-       // (**)                       - (.5+f(v,s4))*lga( pp*qp/(l*v) )
+                                     - .5*L_div(q,v,qp,qm)
                                      + ( (m==2) ? K2/(8.*q*q) : 0.)
+       // (**)                       - (.5+f(v,s4))*lga( pp*qp/(l*v) )
                                      ); // 3C[q,p]
        temp += pow(v/k0,n)*F_14(l,p)*( (-f(fabs(q),s5))*lga( pm*qm/(p*q) )
                                      + (+f(fabs(r),s3))*lga( pm*v/(qp*p) )
-                                     - .5*LL
+                                     - .5*L_div(v,q,qm,qp)
+                                     + ( (n==2) ? K2/(8.*v*v) : 0.)
                                      ); // from (*)
        temp += pow(v/k0,m)*F_25(l,p)*( (-f(fabs(q),s4))*lga( pm*qm/(p*q) )
                                      + (+f(fabs(r),s3))*lga( pm*v/(qp*p) )
-                                     - .5*LL
+                                     - .5*L_div(v,q,qm,qp)
                                      + ( (m==2) ? K2/(8.*v*v) : 0.)
                                      ); //      (**)
        return .5*temp/r;
@@ -379,14 +452,16 @@ double rho11111::integrand(double x, double y) {
       double temp = 0., r = k0-p-q;
       qm = km-q; qp = kp-q;
       //qp = (fabs(qp)<k0) ? qd : qp; // q=kp (!)
-      temp += lga(pm*qm/(pp*qp))*(
+      //if (p>q) { pp = (fabs(pp)<1e-1*h) ? pqd/2. : pp; }
+      //if (p<q) { qp = (fabs(qp)<1e-1*h) ? pqd/2. : qm; }
+      temp += lga(pm/(pp))*(
                                    F_123(p,q,r)       // 4A[p,q]
                                  + F_123(q,p,r)       // 4A[q,p]
                                  + F_345(r,p,q)
                                  + F_345(r,q,p)
                                  );
       return .5*temp/r;
-  },  p  )(y); },  kp    )(x);                        //*/
+  },  kp  )(y); },  kp    )(x);                        //*/
   //\
   return _4A;
   _4B =
@@ -398,32 +473,35 @@ double rho11111::integrand(double x, double y) {
       double temp = 0., r = k0-p-q;
       pm = km-p; pp = kp-p;
       double l = k0-p, v=k0-q;
-      double LL = lga( pp*pm/(l*p) );//-K2/(4.*p*p);
-      LL = ( fabs(p/k0)>1e6 ) ? (K2/SQR(2.*p))*(
+      l = (fabs(l)<1e-1*k0) ? pd : l;
+      /*double LL = lga( pp*pm/(l*p) );//-K2/(4.*p*p);
+      LL = ( fabs(p/k0)>1e4 ) ? (K2/SQR(2.*p))*(
                                               1.+ k0/p
                                                 + (k*k+7.*k0*k0)/(8.*p*p)
                                                 + k0*(k*k+3.*k0*k0)/(4.*CUBE(p))
-                                               ) : LL;
+                                               ) : LL;*/
 
       temp += pow(p/k0,n)*F_14(q,v)*( (+f(fabs(p),s2))*lga( pm*qm/(p*q) )
                                     + (-f(fabs(r),s3))*lga( qm*l/(pp*q) )
-                                    + .5*LL
+                                    + .5*L_div(p,l,pp,pm)
+                                    - ( (n==2) ? K2/(8.*p*p) : 0.)
       // (*)                        - (.5+f(l,s5))*lga( pp*qp/(l*v) )
                                     ); // 4C[q,p]
       temp += pow(p/k0,m)*F_25(q,v)*( (+f(fabs(p),s1))*lga( pm*qm/(p*q) )
                                     + (-f(fabs(r),s3))*lga( qm*l/(pp*q) )
-                                    + .5*LL
+                                    + .5*L_div(p,l,pp,pm)
                                     //+ (.5)*lga( pm*pp/(p*l) )
       // (**)                       - (.5+f(l,s4))*lga( pp*qp/(l*v) )
                                     - ( (m==2) ? K2/(8.*p*p) : 0.)
                                     ); // 4B[p,q]
       temp += pow(l/k0,n)*F_14(v,q)*( (+f(fabs(p),s5))*lga( pm*qm/(p*q) )
                                     + (-f(fabs(r),s3))*lga( qm*l/(pp*q) )
-                                    + .5*LL
+                                    + .5*L_div(l,p,pm,pp)
+                                    - ( (n==2) ? K2/(8.*l*l) : 0.)
                                     ); // from (*)
       temp += pow(l/k0,m)*F_25(v,q)*( (+f(fabs(p),s4))*lga( pm*qm/(p*q) )
                                     + (-f(fabs(r),s3))*lga( qm*l/(pp*q) )
-                                    + .5*LL
+                                    + .5*L_div(l,p,pm,pp)
                                     - ( (m==2) ? K2/(8.*l*l) : 0.)
                                     ); //      (**)
       return .5*temp/r;
@@ -433,13 +511,13 @@ double rho11111::integrand(double x, double y) {
   if (k0>3.*k) {
     //
     _4B+=
-    remap([&](double q, double qd) {                  // q=[km,kp]
-      qm = km-q;
-      qm = (fabs(qm)<1e-1*k) ? qd : qm;               // q=km (!)
-      return remap([&](double p, double pd) {         // p=[k0+km-q,k0]
+    remap([&](double p, double pd) {                  // q=[km,kp]
+      return remap([&](double q, double qd) {         // p=[k0+km-q,k0]
         double temp = 0., r = k0-p-q;
         pm = km-p; pp = kp-p;
-        double l=k0-p; l = (fabs(l)<1e-1*fabs(q-km)) ? pd : l;
+        qm = km-q;
+        //qm = (fabs(qm)<1e-1*k) ? qd : qm;               // q=km (!)
+        double l=k0-p; l = (fabs(l)<1e-1*fabs(k)) ? pd : l;
         double v=k0-q;
         temp += pow(p/k0,n)*F_14(q,v)*( (.5+f(p,s2))*lga( pm*qm/(p*q) )
                                       + (.5+f(r,s3))*lga( qm*l/(pp*q) )
@@ -463,16 +541,19 @@ double rho11111::integrand(double x, double y) {
                 + pow(p/k0,m)*F_25(v,q) )*( (.5+f(r,s3))*lga( l*p/( pp*pm ) )
                                           ); // 3D[l,v]
         return .5*temp/r;
-    },  k0+km-q,k0  )(y); },  km,kp    )(x);
+    },  k0+km-p,kp  )(y); },  2.*km,k0    )(x); //*/
     //
     _4B+=
-    remap([&](double q, double qd) {                  // q=[km,kp]
-      qm = km-q;
-      qm = (fabs(qm)<1e-1*k) ? qd : qm;               // q=km (!)
-      return remap([&](double p, double pd) {         // p=[2kp-q,k0+km-q]
+    remap([&](double p, double pd) {                  // q=[km,kp]
+      return remap([&](double q, double qd) {         // p=[2kp-q,k0+km-q]
         double temp = 0., r = k0-p-q;
         pm = km-p; pp = kp-p;
-        double l = k0-p, v=k0-q; //l = (fabs(l)<1e-1*(km-k)) ? pd : l;
+        qm = km-q;
+        double h = fabs( min(kp,k0+km-p) - max(km,2.*kp-p) );
+        if (p>2.*kp-km) { qm = (fabs(qm)<1e-1*h) ? qd : qm; }              // q=km (!)
+        double l = k0-p, v=k0-q; 
+        l  = ( fabs(l)<1e-1*km) ? pd : l;
+        pp = (fabs(pp)<1e-1*km) ? pd : pp;
         temp += pow(p/k0,n)*F_14(q,v)*( (.5+f(p,s2))*lga( pm*qm/(p*q) )
                                       + (.5+f(r,s3))*lga( qm*l/(pp*q) )
         // (*)                        - (.5+f(l,s5))*lga( pp*qp/(l*v) )
@@ -503,7 +584,8 @@ double rho11111::integrand(double x, double y) {
                                       + (.5+f(r,s3))*lga( pp*q/(qm*p) )
                                       ); //      (****)
         return .5*temp/r;
-    },  2.*kp-q,k0+km-q  )(y); },  km,kp    )(x);
+    //},  2.*kp-q,k0+km-q  )(y); },  km,kp    )(x); //*/
+    },  max(km,2.*kp-p),min(kp,k0+km-p) )(y); },  kp,k0    )(x); //*/
     //
   } else if (k0<3.*k) {
     //
@@ -552,8 +634,11 @@ double rho11111::integrand(double x, double y) {
       double l=k0-p, p2=p*p, l2=l*l;
       double v=k0-q, q2=q*q, v2=v*v;
 
-      double h = fabs( k-pq );
-      qm = (fabs(qm)<1e-1*h) ? rd/2. : qm;            // q=km (!)
+      //double h = fabs( k-fabs(r) );
+      //if (r>0) { qm = (fabs(qm)<1e-1*h) ? pqd/2. : qm; }           // q=km (!)
+      //if (r<0) { pp = (fabs(pp)<1e-1*h) ? pqd/2. : pp; }           // q=km (!)
+      double h = fabs( k-(pq) );
+      qm = (fabs(qm)<1e-1*h) ? rd/2. : qm;
 
       temp += pow(q/k0,n)*F_14(p,l)*( (.5+f(q,s2))*lga( qm*qp/q2 )
                                     - (.5+f(v,s5))*lga( qm*qp/v2 ) ); // 4D[p,q]
@@ -575,7 +660,8 @@ double rho11111::integrand(double x, double y) {
       temp -= pow(v/k0,m)*F_25(l,p)*( (.5+f(v,s1))*lga( qm*qp/v2 )
                                     - (.5+f(q,s4))*lga( qm*qp/q2 ) );
       return .25*temp/r;
-  },  0.,k-pq )(y); }, 0.,k    )(x);                  //*/
+  //},  0.,k-fabs(r) )(y); }, -k,k    )(x);                  //*/
+  },  0.,k-(pq) )(y); }, 0.,k    )(x);                  //*/
   //
   if (k0<3.*k) { 
     //
@@ -601,7 +687,7 @@ double rho11111::integrand(double x, double y) {
     //
   }
   //\
-  return _2B;
+  return _4D;
 
   res += _1A + _1B + _1D + _2A + _2B + _2C + _2D + _4A + _4B + _4D;
 
@@ -981,8 +1067,9 @@ double rho11111::integrand(double x, double y) {
   }
 
   // still don't have a good way to cater for NaNs
-  //if ( isinf(res)||isnan(res) ) { return -0;}
+  //if ( isinf(res)||isnan(res) ) { return -1e6;}//for inspection
+  //if ( isinf(res)||isnan(res) ) { return 0.;}
   //else 
-  { return fabs(K2)*res/k; }
+  { return .5*fabs(K2)*res/k; }
   //else { return res/k; }
 }
