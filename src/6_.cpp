@@ -1,6 +1,5 @@
 #include "core.hh"
 #include "quad.hh"
-#include "trapezoid.hh"
 #include "map.hh"
 
 using namespace std;
@@ -16,19 +15,7 @@ struct rho11111 : Master {
   double F_25(double,double);         //        f2f5/f0   /
 
   double eval();
-  /*struct inner {
-    rho11111 *R;
-    double _x; // x-dependence "stands by"
-    double operator ()(double y) { return (R->integrand)(_x,y); }
-  };
-  struct outer {
-    inner f2;
-    double operator ()(double x) {
-      f2._x = x;
-      integrate<inner> I(f2); // do the y-integral
-      return go(I);
-    };
-  };//*/
+
   rho11111(int _m, int _n, int _s[3]) : Master(_m,_n,_s) { type=6; }
 };
 // function for MAIN

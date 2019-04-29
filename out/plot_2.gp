@@ -1,5 +1,4 @@
-r0=12*16*pi
-
+r0=12*16*pi 
 # to remove the LC divergence, multiply by..
 fac(k0,k) = ((k0-k)*(k0-k))
 
@@ -14,7 +13,7 @@ set key t l
 set grid
 
 set tit "I_{11020}^{(0,0)}, (s_0s_1s_2)"
-p 'data/diagram2_+++_{k=1}.dat'  u 1:($2*r0*fac($1,1)) w l lt 1 t "(+++)",\
+p 'data/diag.2{k=1}.(+++).00.dat'  u 1:($2*r0*fac($1,1)) w l lt 1 t "(+++)",\
   'data/diagram2_-++_{k=1}.dat'  u 1:($2*r0*fac($1,1)) w l lt 2 t "(-++)",\
   'data/diagram2_+-+_{k=1}.dat'  u 1:($2*r0*fac($1,1)) w l lt 3 t "(+-+)",\
   'data/diagram2_--+_{k=1}.dat'  u 1:($2*r0*fac($1,1)) w l lt 4 t "(--+)"
