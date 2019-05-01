@@ -57,8 +57,26 @@ double rho11011::eval()
 
   if ( m==0 && n==0 ) { // (0)
     (this->OPE).T0 = -2.*K2;
-    (this->OPE).T2 = ( a1+a2+a4+a5 )*.25*OOFP;
-    (this->OPE).T4 = ( b1+b2+b4+b5 )*(k0*k0+k*k/3.)/SQR(K2)*OOFP;
+    (this->OPE).T2 = ( a1+a2+a4+a5 )*.25*OOFP/K2;
+    (this->OPE).T4 = ( b1+b2+b4+b5 )*(k0*k0+k*k/3.)/CUBE(K2)*OOFP;
+  } else
+  if ( m==1 && n==0 ) { // (1)
+    (this->OPE).T0 = -K2;
+    (this->OPE).T2 = ( a2+2.*a4+a5 )*.125*OOFP/K2;
+    (this->OPE).T4 = ( -(b1-b4)*K2 
+                       +(b2+2.*b4+b5)*(k0*k0+k*k/3.) )/CUBE(K2)*.5*OOFP;
+  } else
+  if ( m==0 && n==1 ) { // (0,1)
+    (this->OPE).T0 = -K2;
+    (this->OPE).T2 = ( a1+2.*a5+a4 )*.125*OOFP/K2;
+    (this->OPE).T4 = ( +(b2-b5)*K2 
+                       +(b1+2.*b5+b4)*(k0*k0+k*k/3.) )/CUBE(K2)*.5*OOFP;
+  } else
+  if ( m==1 && n==1 ) { // (1,1)
+    (this->OPE).T0 = -.5*K2;
+    (this->OPE).T2 = ( a4+a5 )*.125*OOFP/K2;
+    (this->OPE).T4 = ( -(b4+b5)*K2 
+                       +(b4+b5)*(k0*k0+k*k/3.) )/CUBE(K2)*.5*OOFP;
   } else {
     cerr << "Case: (m,n)=("<< m << ","<<n<<") out of bounds!\n";
     return 0.;
