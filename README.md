@@ -21,7 +21,7 @@ To get the value of the function, one can simply call:
 
 ## Data files
 
-Output from main functions is stored under `out/data`.
+Output from the main function is stored under `out/data`. (If the file is empty, it will be created by the makefile.)
 Naming convention is
 ```
 diag.[type]{k=[k/T]}.([s0][s1][s2]).[m][n].dat
@@ -35,6 +35,5 @@ where `[...]` takes the value specified within the square brackets.
 * ~~include OPE in masters~~ check the T^4
 * organise include files better
 * cuda implementation for high accuracy?
-* check m,n>0 results
+* ~~check m,n>0 results~~
 
-Remarks: should I be using Finite(F &func, a, b) in map.hh?
