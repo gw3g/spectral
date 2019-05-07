@@ -675,5 +675,5 @@ double rho11110::integrand(double x, double y)
   }
     // still don't have a good way to cater for NaNs
   if ( isinf(res)||isnan(res) ) { return 0.;}
-  else { return .25*fabs(K2)*res/(k); }
+  else { return .25*(K2)*res/(k); }
 }

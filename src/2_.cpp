@@ -51,24 +51,24 @@ double rho11020::eval()
 
   if ( m==0 && n==0 ) { // (0)
     (this->OPE).T0 = 0.;
-    (this->OPE).T2 =  -a2*.25*OOFP/K2;
+    (this->OPE).T2 =  -a2*.25*OOFP;
     (this->OPE).T4 = 0.;
   } else
   if ( m==1 && n==0 ) { // (1)
     (this->OPE).T0 = 0.;
-    (this->OPE).T2 =  -a2*.25*OOFP/K2;
+    (this->OPE).T2 =  -a2*.25*OOFP;
     (this->OPE).T4 = 0.;
   } else
   if ( m==2 && n==0 ) { // (2)
     (this->OPE).T0 = 0.;
-    (this->OPE).T2 =  -1.25*a2*.25*OOFP/K2;
+    (this->OPE).T2 =  -1.25*a2*.25*OOFP;
     (this->OPE).T4 = 0.;
   } else {
     cerr << "Case: (m,n)=("<< m << ","<<n<<") out of bounds!\n";
     return 0.;
   }
 
-  return F(m,s[1],s[4])*I(n,s[2]);
+  return -F(m,s[1],s[4])*I(n,s[2]);
 }
 
 
@@ -87,6 +87,14 @@ struct rho11010 : Master {
 Master* _11010(int m, int n, int s[3]) {
   Master *R =  new rho11010(m,n,s); return R;
 }
+Master* _10110(int m, int n, int s[3]) {
+  int s_new[3]; // swap: s_2 <-> s_3
+  s_new[0] = s[0];
+  s_new[1] = s[1];
+  s_new[2] = s[0]*s[1]*s[2];
+  Master *R =  new rho11010(m,n,s_new); return R;
+}
+
 
 /*--------------------------------------------------------------------*/
 // all the thermal weights for cuts from this topology
@@ -144,7 +152,7 @@ double rho11010::eval()
   gsl_integration_qag(  outer, .0+1e-10,1., epsabs, epsrel,
                         limit, 6, wsp, &res, &err  );
 
-  return res;
+  return res*I(n,(this->s)[2])*.25*OOFP;
 }
 
 /*--------------------------------------------------------------------*/

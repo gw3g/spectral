@@ -64,6 +64,7 @@ Master* _00120(int, int, int *);
 
 // type.II
 Master* _11010(int, int, int *);
+Master* _10110(int, int, int *);
 Master* _11020(int, int, int *);
 Master* _10120(int, int, int *);
 

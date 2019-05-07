@@ -139,7 +139,7 @@ double rho11111::eval()
                        ( (b1+b2)*9.+b3*2.+(b4+b5)*5. )*k0*k0 )/SQR(K2)/12.*OOFP;
   } else
   if ( m==2 && n==0 ) { // (2)
-    (this->OPE).T0 = .5*K2*( +11./16. -.5 );
+    (this->OPE).T0 = -.5*K2*( +11./16. -.5 );
     (this->OPE).T2 = -( (a2+a3+a4)*k0*k0-(a2+a5)*K2*.25 )*.25/K2*OOFP;
     (this->OPE).T4 = -(((b1+b4)*3.+(b2+b3+b5)*2.)*.5*K2-
                        (b2*7.+b3+b4*9.+b5*2.)*k0*k0+
@@ -164,11 +164,11 @@ double rho11111::eval()
     auto inner = make_gsl_function( [&](double y) {
           return (this->integrand)(x,y);
         } );
-    gsl_integration_qag( inner, .0+1e-10,1., epsabs, 1e-4,
+    gsl_integration_qag( inner, .0+1e-10,1., epsabs, 1e-3,
                          limit, 6, wsp1, &inner_result, &inner_abserr );
     return inner_result;
   } );
-  gsl_integration_qag( outer, .0+1e-10,1., epsabs, 1e-3,
+  gsl_integration_qag( outer, .0+1e-10,1., epsabs, 1e-2,
                        limit, 6, wsp2, &res, &err  );//*/
 
   double temp = 0.;
@@ -180,10 +180,11 @@ double rho11111::eval()
         ((1.-((double)(this->s)[1])*em)*(1.-((double)(this->s)[2])*em)) )/k;
     temp *= 1.;
   };
-  return ( (  res*pow(k0,m+n)*pow(K2,-(m+n)/2.)
+  return ( (  res*pow(k0,m+n)*pow(K2,-(m+n)/2.) ) )*CUBE(OOFP);
+  /*return ( (  res*pow(k0,m+n)*pow(K2,-(m+n)/2.)
          //+ k0*k0*temp
         -(this->OPE).T0
-      )*CUBE(OOFP));// - (this->OPE).T2 )/(this->OPE).T4;
+      )*CUBE(OOFP) - (this->OPE).T2 )/(this->OPE).T4;*/
 }
 
 /*--------------------------------------------------------------------*/
@@ -192,7 +193,7 @@ double rho11111::eval()
 inline double L_div(double p, double l, double pp, double pm) {
   //double pp = kp-p, pm = km-p, l=k0-p;
   double res = lga( pp*pm/(l*p) );//-K2/(4.*p*p);
- /*res = ( fabs(p/k0)>1e4 ) ? (K2/SQR(2.*p))*(  //1. // dangerous!
+ res = ( fabs(p/k0)>1e5 ) ? (K2/SQR(2.*p))*(  //1. // dangerous!
                                                 //+ k0/p
                                                 //+ (k*k+7.*k0*k0)/(8.*p*p)
                                                 //+ k0*(k*k+3.*k0*k0)/(4.*CUBE(p))
@@ -1060,6 +1061,6 @@ double rho11111::integrand(double x, double y) {
   //if ( isinf(res)||isnan(res) ) { return -1e6;}//for inspection
   //if ( isinf(res)||isnan(res) ) { return 0.;}
   //else 
-  { return .5*fabs(K2)*res/k; }
+  { return .5*(K2)*res/k; }
   //else { return res/k; }
 }

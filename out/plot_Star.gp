@@ -1,7 +1,7 @@
 r0= 384*pi
 
 set xl 'k0/T'
-set yl "64 {/Symbol p} K^2 x {/Symbol r}/T^2"
+set yl "384 {/Symbol p} K^2 x {/Symbol r}/T^2"
 
 set yr [-2.1:1.1]
 set xr [.005:140]
