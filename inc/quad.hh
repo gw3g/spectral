@@ -1,6 +1,6 @@
 #include <gsl/gsl_integration.h>
 /*--------------------------------------------------------------------*/
-// wrapper for GSL integration methods
+// wrapper for GSL ∫ methods
 
 struct quad {
   gsl_integration_workspace * wsp;

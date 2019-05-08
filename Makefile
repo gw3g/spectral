@@ -16,7 +16,7 @@ INC	= -I inc
 $(TARGET): $(OBJ)
 	@mkdir -p bin
 	@mkdir -p $(OUT)/data
-	$(CC) $(CFLAGS) $^ -o $(TARGET)
+	$(CC) $(CFLAGS) $^ $(INC) main.cpp -o $(TARGET)
 
 $(ODIR)/%.o: $(SDIR)/%.$(SRCEXT)
 	@mkdir -p $(ODIR)
@@ -24,6 +24,9 @@ $(ODIR)/%.o: $(SDIR)/%.$(SRCEXT)
 
 clean:
 	$(RM) -r $(ODIR) $(TARGET); $(RM) bin/*;
+
+dileptons: $(OBJ)
+	$(CC) $(CFLAGS) $^ $(INC) spike/dileptons.cpp -o bin/dileptons
 
 .PHONY: clean
 
