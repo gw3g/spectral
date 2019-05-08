@@ -152,7 +152,7 @@ double rho11111::eval()
   //f1.f2.R = this;
   //integrate<outer> I(f1); // do the x-integral
   //res = go(I);
-  double epsabs = 1e-2, epsrel = 1e-2;
+  double epsabs = 1e-1, epsrel = 1e-2;
   size_t limit = 1e6;
 
   quad wsp1(limit);
@@ -164,11 +164,11 @@ double rho11111::eval()
     auto inner = make_gsl_function( [&](double y) {
           return (this->integrand)(x,y);
         } );
-    gsl_integration_qag( inner, .0+1e-10,1., epsabs, 1e-3,
+    gsl_integration_qag( inner, .0+1e-10,1., epsabs, 1e-2,
                          limit, 6, wsp1, &inner_result, &inner_abserr );
     return inner_result;
   } );
-  gsl_integration_qag( outer, .0+1e-10,1., epsabs, 1e-2,
+  gsl_integration_qag( outer, .0+1e-10,1., epsabs, 1e-1,
                        limit, 6, wsp2, &res, &err  );//*/
 
   double temp = 0.;

@@ -11,8 +11,7 @@ int print_D(double);
 int print_k2av();
 
 int main() {
-  //print_D(.3);
-  print_k2av();
+  print_D(3.);
 }
 
 /*--------------------------------------------------------------------*/
@@ -31,10 +30,11 @@ static void sigalrm_handler( int sig ) {
         //setw(10) << "K = ("<< k0 << "," << k << ")" <<endl;
   cout << '[';
   for (int i=0;i<50;i++) {
-    if ((double)i<percentage*50.) {cout << '=';}
-    else {cout << ' ';};
+    if ((double)i<percentage*50.) {cout << '#';}
+    else {cout << '-';};
   }
-  cout << "] " << setprecision(2) << percentage*100. << "%" << '\r';
+  cout << "] " << setw(2) << setfill(' ') << (int)(percentage*100.);
+  cout << "%" << '\r';
   alarm(1);
 }
 
@@ -111,16 +111,13 @@ int print_D(double k_curr) {
   fout << "# ( k=" << k << " )" << endl;
 
   signal( SIGALRM, sigalrm_handler );
-  elapsed=0; alarm(10);
+  elapsed=0; alarm(1);
 
   // Here are some parameters that can be changed:
   N_k0=300; 
 
   k0_min=1e-2;
   k0_max=1e+2;
-  //s = 1e-2;
-  //k0_min = .9*k;
-  //k0_max = 1.1*k;
   // don't change anything after that.
 
   s=pow(k0_max/k0_min,1./(N_k0-1));
@@ -149,14 +146,15 @@ int print_k2av() {
 
   cout << ":: Creating table for k = " << k <<  " ..." << endl << endl;
   Rho_V _R;
-  fout.open("spike/list.Mr_k2av.dat");
+  string fname = "spike/list.Mr_k2av.dat";
+  fout.open(fname);
   fout << "# Columns: b, bb, d, db, g, h, hp, j" << endl;
 
   signal( SIGALRM, sigalrm_handler );
   elapsed=0; alarm(1);
 
   // Here are some parameters that can be changed:
-  N_M=200; 
+  N_M=400; 
 
   M_min=1e-1;
   M_max=1e+2;
@@ -184,5 +182,10 @@ int print_k2av() {
      << endl;
     M*=s;
   }
+  cout << endl;
+  cout << endl;
+  cout << endl << ":: Saved to file [" << fname << "]" << endl;
+  fout.close();
+
   return 0;
 }
