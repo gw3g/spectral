@@ -115,7 +115,7 @@ double rho11110::eval()
   //f1.f2.R = this;
   //integrate<outer> I(f1); // do the x-integral
   //res = go(I) + ( (k0>k) ? -K2/8. : 0. );
-  double epsabs = 1e-2, epsrel = 1e-2;
+  double epsabs = 1e-3, epsrel = 1e-4;
   size_t limit = 1e5;
 
   quad wsp1(limit);

@@ -11,7 +11,7 @@ int print_D(double);
 int print_k2av();
 
 int main() {
-  print_D(3.);
+  print_D(.3);
 }
 
 /*--------------------------------------------------------------------*/
@@ -74,20 +74,21 @@ struct Rho_V
   };
   void operator ()() {
 
-    lo = 2.*Nc*K2*lga( cosh(.5*kp)/cosh(.5*km) )/k*OOFP;
+    //lo = 2.*Nc*K2*lga( cosh(.5*kp)/cosh(.5*km) )/k*OOFP;
+    lo = 2.*Nc*K2*(.5+lga( (1.+exp(-kp))/(1.+exp(-km)) ))/k*OOFP;
     nlo= lo*3.*cF*SQR(OOFP);
 
     _b = (*rho_b )(k0,k)*K2,
     _bb= (*rho_bb)(k0,k)*K2,
     _d = (*rho_d )(k0,k),
-    _db= (*rho_db)(k0,k),
+    _db= (*rho_db)(k0,k);
     _g = (*rho_g )(k0,k)*K2,
     _h = (*rho_h )(k0,k),
     _hp= (*rho_hp)(k0,k),
     _j = (*rho_j )(k0,k);
 
     nlo +=
-    8.*Nc*cF*( 2.*( _b-_bb+_d-_db) + 1.5*_g - 2.*(_h+_hp) + _j );
+    8.*Nc*cF*( 2.*(_b-_bb+_d-_db) + 1.5*_g - 2.*(_h+_hp) + _j );
 
   };
 };
