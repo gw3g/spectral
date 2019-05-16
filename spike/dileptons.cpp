@@ -115,7 +115,7 @@ int print_D(double k_curr) {
   elapsed=0; alarm(1);
 
   // Here are some parameters that can be changed:
-  N_k0=300; 
+  N_k0=600; 
 
   k0_min=1e-2;
   k0_max=1e+2;
