@@ -35,7 +35,7 @@ struct Finite : map {
 template <typename F>
 struct SemiInf : map {
   //double a, TMAX=4.;
-  double TMAX = 20.,  // the large-k0 result is very sensitive to this\
+  double TMAX = 24.,  // the large-k0 result is very sensitive to this\
                          should be ~20 for k0~100T. But if you go over\
                          ~40, expect trouble!
          TMIN = -3.5;
