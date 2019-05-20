@@ -168,7 +168,7 @@ double rho11111::eval()
   //f1.f2.R = this;
   //integrate<outer> I(f1); // do the x-integral
   //res = go(I);
-  double epsabs = 1e+3, epsrel = 1e-2;
+  double epsabs = 1e-1, epsrel = 1e-2;
   size_t limit = 1e6;
 
   quad wsp1(limit);
@@ -180,11 +180,11 @@ double rho11111::eval()
     auto inner = make_gsl_function( [&](double y) {
           return (this->integrand)(x,y);
         } );
-    gsl_integration_qag( inner, .0+1e-10,1., epsabs, 1e-3,
+    gsl_integration_qag( inner, .0+1e-8,1., epsabs, 1e-3,
                          limit, 6, wsp1, &inner_result, &inner_abserr );
     return inner_result;
   } );
-  gsl_integration_qag( outer, .0+1e-10,1., epsabs, 1e-2,
+  gsl_integration_qag( outer, .0+1e-8,1., epsabs, 1e-2,
                        limit, 6, wsp2, &res, &err  );//*/
 
   double temp = 0.;
@@ -192,13 +192,13 @@ double rho11111::eval()
   if ( (m==1)&&(n==1) ) {
     temp += ( (k0>k) ? 2. : 0. );
     double ep = exp(-fabs(kp)), em = exp(-fabs(km));
-    temp += lga( // thermal coefficient of `vacuum'-part
+    /*temp += lga( // thermal coefficient of `vacuum'-part
          (1.-((double)(this->s)[1])*ep)*(1.-((double)(this->s)[4])*ep)*
          (1.-((double)(this->s)[2])*ep)*(1.-((double)(this->s)[5])*ep)/(
          (1.-((double)(this->s)[1])*em)*(1.-((double)(this->s)[4])*em)*
-         (1.-((double)(this->s)[2])*em)*(1.-((double)(this->s)[5])*em) ))/k;
+         (1.-((double)(this->s)[2])*em)*(1.-((double)(this->s)[5])*em) ))/k;*/
 
-    res = ( res*k0*k0/K2 - .5*(this->OPE).T0*temp );
+    res = ( res*k0*k0/K2 - .0*(this->OPE).T0*temp );
   }
   return res*CUBE(OOFP); 
 }
@@ -209,16 +209,16 @@ double rho11111::eval()
 inline double L_div(double p, double l, double pp, double pm) {
   //double pp = kp-p, pm = km-p, l=k0-p;
   double res = lga( pp*pm/(l*p) );//-K2/(4.*p*p);
-  if (p/k0>1e2) {
+  if (fabs(p/k0)>1e2) {
     res = 0.; double Rp=SQR(kp/p),
                      Rm=SQR(km/p),
                      R0=SQR(k0/p);
 
-    for (int n=2;n<100;n++) { // series expansion, p -> +inf
-      res -= ( Rp+Rm-R0 )/((double)n);
+    for (int n=3;n<100;n++) { // series expansion, p -> +inf
       Rp *= kp/p;
       Rm *= km/p;
       R0 *= k0/p;
+      res -= ( Rp+Rm-R0 )/((double)n);
     };
 
   }
@@ -401,11 +401,17 @@ double rho11111::integrand(double x, double y) {
                                      ); //      (**)
 
       temp -= pow(q/k0,n)*F_14(p,l)*.5*L_div(q,v,qp,qm);
-      temp -= pow(q/k0,m)*F_25(p,l)*.5*( L_div(q,v,qp,qm) /*- K2/SQR(2.*p)*/  );
-      temp -= pow(v/k0,n)*F_14(l,p)*.5*L_div(v,q,qm,qp);
-      temp -= pow(v/k0,m)*F_25(l,p)*.5*( L_div(v,q,qm,qp) /*- K2/SQR(2.*p)*/ );
+      temp -= pow(q/k0,m)*F_25(p,l)*.5*L_div(q,v,qp,qm);
+      temp -= pow(v/k0,n)*F_14(l,p)*.5*L_div(q,v,qp,qm);
+      temp -= pow(v/k0,m)*F_25(l,p)*.5*L_div(q,v,qp,qm);
       return .5*temp/r;
-  },  km-p  )(y); },  km,kp )(x);                       //*/
+  },  km-p  )(y)
+    - (.5*K2/8.)*( 
+        F_14(p,k0-p)+
+        F_25(p,k0-p)+
+        F_14(k0-p,p)+
+        F_25(k0-p,p) )*( 1./( (k0-p)*1e2*k0 ) + lga( 1e2*k0/(1e2*k0+k0-p) )/SQR(k0-p) )
+    ; },  km,kp )(x);                       //*/
   //\
   return _2C;
   _2D =
@@ -484,14 +490,17 @@ double rho11111::integrand(double x, double y) {
                                     ); //      (**)
 
       temp += pow(p/k0,n)*F_14(q,v)*.5*L_div(p,l,pp,pm);
-      temp += pow(p/k0,m)*F_25(q,v)*.5*( L_div(p,l,pp,pm) /*- K2/SQR(2.*p)*/  );
-      temp += pow(l/k0,n)*F_14(v,q)*.5*L_div(l,p,pm,pp);
-      temp += pow(l/k0,m)*F_25(v,q)*.5*( L_div(p,l,pp,pm) /*- K2/SQR(2.*p)*/ );
+      temp += pow(p/k0,m)*F_25(q,v)*.5*L_div(p,l,pp,pm);
+      temp += pow(l/k0,n)*F_14(v,q)*.5*L_div(p,l,pp,pm);
+      temp += pow(l/k0,m)*F_25(v,q)*.5*L_div(p,l,pp,pm);
 
       return .5*temp/r;
   },  k0  )(y)
-    //+.5*.125*K2*( lga(q/k0)/(k0-q)/k0 )*F_25(q,k0-q)
-    //+.125*K2*( lga((k0-q)/k0)/q/k0 )*F_25(k0-q,q)
+    + (.5*K2/8.)*( 
+        F_14(q,k0-q)+
+        F_25(q,k0-q)+
+        F_14(k0-q,q)+
+        F_25(k0-q,q) )*( 1./(1e2*k0*(k0-q)) + lga( (1e2*k0-k0+q)/(1e2*k0) )/SQR(k0-q) );
     ; }
   ,  km,kp    )(x);                                   //*/
   //\

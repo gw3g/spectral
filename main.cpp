@@ -9,7 +9,7 @@
 #include <string>
 
 double k0, k;
-int s[] = {+1,-1,-1};
+int s[] = {+1,+1,+1};
 char s_name[] = {'-','+'};
 
 using namespace std;
@@ -20,15 +20,15 @@ void config(Master *rho);
 
 int main() {
   Master *rho;
-  rho = _11111(1,1,s);
+  rho = _11111(0,0,s);
   config(rho);
 
   //k0 = 60.4; k = 10.;
   //print_integrand(0,0,s);
   //Print_k0(rho,.004);
-  //Print_k0(rho,.1);
+  Print_k0(rho,.1);
   //Print_k0(rho,1.);
-  Print_k0(rho,10.);
+  //Print_k0(rho,10.);
   //cout << k0 << ", " << k << endl;
 }
 
@@ -65,9 +65,9 @@ int Print_k0(Master *rho, double k_curr) {
   fout.open(fname);
 
   // Here are some parameters that can be changed:
-  N_k0=200; 
+  N_k0=100; 
 
-  k0_min=1e-2;
+  k0_min=k+1e-1;
   k0_max=1e+2;
   //k0_min = .9*k;
   //k0_max = 1.1*k;
@@ -78,7 +78,7 @@ int Print_k0(Master *rho, double k_curr) {
 
   for (int i=0;i<N_k0;i++) { 
     //percentage=(float)i/((float)N_k0);
-    res = (*rho)(k0,k) ;
+    res = (*rho)(k0,k)*sgn(K2) ;
     cout << k0 << "    " << res << " , OPE= " << (rho->OPE)() << endl;
     fout << k0 << "    " << res << endl;
     k0*=s; 

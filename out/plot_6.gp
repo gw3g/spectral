@@ -13,10 +13,10 @@ set log x
 set key b r
 set grid
 
-set tit "I_{11111}^{(1,1)}, (+++)"
+set tit "I_{11111}^{(0,0)}, (+++)"
 p 'data/diag.6{k=0.004}.(+++).00.dat'   u 1:($2*r0) w lp lt 1 t "k/T=.0",\
-  'data/diag.6{k=0.10}.(+--).11.dat'     u 1:($2*r0) w lp lt 2 t "    .1",\
-  'data/diag.6{k=1.00}.(+--).11.dat'       u 1:($2*r0) w lp lt 3 t "    1.",\
-  'data/diag.6{k=10.00}.(+--).11.dat'      u 1:($2*r0) w lp lt 4 t "    10."
+  'data/diag.6{k=0.10}.(+++).00.dat'     u 1:($2*r0) w lp lt 2 t "    .1",\
+  'data/diag.6{k=1.00}.(+++).00.dat'       u 1:($2*r0) w lp lt 3 t "    1.",\
+  'data/diag.6{k=10.00}.(+++).00.dat'      u 1:($2*r0) w lp lt 4 t "    10."
 pause -1
 
