@@ -9,7 +9,7 @@
 #include <string>
 
 double k0, k;
-int s[] = {+1,+1,+1};
+int s[] = {+1,-1,-1};
 char s_name[] = {'-','+'};
 
 using namespace std;
@@ -28,9 +28,7 @@ int main() {
   //Print_k0(rho,.004);
   //Print_k0(rho,.1);
   //Print_k0(rho,1.);
-  Print_k0(rho,3.);
-  Print_k0(rho,6.);
-  Print_k0(rho,9.);
+  Print_k0(rho,10.);
   //cout << k0 << ", " << k << endl;
 }
 
@@ -67,9 +65,9 @@ int Print_k0(Master *rho, double k_curr) {
   fout.open(fname);
 
   // Here are some parameters that can be changed:
-  N_k0=20; 
+  N_k0=200; 
 
-  k0_min=k+1e-1;
+  k0_min=1e-2;
   k0_max=1e+2;
   //k0_min = .9*k;
   //k0_max = 1.1*k;
@@ -80,7 +78,7 @@ int Print_k0(Master *rho, double k_curr) {
 
   for (int i=0;i<N_k0;i++) { 
     //percentage=(float)i/((float)N_k0);
-    res = (*rho)(k0,k)*sgn(km) ;
+    res = (*rho)(k0,k) ;
     cout << k0 << "    " << res << " , OPE= " << (rho->OPE)() << endl;
     fout << k0 << "    " << res << endl;
     k0*=s; 
