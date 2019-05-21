@@ -3,6 +3,7 @@
 #include "map.hh"
 
 using namespace std;
+double E = 1e3;
 
 /*--------------------------------------------------------------------*/
 
@@ -168,7 +169,7 @@ double rho11111::eval()
   //f1.f2.R = this;
   //integrate<outer> I(f1); // do the x-integral
   //res = go(I);
-  double epsabs = 1e-1, epsrel = 1e-2;
+  double epsabs = 1e1, epsrel = 1e-2;
   size_t limit = 1e6;
 
   quad wsp1(limit);
@@ -180,11 +181,11 @@ double rho11111::eval()
     auto inner = make_gsl_function( [&](double y) {
           return (this->integrand)(x,y);
         } );
-    gsl_integration_qag( inner, .0+1e-8,1., epsabs, 1e-3,
+    gsl_integration_qag( inner, .0+1e-8,1., epsabs, 1e-2,
                          limit, 6, wsp1, &inner_result, &inner_abserr );
     return inner_result;
   } );
-  gsl_integration_qag( outer, .0+1e-8,1., epsabs, 1e-2,
+  gsl_integration_qag( outer, .0+1e-8,1., epsabs, 1e-1,
                        limit, 6, wsp2, &res, &err  );//*/
 
   double temp = 0.;
@@ -209,7 +210,7 @@ double rho11111::eval()
 inline double L_div(double p, double l, double pp, double pm) {
   //double pp = kp-p, pm = km-p, l=k0-p;
   double res = lga( pp*pm/(l*p) );//-K2/(4.*p*p);
-  if (fabs(p/k0)>1e2) {
+  if (fabs(p/k0)>E) {
     res = 0.; double Rp=SQR(kp/p),
                      Rm=SQR(km/p),
                      R0=SQR(k0/p);
@@ -223,6 +224,24 @@ inline double L_div(double p, double l, double pp, double pm) {
 
   }
   return res;
+}
+
+inline double L_int(int j, double a, double p) {
+  // indefinite integrals of the form
+  //
+  //  ∫dp (p/k0)^j (p^2*(a-p))^{-1}
+  //
+  double temp = lga(p/(p-a));
+  if (j==0) {
+    return ( temp/a - 1./p )/a;
+  } else
+  if (j==1) {
+    return temp/(a*k0);
+  } else
+  if (j==2) {
+    return -( lga(SQR(p-a)/K2) )/(2.*k0*k0);
+  }
+  return 0.;
 }
 
 double rho11111::integrand(double x, double y) { 
@@ -402,15 +421,16 @@ double rho11111::integrand(double x, double y) {
 
       temp -= pow(q/k0,n)*F_14(p,l)*.5*L_div(q,v,qp,qm);
       temp -= pow(q/k0,m)*F_25(p,l)*.5*L_div(q,v,qp,qm);
-      temp -= pow(v/k0,n)*F_14(l,p)*.5*L_div(q,v,qp,qm);
-      temp -= pow(v/k0,m)*F_25(l,p)*.5*L_div(q,v,qp,qm);
+      temp -= pow(v/k0,n)*F_14(l,p)*.5*L_div(v,q,qm,qp);
+      temp -= pow(v/k0,m)*F_25(l,p)*.5*L_div(v,q,qm,qp);
       return .5*temp/r;
   },  km-p  )(y)
     - (.5*K2/8.)*( 
-        F_14(p,k0-p)+
-        F_25(p,k0-p)+
-        F_14(k0-p,p)+
-        F_25(k0-p,p) )*( 1./( (k0-p)*1e2*k0 ) + lga( 1e2*k0/(1e2*k0+k0-p) )/SQR(k0-p) )
+        F_14(p,k0-p)*L_int(n,k0-p,-E*k0)+
+        F_25(p,k0-p)*L_int(m,k0-p,-E*k0)+
+        F_14(k0-p,p)*L_int(n,p,E*k0)+
+        F_25(k0-p,p)*L_int(m,p,E*k0)
+        )//*( 1./( (k0-p)*E*k0 ) + lga( E*k0/(E*k0+k0-p) )/SQR(k0-p) )
     ; },  km,kp )(x);                       //*/
   //\
   return _2C;
@@ -491,16 +511,17 @@ double rho11111::integrand(double x, double y) {
 
       temp += pow(p/k0,n)*F_14(q,v)*.5*L_div(p,l,pp,pm);
       temp += pow(p/k0,m)*F_25(q,v)*.5*L_div(p,l,pp,pm);
-      temp += pow(l/k0,n)*F_14(v,q)*.5*L_div(p,l,pp,pm);
-      temp += pow(l/k0,m)*F_25(v,q)*.5*L_div(p,l,pp,pm);
+      temp += pow(l/k0,n)*F_14(v,q)*.5*L_div(l,p,pm,pp);
+      temp += pow(l/k0,m)*F_25(v,q)*.5*L_div(l,p,pm,pp);
 
       return .5*temp/r;
   },  k0  )(y)
-    + (.5*K2/8.)*( 
-        F_14(q,k0-q)+
-        F_25(q,k0-q)+
-        F_14(k0-q,q)+
-        F_25(k0-q,q) )*( 1./(1e2*k0*(k0-q)) + lga( (1e2*k0-k0+q)/(1e2*k0) )/SQR(k0-q) );
+    - (.5*K2/8.)*( 
+        F_14(q,k0-q)*L_int(n,k0-q,E*k0)+
+        F_25(q,k0-q)*L_int(m,k0-q,E*k0)+
+        F_14(k0-q,q)*L_int(n,q,-E*k0)+
+        F_25(k0-q,q)*L_int(m,q,-E*k0)
+        )//*( 1./(E*k0*(k0-q)) + lga( (E*k0-k0+q)/(E*k0) )/SQR(k0-q) );
     ; }
   ,  km,kp    )(x);                                   //*/
   //\
