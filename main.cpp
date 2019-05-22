@@ -20,22 +20,22 @@ void config(Master *rho);
 
 int main() {
   Master *rho;
-  rho = _11111(0,0,s);
+  rho = _11111(2,0,s);
   config(rho);
 
-  //k0 = 60.4; k = 10.;
-  //print_integrand(0,0,s);
+  //k0 = 60.4; k = 1.;
+  //print_integrand(2,0,s);
   //Print_k0(rho,.004);
-  Print_k0(rho,.1);
+  //Print_k0(rho,.1);
   //Print_k0(rho,1.);
-  //Print_k0(rho,10.);
+  Print_k0(rho,10.);
   //cout << k0 << ", " << k << endl;
 }
 
 void config(Master *rho) {
   // a small function: prints m,n,etc
   cout << "m =" << rho->m << endl;
-  cout << "n =" << rho->m << endl;
+  cout << "n =" << rho->n << endl;
   cout << "s0=" << rho->s[0] << 
       " ,  s1=" << rho->s[1] <<
       " ,  s2=" << rho->s[2] <<
@@ -78,7 +78,7 @@ int Print_k0(Master *rho, double k_curr) {
 
   for (int i=0;i<N_k0;i++) { 
     //percentage=(float)i/((float)N_k0);
-    res = (*rho)(k0,k)*sgn(K2) ;
+    res = (*rho)(k0,k) ;
     cout << k0 << "    " << res << " , OPE= " << (rho->OPE)() << endl;
     fout << k0 << "    " << res << endl;
     k0*=s; 

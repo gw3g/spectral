@@ -31,7 +31,6 @@ where `[...]` takes the value specified within the square brackets.
 
 ## Todo
 
-* can the fff in thermal.cpp be deleted?
 * type 6, m=2
 * ~~type 5 + star~~ tune integrator
 * ~~include OPE in masters~~ check the T^4
