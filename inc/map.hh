@@ -13,7 +13,7 @@ struct map {
 
 template <typename F>
 struct Finite : map {
-  double TMAX = 3.5;
+  double TMAX = 3.8;
   F funk;
   double operator ()(double t) {
     double dxdt, del, Q = exp(-2.*sinh(t*TMAX));
@@ -38,26 +38,10 @@ struct SemiInf : map {
   double TMAX = 22.,  // the large-k0 result is very sensitive to this\
                          should be ~20 for k0~100T. But if you go over\
                          ~40, expect trouble!
-         TMIN = -3.5;
-  //double TMAX = 3.8;
+         TMIN = -3.8;
+
   F funk;
   double operator ()(double t) {
-    //double dxdt, del = a*exp(2.*sinh(((1.-2.*t)*TMAX)));
-    //dxdt = TMAX*4.*del*cosh(((1.-2.*t)*TMAX));
-    //double tt = (1.-2.*t)*TMAX;
-    //double dxdt, del = a*exp( tt - exp( -tt ) );
-    //dxdt = -TMAX*2.*del*(1.+exp(-tt));
-    //return funk(a+del,del)*fabs(dxdt);
-    
-    /*double dxdt, 
-           del1 = a*exp(2.*sinh((+t*TMAX))),
-           del2 = a*exp(2.*sinh((-t*TMAX)));
-    dxdt = TMAX*2.*cosh((t*TMAX));
-    double res = 
-       ( funk(a+del1,del1)*fabs(del1)
-       + funk(a+del2,del2)*fabs(del2)
-      )*fabs(dxdt);//*/
-    
     double del1 = a*exp( +t*TMAX - exp(-t*TMAX)),
            del2 = a*exp( +t*TMIN - exp(-t*TMIN));
 

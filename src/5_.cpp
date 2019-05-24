@@ -99,13 +99,21 @@ double rho11110::eval()
          a4=I(0,(this->s)[4]), b4=I(2,(this->s)[4]);
 
   if ( m==0 && n==0 ) { // (0)
-    (this->OPE).T0 = -K2*5./4.;
-    (this->OPE).T2 = +( a1-(a2+a3) )*.25*OOFP;
-    (this->OPE).T4 = +( 3.*b1-(b2+b3) )*(k0*k0+k*k/3.)/SQR(K2)/3.*OOFP;
+    (this->OPE).T0 = -5./4.;
+    (this->OPE).T2 = +( a1-(a2+a3) )*.25*OOFP/K2;
+    (this->OPE).T4 = +( 3.*b1-(b2+b3) )*(k0*k0+k*k/3.)/CUBE(K2)/3.*OOFP;
   } else
   if ( m==1 && n==0 ) { // (1)
+    (this->OPE).T0 = -11./16.;
+    (this->OPE).T2 = -( a2+a3 )*.25*OOFP*k0/K2;
+    (this->OPE).T4 = -( (b2+b3)*(k0*k0+k*k/3.) -.5*(3.*b1+b2+b3)*K2 )*k0/CUBE(K2)
+                      /3.*OOFP;
   } else
   if ( m==0 && n==1 ) { // (0,1)
+    (this->OPE).T0 = -9./32.;
+    (this->OPE).T2 = + a1*.125*OOFP*k0/K2;
+    (this->OPE).T4 = +( 3.*b1*(k0*k0+k*k/3.) - .5*( 3.*(b1+b2)-b3 )*K2 )*k0
+                      /CUBE(K2)/6.*OOFP;
   } else {
     cerr << "Case: (m,n)=("<< m << ","<<n<<") out of bounds!\n";
     return 0.;
@@ -673,7 +681,8 @@ double rho11110::integrand(double x, double y)
   res += _2A + _2B + _4A + _4B + _4D + _5A + _5B + _6A + _6B + _6C + _Virt;
 
   }
-    // still don't have a good way to cater for NaNs
-  if ( isinf(res)||isnan(res) ) { return 0.;}
-  else { return .25*(K2)*res/(k); }
+  // still don't have a good way to cater for NaNs
+  //if ( isinf(res)||isnan(res) ) { return 0.;}
+  //else
+  { return .25*pow(k0,m+n)*res/(k); }
 }

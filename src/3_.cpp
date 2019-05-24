@@ -56,27 +56,27 @@ double rho11011::eval()
          a5=I(0,(this->s)[5]), b5=I(2,(this->s)[5]);
 
   if ( m==0 && n==0 ) { // (0)
-    (this->OPE).T0 = -2.*K2;
+    (this->OPE).T0 = -2.;
     (this->OPE).T2 = ( a1+a2+a4+a5 )*.25*OOFP/K2;
     (this->OPE).T4 = ( b1+b2+b4+b5 )*(k0*k0+k*k/3.)/CUBE(K2)*OOFP;
   } else
   if ( m==1 && n==0 ) { // (1)
-    (this->OPE).T0 = -K2;
-    (this->OPE).T2 = ( a2+2.*a4+a5 )*.125*OOFP/K2;
+    (this->OPE).T0 = -1.;
+    (this->OPE).T2 = ( a2+2.*a4+a5 )*.125*OOFP*k0/K2;
     (this->OPE).T4 = ( -(b1-b4)*K2 
-                       +(b2+2.*b4+b5)*(k0*k0+k*k/3.) )/CUBE(K2)*.5*OOFP;
+                       +(b2+2.*b4+b5)*(k0*k0+k*k/3.) )*k0/CUBE(K2)*.5*OOFP;
   } else
   if ( m==0 && n==1 ) { // (0,1)
-    (this->OPE).T0 = -K2;
-    (this->OPE).T2 = ( a1+2.*a5+a4 )*.125*OOFP/K2;
+    (this->OPE).T0 = -1.;
+    (this->OPE).T2 = ( a1+2.*a5+a4 )*.125*OOFP*k0/K2;
     (this->OPE).T4 = ( +(b2-b5)*K2 
-                       +(b1+2.*b5+b4)*(k0*k0+k*k/3.) )/CUBE(K2)*.5*OOFP;
+                       +(b1+2.*b5+b4)*(k0*k0+k*k/3.) )*k0/CUBE(K2)*.5*OOFP;
   } else
   if ( m==1 && n==1 ) { // (1,1)
-    (this->OPE).T0 = -.5*K2;
-    (this->OPE).T2 = ( a4+a5 )*.125*OOFP/K2;
+    (this->OPE).T0 = -.5;
+    (this->OPE).T2 = ( a4+a5 )*.125*OOFP*SQR(k0)/K2;
     (this->OPE).T4 = ( -(b4+b5)*K2 
-                       +(b4+b5)*(k0*k0+k*k/3.) )/CUBE(K2)*.5*OOFP;
+                       +(b4+b5)*(k0*k0+k*k/3.) )*SQR(k0)/CUBE(K2)*.5*OOFP;
   } else {
     cerr << "Case: (m,n)=("<< m << ","<<n<<") out of bounds!\n";
     return 0.;
@@ -90,7 +90,7 @@ double rho11011::eval()
   res += -(2.*g1m-g0m)*h0n+g1m*h1n;
   res += -(2.*g1n-g0n)*h0m+g1n*h1m;
 
-  return -res*.25*CUBE(OOFP);
+  return -res*.25*CUBE(OOFP)*pow(k0,m+n);
 }
 
 /*--------------------------------------------------------------------*/

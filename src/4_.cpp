@@ -16,21 +16,8 @@ struct rho11100 : Master {
   double integrand(double,double); // supported on [0,1]x[0,1]
 
   double F_123(double,double,double); // Cut: f1f2f3/f0
-
-  /*struct inner {
-    rho11100 *R;
-    double _x; // x-dependence "stands by"
-    double operator ()(double y) { return (R->integrand)(_x,y); }
-  };
-  struct outer {
-    inner f2;
-    double operator ()(double x) {
-      f2._x = x;
-      integrate<inner> I(f2); // do the y-integral
-      return go(I);
-    };
-  };//*/
   double eval();
+
   rho11100(int _m, int _n, int _s[3]) : Master(_m,_n,_s) { type=4; }
 };
 // function for MAIN
@@ -119,7 +106,7 @@ double rho11100::eval() {
                          limit, 6, wsp2, &res, &err  );
 
   return (( res + ( (k0>k) ? -K2/8. : 0. ) ))*CUBE(OOFP);//*/
-  //return (( res ))*CUBE(OOFP);
+  // note: subtraction does not introduce any discontinuity
 }
 
 /*--------------------------------------------------------------------*/

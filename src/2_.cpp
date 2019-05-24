@@ -51,17 +51,17 @@ double rho11020::eval()
 
   if ( m==0 && n==0 ) { // (0)
     (this->OPE).T0 = 0.;
-    (this->OPE).T2 =  -a2*.25*OOFP;
+    (this->OPE).T2 =  -a2*.25*OOFP/K2;
     (this->OPE).T4 = 0.;
   } else
   if ( m==1 && n==0 ) { // (1)
     (this->OPE).T0 = 0.;
-    (this->OPE).T2 =  -a2*.25*OOFP;
+    (this->OPE).T2 =  -a2*.25*OOFP*k0/K2;
     (this->OPE).T4 = 0.;
   } else
   if ( m==2 && n==0 ) { // (2)
     (this->OPE).T0 = 0.;
-    (this->OPE).T2 =  -1.25*a2*.25*OOFP;
+    (this->OPE).T2 =  -1.25*a2*.25*OOFP*SQR(k0)/K2;
     (this->OPE).T4 = 0.;
   } else {
     cerr << "Case: (m,n)=("<< m << ","<<n<<") out of bounds!\n";
@@ -123,25 +123,25 @@ double rho11010::eval()
 {
   double res, err;
 
-  double a1=I(0,(this->s)[1]), // tadpole ints
-         a2=I(0,(this->s)[2]),
-         a4=I(0,(this->s)[4]);
+  double a1=I(n,(this->s)[1]), // tadpole ints
+         a2=I(n,(this->s)[2]),
+         a4=I(n,(this->s)[4]);
 
-  if ( m==0 && n==0 ) { // (0)
+  if ( m==0 ) { // (0)
     (this->OPE).T0 = 0.;
     (this->OPE).T2 =  a2*.25*OOFP;
     (this->OPE).T4 = 0.;
   } else
-  if ( m==1 && n==0 ) { // (1)
+  if ( m==1 ) { // (1)
     (this->OPE).T0 = 0.;
-    (this->OPE).T2 =  a2*.125*OOFP;
+    (this->OPE).T2 =  a2*.125*OOFP*k0;
     (this->OPE).T4 = 0.;
   } else {
-    cerr << "Case: (m,n)=("<< m << ","<<n<<") out of bounds!\n";
+    cerr << "Case:  m = "<< m << "  out of bounds!\n";
     return 0.;
   }
 
-  double epsabs = 1e-2, epsrel = 1e-2;
+  double epsabs = 1e-3, epsrel = 1e-3;
   size_t limit = 1e5;
 
   quad wsp(limit);
@@ -152,7 +152,7 @@ double rho11010::eval()
   gsl_integration_qag(  outer, .0+1e-10,1., epsabs, epsrel,
                         limit, 6, wsp, &res, &err  );
 
-  return res*I(n,(this->s)[2])*.25*OOFP;
+  return res*a2*.25*OOFP*pow(k0,m);
 }
 
 /*--------------------------------------------------------------------*/

@@ -19,6 +19,9 @@ To get the value of the function, one can simply call:
 (*rho)(k0,k)
 ```
 
+**NB** Instances of the masters return a quantity in units
+of the temperature. 
+
 ## Data files
 
 Output from the main function is stored under `out/data`. 
@@ -31,8 +34,9 @@ where `[...]` takes the value specified within the square brackets.
 
 ## Todo
 
+* temp is bad variable name
 * type 6, m=2
-* ~~type 5 + star~~ tune integrator
+* ~~type 5 + star~~ possible OPE mismatch? (for some statistics)
 * ~~include OPE in masters~~ check the T^4
 * ~~organise include files better~~
 * cuda implementation for high accuracy?
