@@ -420,7 +420,7 @@ double rhoStar::integrand(double x, double y)
                       .5*( lga(4.*pm*pp/(k*k))+lga(l2/K2) )
                     + 7./4.
                     - (K2 - 2.*k0*l)/K2
-                    + 2.*s3*tempp/l2
+                    + 2.*tempp/l2
                     );
   }, km,kp    )(x); //*/
   //\
@@ -658,7 +658,7 @@ double rhoStar::integrand(double x, double y)
                           + .5*( lga(4.*pm*pp/(k*k))+lga(l2/K2) )
                           + 7./4.
                           - (K2 - 2.*k0*l)/K2
-                          + 2.*s3*tempp/l2
+                          + 2.*tempp/l2
                         );
   }, kp    )(x); //*/
   _Virt +=
@@ -684,7 +684,7 @@ double rhoStar::integrand(double x, double y)
                           + .5*( lga(4.*pm*pp/(k*k))+lga(l2/K2) )
                           + 7./4.
                           - (K2 - 2.*k0*l)/K2
-                          + 2.*s3*tempp/l2
+                          + 2.*tempp/l2
                         );
   }, km    )(x); //*/
   //\

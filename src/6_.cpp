@@ -96,8 +96,8 @@ double rho11111::F_14(double p, double l) {
 
   double fp=f(p,s1), fl=f(l,s4);
 
-  //res = ( ((double) s1*s4)*exp(k0)-1. )*fp*fl;
-  res = 1. + fp + fl;
+  res = ( ((double) s1*s4)*exp(k0)-1. )*fp*fl;
+  //res = 1. + fp + fl;
   res*= pow(k0,-_m)*pow(p,_m)*sgn(km);
 
   return res;
@@ -113,8 +113,8 @@ double rho11111::F_25(double q, double v) {
 
   double fq=f(q,s2), fv=f(v,s5);
 
-  //res = ( ((double) s2*s5)*exp(k0)-1. )*fq*fv;
-  res = 1. + fq + fv;
+  res = ( ((double) s2*s5)*exp(k0)-1. )*fq*fv;
+  //res = 1. + fq + fv;
   res*= pow(k0,-_n)*pow(q,_n)*sgn(km);
 
   return res;
@@ -135,33 +135,33 @@ double rho11111::eval()
 
   if ( m==0 && n==0 ) { // (0)
     (this->OPE).T0 = 0.;
-    (this->OPE).T2 = -( a1+a2+2.*a3+a4+a5 )*.25*OOFP;
-    (this->OPE).T4 = -( (b1+b2+b4+b5)*11.+b3*6.)*(k0*k0+k*k/3.)/SQR(K2)/6.*OOFP;
+    (this->OPE).T2 = -( a1+a2+2.*a3+a4+a5 )*.25*OOFP/K2;
+    (this->OPE).T4 = -( (b1+b2+b4+b5)*11.+b3*6.)*(k0*k0+k*k/3.)/CUBE(K2)/6.*OOFP;
   } else
   if ( m==1 && n==0 ) { // (1)
     (this->OPE).T0 = 0.;
-    (this->OPE).T2 = -( a2+a3+a4 )*.25*OOFP;
+    (this->OPE).T2 = -( a2+a3+a4 )*.25*OOFP*k0/K2;
     (this->OPE).T4 = -( ( (b2+b4)*11.+b3*3.)*(k0*k0+k*k/3.) +
-                        ( (b1-b4)*9.-(b2-b5)*5. )*K2*.5       )/SQR(K2)/6.*OOFP;
+                        ( (b1-b4)*9.-(b2-b5)*5. )*K2*.5     )*k0/CUBE(K2)/6.*OOFP;
   } else
   if ( m==0 && n==1 ) { // (0,1)
     (this->OPE).T0 = 0.;
-    (this->OPE).T2 = -( a1+a3+a5 )*.25*OOFP;
+    (this->OPE).T2 = -( a1+a3+a5 )*.25*OOFP*k0/K2;
     (this->OPE).T4 = -( ( (b1+b5)*11.+b3*3.)*(k0*k0+k*k/3.) +
-                        ( (b2-b5)*9.-(b1-b4)*5. )*K2*.5       )/SQR(K2)/6.*OOFP;
+                        ( (b2-b5)*9.-(b1-b4)*5. )*K2*.5     )*k0/CUBE(K2)/6.*OOFP;
   } else
   if ( m==1 && n==1 ) { // (1,1)
-    (this->OPE).T0 = K2/16.;
+    (this->OPE).T0 = 1./16.;
     (this->OPE).T2 = 0.;
-    (this->OPE).T4 = -(( (b1+b2+b4+b5)*3.-b3*2.      )*.5*K2-
-                       ( (b1+b2)*9.+b3*2.+(b4+b5)*5. )*k0*k0  )/SQR(K2)/12.*OOFP;
+    (this->OPE).T4 = -(( (b1+b2+b4+b5)*3.-b3*2.      )*.5*K2 -
+                       ( (b1+b2)*9.+b3*2.+(b4+b5)*5. )*k0*k0 )*SQR(k0)/CUBE(K2)/12.*OOFP;
   } else
   if ( m==2 && n==0 ) { // (2)
-    (this->OPE).T0 = -.5*K2*( +11./16. -.5 );
+    (this->OPE).T0 = -.5*( +11./16. -.5 );
     (this->OPE).T2 = -( (a2+a3+a4)*k0*k0-(a2+a5)*K2*.25 )*.25/K2*OOFP;
     (this->OPE).T4 = -(((b1+b4)*3.+(b2+b3+b5)*2.)*.5*K2-
                        (b2*7.+b3+b4*9.+b5*2.)*k0*k0+
-                       ((b2+b4)*11.+b3 )*k0*k0*(k0*k0+k*k/3.)/K2  )/SQR(K2)/6.*OOFP;
+                       ((b2+b4)*11.+b3 )*k0*k0*(k0*k0+k*k/3.)/K2  )*SQR(k0)/CUBE(K2)/6.*OOFP;
   } else {
     cerr << "Case: (m,n)=("<< m << ","<<n<<") out of bounds!\n";
     return 0.;
@@ -170,7 +170,7 @@ double rho11111::eval()
   //f1.f2.R = this;
   //integrate<outer> I(f1); // do the x-integral
   //res = go(I);
-  double epsabs = 1e-2, epsrel = 1e-3;
+  double epsabs = 1e-3, epsrel = 1e-4;
   size_t limit = 1e6;
 
   quad wsp1(limit);
@@ -199,10 +199,10 @@ double rho11111::eval()
          (1.-((double)(this->s)[2])*ep)*(1.-((double)(this->s)[5])*ep)/(
          (1.-((double)(this->s)[1])*em)*(1.-((double)(this->s)[4])*em)*
          (1.-((double)(this->s)[2])*em)*(1.-((double)(this->s)[5])*em) ))/k;
-    res = ( res*k0*k0/K2 - .5*(this->OPE).T0*temp );
+    res = ( res - .5*(this->OPE).T0*temp*K2 );
   }
   if ( (m==2)&&(n==0) ) {
-    res = k0*k0*res/K2;
+    res = res;
     //res = ( res );//- (this->OPE).T0 );
   }
   return res*CUBE(OOFP); 
@@ -1245,6 +1245,6 @@ double rho11111::integrand(double x, double y) {
   //if ( isinf(res)||isnan(res) ) { return -1e6;}//for inspection
   //if ( isinf(res)||isnan(res) ) { return 0.;}
   //else 
-  { return .5*(K2)*res/k; }
+  { return .5*pow(k0,m+n)*res/k; }
   //else { return res/k; }
 }

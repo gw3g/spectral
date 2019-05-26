@@ -1,7 +1,12 @@
-r0= 64*pi
 
-set xl 'k0/T'
-set yl "64 {/Symbol p} K^2 x {/Symbol r}/T^2"
+s=  "+++"
+mn= "00"
+load "format.gp"
+
+R(k0,k) = 64*pi
+
+set xl "k0/T"
+set yl "64 {/Symbol p} x {/Symbol r}/T^2"
 
 set yr [-0.1:2.1]
 set xr [.005:140]
@@ -10,11 +15,10 @@ set log x
 set key t r
 set grid
 
-set tit "I_{11100}^{(0,0)}, (+++)"
-p 'data/diag.4{k=0.004}.(-++).00.dat'  u 1:($2*r0) w lp lt 4 t "k/T=.0",\
-  'data/diag.4{k=0.1}.(-++).00.dat'  u 1:($2*r0) w lp lt 1 t "    .1",\
-  'data/diag.4{k=1}.(-++).00.dat'  u 1:($2*r0) w lp lt 2 t "    1.",\
-  'data/diag.4{k=10}.(-++).00.dat'  u 1:($2*r0) w lp lt 3 t "    10."
+set tit "I_{11100}^{(".mn.")}, (".s.")"
+p diag(4,"0.10",s,mn)   u 1:($2*R($1,0.1))  w lp lt 1 t "k/T=.1"  ,\
+  diag(4,"1.00",s,mn)   u 1:($2*R($1,1.0))  w lp lt 2 t "    1."  ,\
+  diag(4,"10.00",s,mn)  u 1:($2*R($1,10.))  w lp lt 3 t "    10."
 
 pause -1
 
