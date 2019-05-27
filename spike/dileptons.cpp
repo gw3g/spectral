@@ -11,7 +11,7 @@ int print_D(double);
 int print_k2av();
 
 int main() {
-  print_D(.3);
+  print_D(9.0);
 }
 
 /*--------------------------------------------------------------------*/
@@ -144,16 +144,16 @@ struct Rho_00
     _bb_0= (*rho_bb_0)(k0,k)*K2;
     _b_1 = (*rho_b_1 )(k0,k)*k0;
     _bb_1= (*rho_bb_1)(k0,k)*k0;
-    _b_2 = (*rho_b_1 )(k0,k);
-    _bb_2= (*rho_bb_1)(k0,k);
+    _b_2 = (*rho_b_2 )(k0,k);
+    _bb_2= (*rho_bb_2)(k0,k);
     _g   = (*rho_g   )(k0,k)*k*k;
     _h_0 = (*rho_h_0 )(k0,k);   // TODO: check norm of h, j
-    _h_1 = (*rho_h_1 )(k0,k)*k0/K2;
+    _h_1 = (*rho_h_1 )(k0,k)*k0*k0/K2;
     _hp  = (*rho_hp)(k0,k);
     _j_0 = (*rho_j_0 )(k0,k)*(k0*k0+k*k)/K2;
-    _j_2 = (*rho_j_2 )(k0,k)*k0*k0/K2;
+    _j_2 = (*rho_j_2 )(k0,k);
 
-    nlo +=
+    nlo =
     8.*Nc*cF*( 2.*(_b_0-_bb_0-4.*(_b_1-_bb_1)+4.*(_b_2-_bb_2)) 
              - k*k*_g - 2.*(_h_0+_hp) + 8.*_h_1 - _j_0 - 4.*_j_2 );
 
@@ -174,7 +174,7 @@ int print_D(double k_curr) {
                + ".dat";
 
   cout << ":: Creating table for k = " << k <<  " ..." << endl << endl;
-  Rho_V _R;
+  Rho_00 _R;
   fout.open(fname);
   fout << "# Columns: k0/T, -rhoV_LO/T2, -rhoV_NLO/(g2*T2)" << endl;
   fout << "# ( k=" << k << " )" << endl;
@@ -183,9 +183,9 @@ int print_D(double k_curr) {
   elapsed=0; alarm(1);
 
   // Here are some parameters that can be changed:
-  N_k0=600; 
+  N_k0=60; 
 
-  k0_min=1e-2;
+  k0_min=k+1e-1;
   k0_max=1e+2;
   // don't change anything after that.
 
