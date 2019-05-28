@@ -1,9 +1,10 @@
 
-s=  "+++"
+s=  "+--"
 mn= "00"
 load "format.gp"
 
 R(k0,k) = 12*16*pi*(k0-k)*(k0-k)/4.
+#R(k0,k) = 12*16*pi
 
 set xl "k0/T"
 set yl "192 {/Symbol p} x {/Symbol r} (4k_-^2)"

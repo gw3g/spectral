@@ -34,7 +34,7 @@ where `[...]` takes the value specified within the square brackets.
 
 ## Todo
 
-* temp is bad variable name
+* type 6, m=n=1: OPE approach from above/below?
 * type 6, m=2
 * ~~type 5 + star~~ possible OPE mismatch? (for some statistics)
 * ~~include OPE in masters~~ check the T^4

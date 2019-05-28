@@ -18,8 +18,6 @@ double  f(double,int),
        fb(double,int);
 
 double I(int,int); // tadpole
-//double ff(double , double, int , int);
-//double fff(double , double, double, int , int , int *);
 
 void print_integrand(int m, int n, int s[3]); // for checking
 
@@ -53,6 +51,7 @@ struct Master {
   double operator ()(double _k0, double _k) { 
     k0=_k0; k=_k; // reset K
     return eval();
+    // dimension = 2(a+b+c+d+e)-m-n-6
   };
 };
 

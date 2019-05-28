@@ -1,11 +1,13 @@
 
 s=  "+++"
-mn= "11"
+mn= "00"
 load "format.gp"
 
-#R(k0,k) = 32*pi*abs(k0*k0-k*k) 
-#R(k0,k) = 32*pi*12./5.
-R(k0,k) = 32*pi
+R(k0,k) = 32*pi*(k0*k0-k*k)**2 
+#R(k0,k) = 32*pi*(k0*k0-k*k)**2/k0
+#R(k0,k) = 32*pi*(k0*k0-k*k)
+#R(k0,k) = 32*pi*(k0*k0-k*k)*12./5.
+#R(k0,k) = 32*pi
 
 set xl "k0/T"
 set yl "32 {/Symbol p} K^2 x {/Symbol r} / T^2"
