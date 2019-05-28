@@ -154,7 +154,7 @@ struct Rho_00
     _j_2 = (*rho_j_2 )(k0,k)*K2;
 
     nlo =
-    8.*Nc*cF*( (-_b_0+_bb_0-4.*(_b_1-_bb_1)+4.*(_b_2-_bb_2)) 
+    8.*Nc*cF*( 2.*(_b_0-_bb_0-4.*(_b_1-_bb_1)+4.*(_b_2-_bb_2))
              - _g - 2.*(_h_0+_hp) + 8.*_h_1 - _j_0 + 4.*_j_2 );
 
   };
@@ -183,9 +183,9 @@ int print_D(double k_curr) {
   elapsed=0; alarm(1);
 
   // Here are some parameters that can be changed:
-  N_k0=100; 
+  N_k0=5; 
 
-  k0_min=k+1e-1;
+  k0_min=4e1+1e-1;
   k0_max=1e+2;
   // don't change anything after that.
 

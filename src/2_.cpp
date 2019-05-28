@@ -5,8 +5,8 @@
 double F(int nu, int sA, int sB) {
   // here F_m for m={0,1,2}
   double res=0.;
-  res += f(km,sA)*f(kp,sB)/kp;
-  res -= f(kp,sA)*f(km,sB)/km;
+  res += f(kp,sA)*f(km,sB)/km;
+  res -= f(km,sA)*f(kp,sB)/kp;
   res *= ((double)sA*sB)*exp(k0)-1.; // = F_0
   if (nu>0) {
     res *= k0;
@@ -21,7 +21,7 @@ double F(int nu, int sA, int sB) {
     res -= f(fabs(kp),sB)*( k0 + f(fabs(kp),sA)*exp(fabs(kp))*kp*((double)(sB-sA)) ); // = F_2
   }
 
-  res *= -.0625*OOFP/k; // coeff = 1/16
+  res *= .0625*OOFP/k; // coeff = 1/16
   return res;
 }
 
@@ -61,7 +61,7 @@ double rho11020::eval()
   } else
   if ( m==2 && n==0 ) { // (2)
     (this->OPE).T0 = 0.;
-    (this->OPE).T2 =  -1.25*a2*.25*OOFP*SQR(k0)/K2;
+    (this->OPE).T2 =  -.75*a2*.25*OOFP*(k0*k0+k*k/3.)/K2;
     (this->OPE).T4 = 0.;
   } else {
     cerr << "Case: (m,n)=("<< m << ","<<n<<") out of bounds!\n";
