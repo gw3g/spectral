@@ -10,7 +10,7 @@ set key t l
 
 n = -1/(24*16*pi)
 
-set tit "{/Symbol r}/T^2,   w/  k^2_{av}(M) "
+set tit "{/Symbol r}/T^2,   w/  k@^2_{av}(M) "
 p (4*n) lt 2 not,\
   (n) lt 3 not,\
   (-n) lt 4 not,\
@@ -24,4 +24,5 @@ p (4*n) lt 2 not,\
   'list.Mr_k2av.dat'   u 1:7 pt 7 t  "11110 (h:--+)",\
   'list.Mr_k2av.dat'   u 1:8 pt 7 t  "{/ZapfDingbats H}  (h':--+)",\
   'list.Mr_k2av.dat'   u 1:9 pt 8 t  "11111 (j:--+)"
+
 pause -1

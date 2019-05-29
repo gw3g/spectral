@@ -9,7 +9,7 @@
 #include <string>
 
 double k0, k;
-int s[] = {+1,+1,+1};
+int s[] = {+1,-1,-1};
 char s_name[] = {'-','+'};
 
 using namespace std;
@@ -20,7 +20,7 @@ void config(Master *rho);
 
 int main() {
   Master *rho;
-  rho = _10120(0,0,s);
+  rho = _11110(0,1,s);
   config(rho);
 
   //k0 = 60.4; k = 1.;
@@ -65,9 +65,9 @@ int Print_k0(Master *rho, double k_curr) {
   fout.open(fname);
 
   // Here are some parameters that can be changed:
-  N_k0=500; 
+  N_k0=10; 
 
-  k0_min=1e-2;
+  k0_min=50+1e-2;
   k0_max=1e+2;
   //k0_min = .9*k;
   //k0_max = 1.1*k;

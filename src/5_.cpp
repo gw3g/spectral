@@ -123,7 +123,7 @@ double rho11110::eval()
   //f1.f2.R = this;
   //integrate<outer> I(f1); // do the x-integral
   //res = go(I) + ( (k0>k) ? -K2/8. : 0. );
-  double epsabs = 1e-3, epsrel = 1e-5;
+  double epsabs = 1e-5, epsrel = 1e-2;
   size_t limit = 1e5;
 
   quad wsp1(limit);
@@ -138,7 +138,7 @@ double rho11110::eval()
                        limit, 6, wsp1, &inner_result, &inner_abserr );
     return inner_result;
   } );
-  gsl_integration_qag(  outer, .0+1e-10,1., epsabs, epsrel*10, 
+  gsl_integration_qag(  outer, .0+1e-10,1., epsabs, epsrel*2, 
                         limit, 6, wsp2, &res, &err  );
 
   return (( res ))*CUBE(OOFP);
@@ -642,7 +642,7 @@ double rho11110::integrand(double x, double y)
 
     return F_14(p,l)*(
                       ( lga(4.*pm*pp/(k*k))+lga(l*l/K2)
-                    + ( (m+n==1) ? 3.5 : 3. ) // 3.5 if m,n=1
+                    + ( (m+n==1) ? 3.5 : 3. )           // 3.5 if m,n=1
                     )*pow( .5*l/k0, n )
                     + 2.*tempp/l
                     );
@@ -670,7 +670,7 @@ double rho11110::integrand(double x, double y)
 
     return F_14(p,l)*(
                       ( lga(4.*pm*pp/(k*k))+lga(l*l/K2)
-                    + ( (m+n==1) ? 3.5 : 3. ) // 3.5 if m,n=1
+                    + ( (m+n==1) ? 3.5 : 3. )           // 3.5 if m,n=1
                     )*pow( .5*l/k0, n )
                     + 2.*tempp/l
                     );

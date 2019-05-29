@@ -11,7 +11,8 @@ int print_D(double);
 int print_k2av();
 
 int main() {
-  print_D(.3);
+  //print_D(1.5);
+  print_k2av();
 }
 
 /*--------------------------------------------------------------------*/
@@ -75,7 +76,7 @@ struct Rho_V
   void operator ()() {
 
     //lo = 2.*Nc*K2*lga( cosh(.5*kp)/cosh(.5*km) )/k*OOFP;
-    lo = 2.*Nc*K2*(.5+lga( (1.+exp(-kp))/(1.+exp(-km)) ))/k*OOFP;
+    lo = 2.*Nc*K2*(.5+lga( (1.+exp(-kp))/(1.+exp(-km)) )/k)*OOFP;
     nlo= lo*3.*cF*SQR(OOFP);
 
     _b = (*rho_b )(k0,k)*K2;
@@ -85,7 +86,7 @@ struct Rho_V
     _g = (*rho_g )(k0,k)*K2;
     _h = (*rho_h )(k0,k)*K2;
     _hp= (*rho_hp)(k0,k);
-    _j = (*rho_j )(k0,k);
+    _j = (*rho_j )(k0,k)*SQR(K2);
 
     nlo +=
     8.*Nc*cF*( 2.*(_b-_bb+_d-_db) + 1.5*_g - 2.*(_h+_hp) + _j );
@@ -183,9 +184,9 @@ int print_D(double k_curr) {
   elapsed=0; alarm(1);
 
   // Here are some parameters that can be changed:
-  N_k0=5; 
+  N_k0=300; 
 
-  k0_min=4e1+1e-1;
+  k0_min=1e-2;
   k0_max=1e+2;
   // don't change anything after that.
 
@@ -223,7 +224,7 @@ int print_k2av() {
   elapsed=0; alarm(1);
 
   // Here are some parameters that can be changed:
-  N_M=400; 
+  N_M=300; 
 
   M_min=1e-1;
   M_max=1e+2;

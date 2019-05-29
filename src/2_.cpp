@@ -68,7 +68,7 @@ double rho11020::eval()
     return 0.;
   }
 
-  return -F(m,s[1],s[4])*I(n,s[2]);
+  return -F(m,s[1],s[4])*I(n,s[2]); // the minus is from I(..)
 }
 
 

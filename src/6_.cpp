@@ -171,7 +171,7 @@ double rho11111::eval()
   (this->OPE).T2 /= SQR(K2);
   (this->OPE).T4 /= SQR(K2);
 
-  double epsabs = 1e-2, epsrel = 1e-3;
+  double epsabs = 1e-5, epsrel = 1e-2;
   size_t limit = 1e6;
 
   quad wsp1(limit);
@@ -187,7 +187,7 @@ double rho11111::eval()
                          limit, 6, wsp1, &inner_result, &inner_abserr );
     return inner_result;
   } );
-  gsl_integration_qag( outer, .0+1e-8,1., epsabs, epsrel*10,
+  gsl_integration_qag( outer, .0+1e-8,1., epsabs, epsrel*2,
                        limit, 6, wsp2, &res, &err  );//*/
 
   double temp = 0.;
