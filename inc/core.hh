@@ -19,6 +19,10 @@ double  f(double,int),
 
 double I(int,int); // tadpole
 
+double psi0(int sA, int sB); // moments
+double psi1(int sA, int sB);
+double psi2(int sA, int sB);
+
 void print_integrand(int m, int n, int s[3]); // for checking
 
 /*--------------------------------------------------------------------*/
