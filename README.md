@@ -1,5 +1,7 @@
 # NLO spectral functions
 
+![Labelling of generic two-loop diagram](inc/twoloop.png?raw=true "2-loop")
+
 ## Usage
 
 You can use the master integrals by first declaring
@@ -12,7 +14,7 @@ rho = _10120(m,n,s);
 Here `m` and `n` are the powers of p_0 and q_0 (resp.),
 and `s` is an `int [3]` array of entries +1 (boson)
 or -1 (fermion) to capture the statistical 
-configuration: (s<sub>0</sub>,s<sub>1</sub>,<sub>s</sub>).
+configuration: (s<sub>0</sub>,s<sub>1</sub>,s<sub>2</sub>).
 
 To get the value of the function, one can simply call:
 ```
