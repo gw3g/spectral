@@ -1,6 +1,14 @@
 # NLO spectral functions
 
+Here I provide functions to compute the imaginary part of  
+two-loop diagrams, like the one shown below.
+These are thermal self energies of an external four momentum K=(k<sub>0</sub>,k).
+
 ![Labelling of generic two-loop diagram](inc/twoloop.png?raw=true "2-loop")
+
+Powers of the internal propagators for P, Q, R, L and V respectively are 
+used to classify the masters by a string `abcde'.
+Here the powers are all either 0, 1 or 2.
 
 ## Usage
 
