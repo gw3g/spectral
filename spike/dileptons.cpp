@@ -11,11 +11,13 @@ int print_D(double);
 int print_k2av();
 
 int main() {
-  print_D(.3);
+  //print_D(.3);
+  print_D(.5);
+  print_D(1.);
   print_D(1.5);
-  print_D(3.);
-  print_D(6.);
-  print_D(9.);
+  //print_D(3.);
+  //print_D(6.);
+  //print_D(9.);
   //print_k2av();
 }
 
@@ -67,10 +69,10 @@ struct Rho_V
 
     S[0] = +1; S[1] = - 1; S[2] = -1; // statistics
 
-    rho_b =  _10120(0,0,S); // 'vector' channel
-    rho_bb=  _11020(0,0,S);
-    rho_d =  _10110(0,0,S);
-    rho_db=  _11010(0,0,S);
+    rho_b =  _11020(0,0,S); // 'vector' channel
+    rho_bb=  _10120(0,0,S);
+    rho_d =  _11010(0,0,S);
+    rho_db=  _10110(0,0,S);
     rho_g =  _11011(0,0,S);
     rho_h =  _11110(0,0,S);
     rho_hp=  _Star( 0,0,S);
@@ -79,8 +81,8 @@ struct Rho_V
   };
   void operator ()() {
 
-    lo = 2.*Nc*K2*lga( cosh(.5*kp)/cosh(.5*km) )/k*OOFP;
-    //lo = 2.*Nc*( k0*k0*( psi1(-1,-1)-psi2(-1,-1) ) - .25*K2*psi0(-1,-1) )*OOFP
+    //lo = 2.*Nc*K2*lga( cosh(.5*kp)/cosh(.5*km) )/k*OOFP;
+    lo = -Nc*K2*psi0(-1,-1)*OOFP; // note sign convention
     nlo= lo*3.*cF*SQR(OOFP);
 
     _b = (*rho_b )(k0,k)*K2;
@@ -93,7 +95,7 @@ struct Rho_V
     _j = (*rho_j )(k0,k)*SQR(K2);
 
     nlo +=
-    8.*Nc*cF*( 2.*(_b-_bb+_d-_db) + 1.5*_g - 2.*(_h+_hp) + _j );
+    8.*Nc*cF*( 2.*(_b-_bb+_d-_db) - 1.5*_g + 2.*(_h+_hp) - _j );
 
   };
 };
@@ -125,12 +127,12 @@ struct Rho_00
 
     S[0] = +1; S[1] = - 1; S[2] = -1; // statistics
 
-    rho_b_0 =  _10120(0,0,S); // notation: rho_<tag>_<power of ..>
-    rho_bb_0=  _11020(0,0,S);
-    rho_b_1 =  _10120(1,0,S);
-    rho_bb_1=  _11020(1,0,S);
-    rho_b_2 =  _10120(2,0,S);
-    rho_bb_2=  _11020(2,0,S);
+    rho_b_0 =  _11020(0,0,S); // notation: rho_<tag>_<power of ..>
+    rho_bb_0=  _10120(0,0,S);
+    rho_b_1 =  _11020(1,0,S);
+    rho_bb_1=  _10120(1,0,S);
+    rho_b_2 =  _11020(2,0,S);
+    rho_bb_2=  _10120(2,0,S);
     rho_g   =  _11011(0,0,S);
     rho_h_0 =  _11110(0,0,S);
     rho_h_1 =  _11110(0,1,S);
@@ -143,9 +145,8 @@ struct Rho_00
 
     //lo = 2.*Nc*K2*lga( cosh(.5*kp)/cosh(.5*km) )/k*OOFP;
     //lo = 2.*Nc*K2*(.5+lga( (1.+exp(-kp))/(1.+exp(-km)) ))/k*OOFP;
-    //lo = 2.*Nc*( k0*k0*( psi1(-1,-1)-psi2(-1,-1) ) - .25*K2*psi0(-1,-1) )*OOFP;
-    lo = Nc*( k*k*psi0(-1,-1) )*OOFP;
-    nlo= lo*3.*cF*SQR(OOFP);
+    lo = 2.*Nc*( k0*k0*( psi1(-1,-1)-psi2(-1,-1) ) - .25*K2*psi0(-1,-1) )*OOFP;
+    nlo = cF*Nc*( k*k*psi0(-1,-1) )*CUBE(OOFP);
 
     _b_0 = (*rho_b_0 )(k0,k)*K2;
     _bb_0= (*rho_bb_0)(k0,k)*K2;
@@ -162,7 +163,7 @@ struct Rho_00
 
     nlo +=
     8.*Nc*cF*( 2.*(_b_0-_bb_0-4.*(_b_1-_bb_1)+4.*(_b_2-_bb_2))
-             - _g - 2.*(_h_0+_hp) + 8.*_h_1 - _j_0 + 4.*_j_2 );
+             + _g + 2.*(_h_0+_hp) - 8.*_h_1 + _j_0 - 4.*_j_2 );
 
   };
 };
@@ -176,14 +177,15 @@ int print_D(double k_curr) {
   // filename
   char k_name[20];
   sprintf(k_name,"{k=%.2f}",k);
-  string fname = "spike/NLO_rhoV_"
+  string fname = "spike/NLO_rho_"
                + string(k_name)
                + ".dat";
 
   cout << ":: Creating table for k = " << k <<  " ..." << endl << endl;
-  Rho_00 _R;
+  Rho_V rV;
+  Rho_00 r00;
   fout.open(fname);
-  fout << "# Columns: k0/T, -rhoV_LO/T2, -rhoV_NLO/(g2*T2)" << endl;
+  fout << "# Columns: k0/T, rhoV_LO/T2, rho00_LO/T2, rhoV_NLO/(g2*T2), rho00_NLO/(g2*T2)" << endl;
   fout << "# ( k=" << k << " )" << endl;
 
   signal( SIGALRM, sigalrm_handler );
@@ -193,22 +195,26 @@ int print_D(double k_curr) {
   N_k0=30; 
 
   k0_min=10;
-  k0_max=30;
+  k0_max=20;
   // don't change anything after that.
 
-  s=pow(k0_max/k0_min,1./(N_k0-1));
+  //s=pow(k0_max/k0_min,1./(N_k0-1));
+  s=(k0_max-k0_min)/((double)N_k0-1.);
   k0=k0_min;
 
   for (int i=0;i<N_k0;i++) { 
   //while (k0<10.) {
     percentage=(float)i/((float)N_k0);
-    _R();
+    rV();
+    r00();
     //cout << k0 << "    " << res << endl;
     fout << k0     << "    "
-         << _R.lo  << "    "
-         << _R.nlo << endl;
+         << rV.lo  << "    "
+         << r00.lo  << "    "
+         << rV.nlo  << "    "
+         << r00.nlo << endl;
 
-    k0*=s; 
+    k0+=s; 
   }
   cout << endl << ":: Saved to file [" << fname << "]" << endl;
   fout.close();
