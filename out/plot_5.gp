@@ -1,10 +1,10 @@
 
-s=  "+--"
-mn= "01"
+s=  "+++"
+mn= "10"
 load "format.gp"
 
 #R(k0,k) = 192*pi*abs(k0*k0-k*k)
-R(k0,k) = 4*192*pi*k0
+R(k0,k) = 96*pi*abs(K2(k0,k))/k0
 
 set xl "k0/T"
 set yl "192 {/Symbol p} K^2 x {/Symbol r}/T^2"

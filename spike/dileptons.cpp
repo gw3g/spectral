@@ -12,9 +12,11 @@ int print_k2av();
 
 int main() {
   //print_D(.3);
-  print_D(.5);
+
+  //print_D(.5);
   print_D(1.);
-  print_D(1.5);
+  //print_D(1.5);
+
   //print_D(3.);
   //print_D(6.);
   //print_D(9.);
@@ -161,8 +163,8 @@ struct Rho_00
     _j_0 = (*rho_j_0 )(k0,k)*(k0*k0+k*k)*K2;
     _j_2 = (*rho_j_2 )(k0,k)*K2;
 
-    nlo +=
-    8.*Nc*cF*( 2.*(_b_0-_bb_0-4.*(_b_1-_bb_1)+4.*(_b_2-_bb_2))
+    nlo -=
+    4.*Nc*cF*( 2.*(_b_0-_bb_0-4.*(_b_1-_bb_1)+4.*(_b_2-_bb_2))
              + _g + 2.*(_h_0+_hp) - 8.*_h_1 + _j_0 - 4.*_j_2 );
 
   };
@@ -192,10 +194,10 @@ int print_D(double k_curr) {
   elapsed=0; alarm(1);
 
   // Here are some parameters that can be changed:
-  N_k0=30; 
+  N_k0=50; 
 
-  k0_min=10;
-  k0_max=20;
+  k0_min=1e-2;
+  k0_max=15.;
   // don't change anything after that.
 
   //s=pow(k0_max/k0_min,1./(N_k0-1));

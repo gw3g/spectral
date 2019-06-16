@@ -3,7 +3,7 @@
 #include "map.hh"
 
 using namespace std;
-double E = 3e1; // control param for large momenta: used to \
+double E = 3e2; // control param for large momenta: used to \
                    switch between expanded or full integrand
 
 /*--------------------------------------------------------------------*/
@@ -60,8 +60,8 @@ double rho11111::F_123(double p, double q, double r) {
 
   double fp=f(p,s1), fq=f(q,s2), fr= f(r,s3);
 
-  //res = ( ((double) s1*s2*s3)*exp(k0)-1. )*fp*fq*fr;
-  res = 1. + fp + fq + fr + fp*fq + fp*fr + fq*fr;
+  res = ( ((double) s1*s2*s3)*exp(k0)-1. )*fp*fq*fr;
+  //res = 1. + fp + fq + fr + fp*fq + fp*fr + fq*fr;
   res*= pow(k0,-_m-_n)*pow(p,_m)*pow(q,_n) ;
 
   return res;
@@ -79,8 +79,8 @@ double rho11111::F_345(double r, double l, double v) {
 
   double fr=f(r,s3), fl=f(l,s4), fv= f(v,s5);
 
-  //res = ( ((double) s3*s4*s5)*exp(k0)-1. )*fr*fl*fv;
-  res = 1. + fl + fv + fr + fl*fv + fl*fr + fv*fr;
+  res = ( ((double) s3*s4*s5)*exp(k0)-1. )*fr*fl*fv;
+  //res = 1. + fl + fv + fr + fl*fv + fl*fr + fv*fr;
   res*= pow(k0,-_m-_n)*pow(k0-l,_m)*pow(k0-v,_n) ;
 
   return res;
@@ -96,8 +96,8 @@ double rho11111::F_14(double p, double l) {
 
   double fp=f(p,s1), fl=f(l,s4);
 
-  //res = ( ((double) s1*s4)*exp(k0)-1. )*fp*fl;
-  res = 1. + fp + fl;
+  res = ( ((double) s1*s4)*exp(k0)-1. )*fp*fl;
+  //res = 1. + fp + fl;
   res*= pow(k0,-_m)*pow(p,_m)*sgn(km);
 
   return res;
@@ -113,8 +113,8 @@ double rho11111::F_25(double q, double v) {
 
   double fq=f(q,s2), fv=f(v,s5);
 
-  //res = ( ((double) s2*s5)*exp(k0)-1. )*fq*fv;
-  res = 1. + fq + fv;
+  res = ( ((double) s2*s5)*exp(k0)-1. )*fq*fv;
+  //res = 1. + fq + fv;
   res*= pow(k0,-_n)*pow(q,_n)*sgn(km);
 
   return res;
@@ -171,7 +171,7 @@ double rho11111::eval()
   (this->OPE).T2 /= SQR(K2);
   (this->OPE).T4 /= SQR(K2);
 
-  double epsabs = 1e-5, epsrel = 1e-3;
+  double epsabs = 1e-4, epsrel = 1e-2;
   size_t limit = 1e6;
 
   quad wsp1(limit);
@@ -200,7 +200,7 @@ double rho11111::eval()
          (1.-((double)(this->s)[2])*ep)*(1.-((double)(this->s)[5])*ep)/(
          (1.-((double)(this->s)[1])*em)*(1.-((double)(this->s)[4])*em)*
          (1.-((double)(this->s)[2])*em)*(1.-((double)(this->s)[5])*em) ))/k;
-    res = ( res - .0*(this->OPE).T0*temp*K2/SQR(k0) );
+    res = ( res - .5*(this->OPE).T0*temp*K2/SQR(k0) );
   }
   if ( (m==2)&&(n==0) ) {
     res = res;
