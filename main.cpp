@@ -9,7 +9,7 @@
 #include <string>
 
 double k0, k;
-int s[] = {+1,+1,+1};
+int s[] = {+1,-1,-1};
 char s_name[] = {'-','+'};
 
 using namespace std;
@@ -20,15 +20,15 @@ void config(Master *rho);
 
 int main() {
   Master *rho;
-  rho = _11110(1,0,s);
+  rho = _11111(0,0,s);
   config(rho);
 
   //k0 = 60.4; k = 1.;
   //print_integrand(2,0,s);
   //Print_k0(rho,.0004);
-  //Print_k0(rho,.1);
+  Print_k0(rho,.1);
   //Print_k0(rho,1.);
-  Print_k0(rho,10.);
+  //Print_k0(rho,10.);
   //cout << k0 << ", " << k << endl;
 }
 
@@ -65,20 +65,26 @@ int Print_k0(Master *rho, double k_curr) {
   fout.open(fname);
 
   // Here are some parameters that can be changed:
-  N_k0=300; 
+  N_k0=10; 
 
-  k0_min=1e-2;
+  k0_min=20+1e-2;
   k0_max=1e+2;
   //k0_min = .9*k;
   //k0_max = 1.1*k;
   // don't change anything after that.
+  int o=0; // flag for OPE
 
   s=pow(k0_max/k0_min,1./(N_k0-1));
   k0=k0_min;
 
   for (int i=0;i<N_k0;i++) { 
     //percentage=(float)i/((float)N_k0);
+    /*if (o==1) { 
+      res = (*rho)(k0,k);
+      fout << k0 << "    " << (rho->OPE)() << endl; 
+      k0*=s; continue; }*/
     res = (*rho)(k0,k);
+    //if (o==0) { if ( (k0>1.5*k)&&(fabs(1.-res/(rho->OPE)())<1e-2) ) { o=1; }; }
     cout << k0 << "    " << res << " , OPE= " << (rho->OPE)() << endl;
     fout << k0 << "    " << res << endl;
     k0*=s; 
