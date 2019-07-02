@@ -13,9 +13,9 @@ int print_k2av();
 int main() {
   //print_D(.3);
 
-  print_D(.5);
+  //print_D(.5);
   //print_D(1.);
-  //print_D(1.5);
+  print_D(1.5);
 
   //print_D(3.);
   //print_D(6.);
@@ -195,10 +195,10 @@ int print_D(double k_curr) {
   elapsed=0; alarm(1);
 
   // Here are some parameters that can be changed:
-  N_k0=40; 
+  N_k0=300; 
 
-  k0_min=2.+1e-2;
-  k0_max=10.;
+  k0_min=1e-2;
+  k0_max=2.;
   // don't change anything after that.
 
   //s=pow(k0_max/k0_min,1./(N_k0-1));

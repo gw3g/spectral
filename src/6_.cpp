@@ -60,8 +60,8 @@ double rho11111::F_123(double p, double q, double r) {
 
   double fp=f(p,s1), fq=f(q,s2), fr= f(r,s3);
 
-  //res = ( ((double) s1*s2*s3)*exp(k0)-1. )*fp*fq*fr;
-  res = 1. + fp + fq + fr + fp*fq + fp*fr + fq*fr;
+  res = ( ((double) s1*s2*s3)*exp(k0)-1. )*fp*fq*fr;
+  //res = 1. + fp + fq + fr + fp*fq + fp*fr + fq*fr;
   res*= pow(k0,-_m-_n)*pow(p,_m)*pow(q,_n) ;
 
   return res;
@@ -79,8 +79,8 @@ double rho11111::F_345(double r, double l, double v) {
 
   double fr=f(r,s3), fl=f(l,s4), fv= f(v,s5);
 
-  //res = ( ((double) s3*s4*s5)*exp(k0)-1. )*fr*fl*fv;
-  res = 1. + fl + fv + fr + fl*fv + fl*fr + fv*fr;
+  res = ( ((double) s3*s4*s5)*exp(k0)-1. )*fr*fl*fv;
+  //res = 1. + fl + fv + fr + fl*fv + fl*fr + fv*fr;
   res*= pow(k0,-_m-_n)*pow(k0-l,_m)*pow(k0-v,_n) ;
 
   return res;
@@ -96,8 +96,8 @@ double rho11111::F_14(double p, double l) {
 
   double fp=f(p,s1), fl=f(l,s4);
 
-  //res = ( ((double) s1*s4)*exp(k0)-1. )*fp*fl;
-  res = 1. + fp + fl;
+  res = ( ((double) s1*s4)*exp(k0)-1. )*fp*fl;
+  //res = 1. + fp + fl;
   res*= pow(k0,-_m)*pow(p,_m)*sgn(km);
 
   return res;
@@ -113,8 +113,8 @@ double rho11111::F_25(double q, double v) {
 
   double fq=f(q,s2), fv=f(v,s5);
 
-  //res = ( ((double) s2*s5)*exp(k0)-1. )*fq*fv;
-  res = 1. + fq + fv;
+  res = ( ((double) s2*s5)*exp(k0)-1. )*fq*fv;
+  //res = 1. + fq + fv;
   res*= pow(k0,-_n)*pow(q,_n)*sgn(km);
 
   return res;
@@ -183,11 +183,11 @@ double rho11111::eval()
     auto inner = make_gsl_function( [&](double y) {
           return (this->integrand)(x,y);
         } );
-    gsl_integration_qag( inner, .0+1e-8,1., epsabs, epsrel,
+    gsl_integration_qag( inner, .0+1e-13,1., epsabs, epsrel,
                          limit, 6, wsp1, &inner_result, &inner_abserr );
     return inner_result;
   } );
-  gsl_integration_qag( outer, .0+1e-8,1., epsabs, epsrel*2,
+  gsl_integration_qag( outer, .0+1e-13,1., epsabs, epsrel*2,
                        limit, 6, wsp2, &res, &err  );//*/
 
   double temp = 0.;
@@ -206,8 +206,8 @@ double rho11111::eval()
     res = res;
     //res = ( res );//- (this->OPE).T0 );
   }
-  res = res*pow(k0,m+n)*CUBE(OOFP)/K2; 
-  return ( res - (this->OPE).T2 )/(this->OPE).T4;
+  res = res*pow(k0,m+n)*CUBE(OOFP)/K2; return res;
+  //return ( res - (this->OPE).T2 )/(this->OPE).T4;
 }
 
 /*--------------------------------------------------------------------*/
