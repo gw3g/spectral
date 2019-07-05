@@ -12,11 +12,16 @@ set yr [-.5:.5]
 set grid
 set key t r
 
+#set tit "{/Symbol r}_V^{nlo} /(gT)^2 - {/Symbol r}_V^{lo}/(2{/Symbol p}T)^2"
+#p 'NLO_rho_{k=0.50}.dat' u 1:(($4+r($1,.5)*($5))) w lp t "k/T=0.5",\
+#  'NLO_rho_{k=1.00}.dat' u 1:(($4+r($1,1.)*($5))) w lp t "   =1.0",\
+#  'NLO_rho_{k=1.50}.dat' u 1:(($4+r($1,1.5)*($5))) w lp t "   =1.5",\
+#  'NLO_rho_{k=0.01}.dat' u 1:(($4+r($1,.005)*($5))) w lp t "   =0",\
+
 set tit "{/Symbol r}_V^{nlo} /(gT)^2 - {/Symbol r}_V^{lo}/(2{/Symbol p}T)^2"
-p 'NLO_rho_{k=0.50}.dat' u 1:(($4+r($1,.5)*($5))) w lp t "k/T=0.5",\
-  'NLO_rho_{k=1.00}.dat' u 1:(($4+r($1,1.)*($5))) w lp t "   =1.0",\
-  'NLO_rho_{k=1.50}.dat' u 1:(($4+r($1,1.5)*($5))) w lp t "   =1.5",\
-  'NLO_rho_{k=0.01}.dat' u 1:(($4+r($1,.005)*($5))) w lp t "   =0",\
+p 'NLO_rho_{k=1.83}.dat' u 1:(($4+r($1,1.8326)*($5))) w lp t "   =1*kn",\
+  'NLO_rho_{k=3.67}.dat' u 1:(($4+r($1,3.6652)*($5))) w lp t "   =2*kn",\
+  'NLO_rho_{k=5.50}.dat' u 1:(($4+r($1,5.4978)*($5))) w lp t "   =3*kn",\
   OPE(x,.5) lt 1,\
   OPE(x,1.) lt 2,\
   OPE(x,1.5) lt 3
