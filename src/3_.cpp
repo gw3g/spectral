@@ -127,7 +127,7 @@ double H0::val(int _nu, int _sA, int _sB)
   sB=_sB;
   double res=0.,err;
 
-  double epsabs = 1e-3, epsrel = 1e-6;
+  double epsabs = 1e-5, epsrel = 1e-6;
   size_t limit = 1e5;
 
   quad wsp(limit);
@@ -182,7 +182,7 @@ double H1::val(int _nu, int _sA, int _sB)
   sB=_sB;
   double res, err;
 
-  double epsabs = 1e-2, epsrel = 1e-2;
+  double epsabs = 1e-4, epsrel = 1e-5;
   size_t limit = 1e5;
 
   quad wsp(limit);
@@ -273,7 +273,7 @@ double G0::val(int _nu, int _sA, int _sB)
   sB=_sB;
   double res, err;
 
-  double epsabs = 1e-2, epsrel = 1e-2;
+  double epsabs = 1e-5, epsrel = 1e-4;
   size_t limit = 1e5;
 
   quad wsp(limit);
