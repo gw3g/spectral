@@ -1,9 +1,9 @@
 
-s=  "+++"
+s=  "+--"
 mn= "20"
 load "format.gp"
 
-#R(k0,k) = 32*pi*(k0*k0-k*k)
+#R(k0,k) = 32*pi*K2(k0,k)*abs(K2(k0,k))
 #R(k0,k) = 32*pi*(k0*k0-k*k)**2/k0
 #R(k0,k) = 32*pi*(k0*k0-k*k)
 R(k0,k) = 32*pi*(k0*k0-k*k)*12./5.

@@ -65,14 +65,14 @@ int Print_k0(Master *rho, double k_curr) {
   fout.open(fname);
 
   // Here are some parameters that can be changed:
-  N_k0=150; 
+  N_k0=20; 
 
-  k0_min=1e-2;
-  k0_max=1e+2;
-  //k0_min = .9*k;
-  //k0_max = 1.1*k;
+  //k0_min=1e-2;
+  //k0_max=1e+2;
+  k0_min = .9*k;
+  k0_max = 1.1*k;
   // don't change anything after that.
-  int o=0; // flag for OPE
+  //int o=0; // flag for OPE
 
   s=pow(k0_max/k0_min,1./(N_k0-1));
   k0=k0_min;
