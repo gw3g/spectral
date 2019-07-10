@@ -173,8 +173,8 @@ double rho11111::eval()
 
   double epsabs = 1e-4, epsrel = 1e-2;
   //if (k0>2.*k) { epsabs*=.1; epsrel*=.1; }
-  if (k0>5.*k) { epsabs*=.1; epsrel*=.1; }
-  if (k0>7.*k) { epsabs*=.1; epsrel*=.1; }
+  //if (k0>5.*k) { epsabs*=.1; epsrel*=.1; }
+  //if (k0>7.*k) { epsabs*=.1; epsrel*=.1; }
   size_t limit = 1e6;
 
   quad wsp1(limit);

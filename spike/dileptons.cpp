@@ -12,9 +12,9 @@ int print_k2av();
 
 int main() {
   //print_D(1.*2.*M_PI/3.);
-  print_D(2.*7.*M_PI/12.);
-  //print_D(sqrt(2.)*M_PI/2.);
-  //print_D(M_PI);
+  //print_D(1.*7.*M_PI/12.);
+  print_D(sqrt(1.)*M_PI/2.);
+  //print_D(1.5*M_PI);
 
   //print_D(.5);
   //print_D(1.);
@@ -187,7 +187,7 @@ int print_D(double k_curr) {
   sprintf(k_name,"{k=%.2f}",k);
   string fname = "spike/NLO_rho_"
                + string(k_name)
-               + ".dat";
+               + ".1.dat";
 
   cout << ":: Creating table for k = " << k <<  " ..." << endl << endl;
   Rho_V rV;
@@ -203,7 +203,7 @@ int print_D(double k_curr) {
   N_k0=10; 
 
   k0_min=1e-1;
-  k0_max=20.;
+  k0_max=10.;
   //k0_min=40.;
   //k0_max=50.;
   // don't change anything after that.
