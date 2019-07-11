@@ -119,10 +119,6 @@ double rho11110::eval()
     return 0.;
   }
 
-  //outer f1;
-  //f1.f2.R = this;
-  //integrate<outer> I(f1); // do the x-integral
-  //res = go(I) + ( (k0>k) ? -K2/8. : 0. );
   double epsabs = 1e-4, epsrel = 1e-3;
   if (k0>5.*k) { epsabs*=.1; epsrel*=.1; }
   if (k0>7.*k) { epsabs*=.1; epsrel*=.1; }
