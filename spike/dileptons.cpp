@@ -88,8 +88,8 @@ struct Rho_V
   };
   void operator ()() {
 
-    //lo = 2.*Nc*K2*lga( cosh(.5*kp)/cosh(.5*km) )/k*OOFP;
     lo = +Nc*K2*psi0(-1,-1)*OOFP; // note sign convention
+    //lo = Nc*K2*OOFP; // large-K2
     nlo= lo*3.*cF*SQR(OOFP);
 
     _b = (*rho_b )(k0,k)*K2;
@@ -151,10 +151,9 @@ struct Rho_00
   };
   void operator ()() {
 
-    //lo = 2.*Nc*K2*lga( cosh(.5*kp)/cosh(.5*km) )/k*OOFP;
-    //lo = 2.*Nc*K2*(.5+lga( (1.+exp(-kp))/(1.+exp(-km)) ))/k*OOFP;
     lo = -2.*Nc*( k0*k0*( psi1(-1,-1)-psi2(-1,-1) ) - .25*K2*psi0(-1,-1) )*OOFP;
     nlo = -cF*Nc*( k*k*psi0(-1,-1) )*CUBE(OOFP);
+    //nlo = -cF*Nc*( k*k )*CUBE(OOFP); // large-K2
 
     _b_0 = (*rho_b_0 )(k0,k)*K2;
     _bb_0= (*rho_bb_0)(k0,k)*K2;
@@ -170,7 +169,7 @@ struct Rho_00
     _j_2 = (*rho_j_2 )(k0,k)*K2;
 
     nlo -=
-    4.*Nc*cF*( //2.*(_b_0-_bb_0-4.*(_b_1-_bb_1)+4.*(_b_2-_bb_2))
+    4.*Nc*cF*( //2.*(_b_0-_bb_0-4.*(_b_1-_bb_1)+4.*(_b_2-_bb_2)) // =0 
              + _g + 2.*(_h_0+_hp) - 8.*_h_1 + _j_0 - 4.*_j_2 );
 
   };
@@ -187,7 +186,7 @@ int print_D(double k_curr) {
   sprintf(k_name,"{k=%.2f}",k);
   string fname = "spike/NLO_rho_"
                + string(k_name)
-               + ".1.dat";
+               + ".dat";
 
   cout << ":: Creating table for k = " << k <<  " ..." << endl << endl;
   Rho_V rV;
@@ -202,7 +201,7 @@ int print_D(double k_curr) {
   // Here are some parameters that can be changed:
   N_k0=10; 
 
-  k0_min=1e-1;
+  k0_min=+1e-1;
   k0_max=10.;
   //k0_min=40.;
   //k0_max=50.;
@@ -210,7 +209,7 @@ int print_D(double k_curr) {
 
   //s=pow(k0_max/k0_min,1./(N_k0-1));
   //s=(k0_max-k0_min)/((double)N_k0-1.);
-  s = 1e-1;
+  s = 1e-2;
   k0=k0_min;
 
   int i=0;

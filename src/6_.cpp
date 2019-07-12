@@ -161,7 +161,7 @@ double rho11111::eval()
     (this->OPE).T2 = -( (a2+a3+a4)*k0*k0-(a2+a5)*K2*.25 )*.25*OOFP;
     (this->OPE).T4 = -(((b1+b4)*3.+(b2+b3+b5)*2.)*.5*K2-
                        (b2*7.+b3+b4*9.+b5*2.)*k0*k0+
-                       ((b2+b4)*11.+3.*b3 )*k0*k0*(k0*k0+k*k/3.)/K2  )*SQR(k0)/SQR(K2)/6.*OOFP;
+                       ((b2+b4)*11.+3.*b3 )*k0*k0*(k0*k0+k*k/3.)/K2  )/K2/6.*OOFP;
   } else {
     cerr << "Case: (m,n)=("<< m << ","<<n<<") out of bounds!\n";
     return 0.;
@@ -173,9 +173,9 @@ double rho11111::eval()
 
   double epsabs = 1e-4, epsrel = 1e-2;
   if (k0>2.*k) { epsabs*=.1; epsrel*=.1; }
-  if (k0>3.*k) { epsabs*=.1; epsrel*=.1; }
+  //if (k0>3.*k) { epsabs*=.1; epsrel*=.1; }
   //if (k0>7.*k) { epsabs*=.1; epsrel*=.1; }
-  size_t limit = 1e6;
+  size_t limit = 1e8;
 
   quad wsp1(limit);
   quad wsp2(limit);
@@ -186,12 +186,12 @@ double rho11111::eval()
     auto inner = make_gsl_function( [&](double y) {
           return (this->integrand)(x,y);
         } );
-    gsl_integration_qag( inner, .0+1e-16,1., epsabs, epsrel,
-                         limit, 6, wsp1, &inner_result, &inner_abserr );
+    gsl_integration_qag( inner, .0+1e-19,1., epsabs, epsrel,
+                         limit, 7, wsp1, &inner_result, &inner_abserr );
     return inner_result;
   } );
-  gsl_integration_qag( outer, .0+1e-16,1., epsabs, epsrel*9,
-                       limit, 6, wsp2, &res, &err  );//*/
+  gsl_integration_qag( outer, .0+1e-19,1., epsabs, epsrel*2,
+                       limit, 7, wsp2, &res, &err  );//*/
 
   double temp = 0.;
 
