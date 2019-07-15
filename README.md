@@ -33,9 +33,16 @@ To get the value of the function, one can simply call:
 ```
 (*rho)(k0,k)
 ```
+Any changes to `main.cpp` will require a clean to be picked up
+by the makefile.
 
 **NB** Instances of the masters return a quantity in units
 of the temperature. 
+
+### Dileptons
+
+See files under `spike`, compile with `make dileptons`.
+
 
 ## Data files
 
@@ -46,13 +53,10 @@ Naming convention is
 diag.[type]{k=[k/T]}.([s0][s1][s2]).[m][n].dat
 ```
 where `[...]` takes the value specified within the square brackets.
+Each file tabulates the energy master integrals, as a function of energy.
+There are four columns: 1) energy k<sub>0</sub>/T, 2) rho, scaled so that ...
+3) is the leading OPE and 4) the next-to-leading OPE.
 
-## Todo
-
-* type 6, m=n=1: OPE approach from above/below?
-* sort out eps
-* ~~type 5 + star~~
-* ~~include OPE in masters~~ check the T^4
-* ~~organise include files better~~
-* cuda implementation for high accuracy?
+These can be plotted with the helpt of the [gnuplot](www.gnuplot.info) 
+scripts in the `out` directory.
 

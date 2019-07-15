@@ -88,10 +88,14 @@ double rho11110::eval()
     return 0.;
   }
 
-  double epsabs = 1e-4, epsrel = 1e-2;
-  if (k0>5.*k) { epsabs*=.1; epsrel*=.1; }
-  if (k0>7.*k) { epsabs*=.1; epsrel*=.1; }
-  size_t limit = 1e5;
+  // Quadrature step! --
+  double epsabs = 1e-5, epsrel = 1e-3;
+  double rr = 1.;
+  if (k0>k) { rr = pow(1., -3.*(k0-k)/(100.-k) ); }// smarter (?) error adaption
+  epsabs *= rr;
+  epsrel *= rr;
+
+  size_t limit = 1e6;
 
   quad wsp1(limit);
   quad wsp2(limit);
@@ -101,11 +105,11 @@ double rho11110::eval()
     auto inner = make_gsl_function( [&](double y) {
         return (this->integrand)(x,y);
         } );
-    gsl_integration_qag(inner, .0+1e-13,1., epsabs, epsrel, 
+    gsl_integration_qag(inner, .0+1e-16,1., epsabs, epsrel, 
                        limit, 6, wsp1, &inner_result, &inner_abserr );
     return inner_result;
   } );
-  gsl_integration_qag(  outer, .0+1e-13,1., epsabs, epsrel*2, 
+  gsl_integration_qag(  outer, .0+1e-16,1., epsabs, epsrel*2, 
                         limit, 6, wsp2, &res, &err  );
 
   return (( res ))*CUBE(OOFP);

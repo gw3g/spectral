@@ -5,10 +5,12 @@
 double F(int nu, int sA, int sB) {
   // here F_m for m={0,1,2}
   double res=0.;
-  res += f(kp,sA)*f(km,sB)/km;
-  res -= f(km,sA)*f(kp,sB)/kp;
+  res += pow(kp,nu)*f(kp,sA)*f(km,sB)/km;
+  res -= pow(km,nu)*f(km,sA)*f(kp,sB)/kp;
   res *= ((double)sA*sB)*exp(k0)-1.; // = F_0
-  if (nu>0) {
+
+  // Old stuff: (all wrong!)
+  /*if (nu>0) {
     res *= k0;
     res += ( 2.-exp(kp)*((double)(sA+sB)) )*f(kp,sA)*f(kp,sB);
     res += sgn(km)*( f(fabs(km),sA)+f(fabs(km),sB) ); // = F_1
@@ -19,7 +21,7 @@ double F(int nu, int sA, int sB) {
     res += 2.*(( kp-fabs(km)-lga( (exp(kp)-sB)/(exp(fabs(km))-sB) ) ));
     res += f(fabs(km),sB)*( k0 + f(fabs(km),sA)*exp(fabs(km))*km*((double)(sB-sA)) )*sgn(km);
     res -= f(fabs(kp),sB)*( k0 + f(fabs(kp),sA)*exp(fabs(kp))*kp*((double)(sB-sA)) ); // = F_2
-  }
+  }*/
 
   res *= .0625*OOFP/k; // coeff = 1/16
   return res;

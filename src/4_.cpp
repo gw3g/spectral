@@ -64,10 +64,6 @@ double rho11100::eval() {
     return 0.;
   }
 
-  //outer f1;
-  //f1.f2.R = this;
-  //integrate<outer> I(f1); // do the x-integral
-  //res = go(I) + ( (k0>k) ? -K2/8. : 0. );
   double epsabs = 1e-2, epsrel = 0;
   size_t limit = 1e5;
 
@@ -96,7 +92,7 @@ double rho11100::eval() {
 double rho11100::integrand(double x, double y) 
 {
   double res=0.; 
-  //double pqr[3];
+
   if (k0>k) {
 
   res+=

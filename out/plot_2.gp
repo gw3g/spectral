@@ -2,7 +2,8 @@
 mn= "00"
 load "format.gp"
 
-R(k0,k) = 48*16*pi*(k0-k)*(k0-k)/4.
+R(k0,k) = 48*16*pi*(k0-k)*(k0-k)/4. # 00
+#R(k0,k) = 48*16*pi*(k0-k)*(k0-k)/((k0+k)*4.) # 10 ?
 #R(k0,k) = 12*16*pi
 
 set xl "k0/T"
@@ -12,7 +13,7 @@ set yr [-1.2:.2]
 set xr [.005:140]
 set log x
 
-set key t l
+set key b l
 set grid
 
 set tit "I@_{11020}^{(".mn.")}      {\\@}  k=T"

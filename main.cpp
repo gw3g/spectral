@@ -9,43 +9,49 @@
 #include <string>
 
 double k0, k;
-int s[] = {+1,-1,-1};
+int s[] = {+1,+1,+1};
 char s_name[] = {'-','+'};
 
 using namespace std;
 
 ofstream fout;
-int Print_k0(Master*,double);
+int Print_k0(Master*,double); int elapsed; float percentage;
 void config(Master *rho);
 
 int main() {
   Master *rho;
-  rho = _11111(2,0,s);
+  rho = _11111(0,0,s);
   config(rho);
 
-  //k0 = 60.4; k = 1.;
-  //print_integrand(2,0,s);
-  //Print_k0(rho,.0004);
   Print_k0(rho,.1);
   //Print_k0(rho,1.);
   //Print_k0(rho,10.);
-  //cout << k0 << ", " << k << endl;
+  /*double kL = k*(1.-1e-4),
+         kR = k*(1.+1e-4);
+  double disc= (*rho)(kL,k)*(kL*kL-k*k)
+              -(*rho)(kR,k)*(kR*kR-k*k) ;
+  cout << " k =  " << k << endl;
+  cout << " disc = " << disc << endl;
+  cout << " %*64PI*K2 = " << disc*64.*M_PI << endl;
+  cout << " %*64*(12/PI)*K2 = " << disc*64.*12/M_PI << endl;//*/
 }
 
 void config(Master *rho) {
-  // a small function: prints m,n,etc
-  cout << "m =" << rho->m << endl;
-  cout << "n =" << rho->n << endl;
-  cout << "s0=" << rho->s[0] << 
-      " ,  s1=" << rho->s[1] <<
-      " ,  s2=" << rho->s[2] <<
-      " ,  s3=" << rho->s[3] <<
-      " ,  s4=" << rho->s[4] <<
-      " ,  s5=" << rho->s[5] << endl << endl;//*/
+  // a small function: prints m,n, etc
+  cout << "\n:: Configuration of master, TYPE-" << rho->type << endl << endl;
+  cout << "m = " << rho->m << endl;
+  cout << "n = " << rho->n << endl;
+  cout << "s0 = " << rho->s[0] << 
+      " ,  s1 = " << rho->s[1] <<
+      " ,  s2 = " << rho->s[2] <<
+      " ,  s3 = " << rho->s[3] <<
+      " ,  s4 = " << rho->s[4] <<
+      " ,  s5 = " << rho->s[5] << endl << endl;//*/
 }
 
 int Print_k0(Master *rho, double k_curr) {
   int N_k0;
+  //percentage;
   double res, s, k0_min, k0_max;
   k=k_curr;
 
@@ -61,13 +67,17 @@ int Print_k0(Master *rho, double k_curr) {
                + to_string(rho->m)+to_string(rho->n)
                + ".dat";
 
-  cout << "Creating table for k = " << k <<  " ..." << endl;
+  cout << ":: Creating table for k = " << k <<  " ..." << endl << endl;
   fout.open(fname);
+  fout << "# Columns: k0/T, rho, ope (LO), ope (NLO)" << endl;
+
+  signal( SIGALRM, sigalrm_handler );
+  elapsed=0; alarm(1);
 
   // Here are some parameters that can be changed:
-  N_k0=600; 
+  N_k0=10; 
 
-  k0_min=1e-2;
+  k0_min=30+1e-2;
   k0_max=1e+2;
   //k0_min = .9*k;
   //k0_max = 1.1*k;
@@ -78,18 +88,22 @@ int Print_k0(Master *rho, double k_curr) {
   k0=k0_min;
 
   for (int i=0;i<N_k0;i++) { 
-    //percentage=(float)i/((float)N_k0);
+    percentage=(float)i/((float)N_k0);
     /*if (o==1) { 
       res = (*rho)(k0,k);
       fout << k0 << "    " << (rho->OPE)() << endl; 
       k0*=s; continue; }*/
     res = (*rho)(k0,k);
     //if (o==0) { if ( (k0>1.5*k)&&(fabs(1.-res/(rho->OPE)())<1e-2) ) { o=1; }; }
-    cout << k0 << "    " << res << " , OPE= " << (rho->OPE)() << endl;
-    fout << k0 << "    " << res << endl;
+    fout << scientific << k0 << 
+                  "    " << res << 
+                  "    " << (rho->OPE).T2  <<
+                  "    " << (rho->OPE).T4 
+                  << endl;
+    //fout << k0 << "    " << res << endl;
     k0*=s; 
   }
-  cout << "Saved to file [" << fname << "]" << endl;
+  cout << endl << endl << ":: Saved to file [" << fname << "]" << endl;
   fout.close();
 
   return 0;

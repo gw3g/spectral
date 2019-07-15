@@ -4,7 +4,8 @@
 
 using namespace std;
 double E = 1e1; // control param for large momenta: used to \
-                   switch between expanded or full integrand
+                   switch between expanded or full integrand\
+                   See: L_div(...) and L_int(...)
 
 /*--------------------------------------------------------------------*/
 
@@ -172,10 +173,14 @@ double rho11111::eval()
   (this->OPE).T4 /= SQR(K2);
 
   double epsabs = 1e-4, epsrel = 1e-1;
-  if (k0>2.*k) { epsabs*=.1; epsrel=.01; }
-  if (k0>3.*k) { epsabs*=.1; epsrel*=.1; }
-  if (k0>50.*k) { epsabs*=.1; epsrel*=.1; }
-  //if (k0>7.*k) { epsabs*=.1; epsrel*=.1; }
+  //if (k0>2.*k) { epsabs*=.1; }
+  //if (k0>3.*k) { epsabs*=.1; }
+  //if (k0>20.*k) { epsrel*=.1; }
+  //if (k0>50.*k) { epsabs*=.1; epsrel*=.01; }
+  double rr = 1.;
+  if (k0>k) { rr = pow(1., -5.*(k0-k)/(100.-k) ); }// smarter (?) error adaption
+  epsabs *= rr;
+  epsrel *= rr;
   size_t limit = 1e8;
 
   quad wsp1(limit);

@@ -7,51 +7,29 @@ double k0,k;
 using namespace std;
 
 ofstream fout;
-int print_D(double);
-int print_k2av();
+int Print_D(double); int elapsed; float percentage;
+int Print_k2av();
 
 int main() {
-  //print_D(1.*2.*M_PI/3.);
-  //print_D(1.*7.*M_PI/12.);
-  //print_D(sqrt(1.)*M_PI/2.);
-  //print_D(1.5*M_PI);
-  print_D(1.);
+  //Print_D(1.*2.*M_PI/3.);
+  //Print_D(1.*7.*M_PI/12.);
+  //Print_D(sqrt(1.)*M_PI/2.);
+  //Print_D(1.5*M_PI);
+  Print_D(1.);
 
-  //print_D(.5);
-  //print_D(1.);
-  //print_D(1.5);
+  //Print_D(.5);
+  //Print_D(1.);
+  //Print_D(1.5);
 
-  //print_D(.3);
-  //print_D(1.5);
-  //print_D(3.);
-  //print_D(6.);
-  //print_D(9.);
-  //print_k2av();
+  //Print_D(.3);
+  //Print_D(1.5);
+  //Print_D(3.);
+  //Print_D(6.);
+  //Print_D(9.);
+  //Print_k2av();
 }
 
 /*--------------------------------------------------------------------*/
-
-#include <signal.h>
-#include <unistd.h>
-#include <iomanip>
-int elapsed;
-float percentage=0.;
-static void sigalrm_handler( int sig ) {
-  elapsed+=1; // monitor progress every 10 sec
-  cout.flush();
-  cout << "  "<< setw(2) << setfill('0') << elapsed/60 ;
-  cout << ":" ;
-  cout << setw(2) << setfill('0') << elapsed%60 <<" "; //<< right << 
-        //setw(10) << "K = ("<< k0 << "," << k << ")" <<endl;
-  cout << '[';
-  for (int i=0;i<50;i++) {
-    if ((double)i<percentage*50.) {cout << '#';}
-    else {cout << '-';};
-  }
-  cout << "] " << setw(2) << setfill(' ') << (int)(percentage*100.);
-  cout << "%" << '\r';
-  alarm(1);
-}
 
 #include <gsl/gsl_sf_bessel.h>
 double k2av(double M) {
@@ -103,8 +81,7 @@ struct Rho_V
     _j = (*rho_j )(k0,k)*SQR(K2);
 
     nlo -=
-    8.*Nc*cF*( 2.*(_b-_bb+_d-_db) 
-        - 1.5*_g + 2.*(_h+_hp) - _j );
+    8.*Nc*cF*( 2.*(_b-_bb+_d-_db) - 1.5*_g + 2.*(_h+_hp) - _j );
 
   };
 };
@@ -177,7 +154,7 @@ struct Rho_00
 };
 
 
-int print_D(double k_curr) {
+int Print_D(double k_curr) {
   int N_k0;
   double res, s, k0_min, k0_max;
   k=k_curr;
@@ -193,8 +170,10 @@ int print_D(double k_curr) {
   Rho_V rV;
   Rho_00 r00;
   fout.open(fname);
-  fout << "# Columns: k0/T, rhoV_LO/T2, rho00_LO/T2, rhoV_NLO/(g2*T2), rho00_NLO/(g2*T2)" << endl;
-  fout << "# ( k=" << k << " )" << endl;
+  fout << 
+  "# Columns: k0/T, rhoV_LO/T2, rho00_LO/T2, rhoV_NLO/(g2*T2), rho00_NLO/(g2*T2)" 
+       << endl
+       << "# ( k=" << k << " )" << endl;
 
   signal( SIGALRM, sigalrm_handler );
   elapsed=0; alarm(1);
@@ -235,7 +214,7 @@ int print_D(double k_curr) {
   return 0;
 }
 
-int print_k2av() {
+int Print_k2av() {
   int N_M;
   double res, s, M, M_min, M_max;
 
