@@ -1,6 +1,5 @@
 #include "core.hh"
 #include "quad.hh"
-//#include "trapezoid.hh"
 #include "map.hh"
 
 //W_IV
@@ -24,24 +23,6 @@ struct rho11100 : Master {
 Master* _11100(int m, int n, int s[3]) {
   Master *R =  new rho11100(m,n,s); return R;
 }
-
-/*#include <fstream>
-using namespace std;
-void print_integrand(int m, int n, int s[3]) {
-  ofstream fout;
-  rho11100 *R =  new rho11100(m,n,s);
-  fout.open("out/data/test_integrand.dat");
-  double x=-.0125*.5;
-  double y;
-  for (int i=0;i<80;i++) {
-    x+=.025*.5;
-    y=-.0125*.5;
-    for (int j=0;j<80;j++) {
-      y+=.025*.5;
-      fout << x << "    " << y << "    " << (  (R->integrand)(x,y)  ) << endl; }
-  }
-  fout.close(); 
-}//*/
 
 /*--------------------------------------------------------------------*/
 // thermal weight for (single) cut from this topology

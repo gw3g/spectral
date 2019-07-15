@@ -11,43 +11,12 @@ struct rho11110 : Master {
   double F_14(double,double);         //        f1f4/f0   }- virtual
 
   double eval();
-  /*struct inner {
-    rho11100 *R;
-    double _x; // x-dependence "stands by"
-    double operator ()(double y) { return (R->integrand)(_x,y); }
-  };
-  struct outer {
-    inner f2;
-    double operator ()(double x) {
-      f2._x = x;
-      integrate<inner> I(f2); // do the y-integral
-      return go(I);
-    };
-  };//*/
   rho11110(int _m, int _n, int _s[3]) : Master(_m,_n,_s) { type=5; }
 };
 // function for MAIN
 Master* _11110(int m, int n, int s[3]) {
   Master *R =  new rho11110(m,n,s); return R;
 }
-
-/*#include <fstream>
-using namespace std;
-void print_integrand(int m, int n, int s[3]) {
-  ofstream fout;
-  rho11110 *R =  new rho11110(m,n,s);
-  fout.open("out/data/test_integrand.dat");
-  double x=-.0125*.5;
-  double y;
-  for (int i=0;i<80;i++) {
-    x+=.025*.5;
-    y=-.0125*.5;
-    for (int j=0;j<80;j++) {
-      y+=.025*.5;
-      fout << x << "    " << y << "    " << (  (R->integrand)(x,y)  ) << endl; }
-  }
-  fout.close(); 
-}//*/
 
 /*--------------------------------------------------------------------*/
 // all the thermal weights for cuts from this topology
@@ -119,7 +88,7 @@ double rho11110::eval()
     return 0.;
   }
 
-  double epsabs = 1e-4, epsrel = 1e-3;
+  double epsabs = 1e-4, epsrel = 1e-2;
   if (k0>5.*k) { epsabs*=.1; epsrel*=.1; }
   if (k0>7.*k) { epsabs*=.1; epsrel*=.1; }
   size_t limit = 1e5;

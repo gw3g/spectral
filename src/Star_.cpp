@@ -13,43 +13,12 @@ struct rhoStar : Master {
   double g_(double,double);            // non-log function
 
   double eval();
-  /*struct inner {
-    rho11100 *R;
-    double _x; // x-dependence "stands by"
-    double operator ()(double y) { return (R->integrand)(_x,y); }
-  };
-  struct outer {
-    inner f2;
-    double operator ()(double x) {
-      f2._x = x;
-      integrate<inner> I(f2); // do the y-integral
-      return go(I);
-    };
-  };//*/
   rhoStar(int _s[3]) : Master(0,0,_s) { type=7; }
 };
 // function for MAIN
 Master* _Star(int m, int n, int s[3]) {
   Master *R =  new rhoStar(s); return R;
 }
-
-/*#include <fstream>
-using namespace std;
-void print_integrand(int m, int n, int s[3]) {
-  ofstream fout;
-  rhoStar *R =  new rhoStar(s);
-  fout.open("out/data/test_integrand.dat");
-  double x=-.0125*.5;
-  double y;
-  for (int i=0;i<80;i++) {
-    x+=.025*.5;
-    y=-.0125*.5;
-    for (int j=0;j<80;j++) {
-      y+=.025*.5;
-      fout << x << "    " << y << "    " << (  (R->integrand)(x,y)  ) << endl; }
-  }
-  fout.close(); 
-}//*/
 
 /*--------------------------------------------------------------------*/
 // all the thermal weights for cuts from this topology
@@ -134,7 +103,8 @@ double rhoStar::eval() {
     (this->OPE).T4 = +( 3.*(b1-b2)+b3 )*(k0*k0+k*k/3.)/SQR(K2)/6.*OOFP;
   } 
 
-  double epsabs = 1e-4, epsrel = 1e-5;
+  double epsabs = 1e-4, epsrel = 1e-2;
+  if (k0>20.) { epsabs*=.1; epsrel*=.1; }
   size_t limit = 1e5;
 
   quad wsp1(limit);
