@@ -172,13 +172,14 @@ double rho11111::eval()
   (this->OPE).T2 /= SQR(K2);
   (this->OPE).T4 /= SQR(K2);
 
-  double epsabs = 1e-4, epsrel = 1e-1;
+  double epsabs = 1e-4, epsrel = 1e-2;
   //if (k0>2.*k) { epsabs*=.1; }
   //if (k0>3.*k) { epsabs*=.1; }
   //if (k0>20.*k) { epsrel*=.1; }
   //if (k0>50.*k) { epsabs*=.1; epsrel*=.01; }
   double rr = 1.;
-  if (k0>k) { rr = pow(1., -5.*(k0-k)/(100.-k) ); }// smarter (?) error adaption
+  //if (k0>k) { rr = pow(10., -3.*(k0-k)/(100.-k) ); }// smarter (?) error adaption
+  if (k0>k) { rr = pow(k0/k, -.5 ); }// smarter (?) error adaption
   epsabs *= rr;
   epsrel *= rr;
   size_t limit = 1e8;
