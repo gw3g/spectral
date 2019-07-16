@@ -9,11 +9,16 @@ and dependent on the statistical configuration.
 
 Powers of the internal propagators for P, Q, R, L and V respectively are 
 used to classify the masters by a string `abcde'.
-Here the powers are all either 0, 1 or 2.
+Here the powers are all either 0, 1 or 2. 
+(Some propagators in the figure will be absent if the power is 0.)
 The s<sub>i</sub> are statistical factors +1 for bosons
 and -1 for fermions.
 By cutting the diagram, some momenta are put on shall which allows
 the master to be computed as a 2D integral over p and q (3-momenta magnitudes).
+
+See below for a list of which functions have been included.
+(They are defined in `inc/core.hh`)
+
 
 ## Usage
 
@@ -39,6 +44,28 @@ by the makefile.
 **NB** Instances of the masters return a quantity in units
 of the temperature. 
 
+### List of included integrals
+
+| Type     |  Propagators |
+|:---------|:------------:|
+| I        | 01020        |
+|          | 00120        |
+|:---------|:------------:|
+| II       | 11010        |
+|          | 10110        |
+|          | 11020        |
+|          | 10120        |
+|:---------|:------------:|
+| III      | 11011        |
+|:---------|:------------:|
+| IV       | 11100        |
+|:---------|:------------:|
+| V        | 11100        |
+|          | (+"Star")    |
+|:---------|:------------:|
+| VI       | 11111        |
+
+
 ### Dileptons
 
 See files under `spike`, compile with `make dileptons`.
@@ -57,6 +84,6 @@ Each file tabulates the energy master integrals, as a function of energy.
 There are four columns: 1) energy k<sub>0</sub>/T, 2) rho, scaled so that ...
 3) is the leading OPE and 4) the next-to-leading OPE.
 
-These can be plotted with the helpt of the [gnuplot](www.gnuplot.info) 
+These can be plotted with the helpt of the [gnuplot](https://www.gnuplot.info)
 scripts in the `out` directory.
 

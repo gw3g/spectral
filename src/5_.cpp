@@ -91,7 +91,7 @@ double rho11110::eval()
   // Quadrature step! --
   double epsabs = 1e-3, epsrel = 1e-2;
   double rr = 1.;
-  if (k0>k) { rr = pow(10., -4.*(k0-k)/(100.-k) ); }// smarter (?) error adaption
+  if (k0>k) { rr = pow(10., -6.*(k0-k)/(100.-k) ); }// smarter (?) error adaption
   epsabs *= rr;
   epsrel *= rr;
 

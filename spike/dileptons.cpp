@@ -13,9 +13,9 @@ int Print_k2av();
 int main() {
   //Print_D(1.*2.*M_PI/3.);
   //Print_D(1.*7.*M_PI/12.);
-  //Print_D(sqrt(1.)*M_PI/2.);
-  //Print_D(1.5*M_PI);
-  Print_D(1.);
+  //Print_D(sqrt(3.)*M_PI/2.);
+  Print_D(M_PI);
+  //Print_D(1.);
 
   //Print_D(.5);
   //Print_D(1.);
@@ -181,8 +181,8 @@ int Print_D(double k_curr) {
   // Here are some parameters that can be changed:
   N_k0=10; 
 
-  k0_min=.5*1e-1;
-  k0_max=30.;
+  k0_min=1e-1;
+  k0_max=20.;
   //k0_min=40.;
   //k0_max=50.;
   // don't change anything after that.

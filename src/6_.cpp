@@ -179,7 +179,7 @@ double rho11111::eval()
   //if (k0>50.*k) { epsabs*=.1; epsrel*=.01; }
   double rr = 1.;
   //if (k0>k) { rr = pow(10., -3.*(k0-k)/(100.-k) ); }// smarter (?) error adaption
-  if (k0>k) { rr = pow(k0/k, -.5 ); }// smarter (?) error adaption
+  if (k0>k) { rr = pow(k0/k, -1. ); }// smarter (?) error adaption
   epsabs *= rr;
   epsrel *= rr;
   size_t limit = 1e8;

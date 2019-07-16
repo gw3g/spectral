@@ -76,7 +76,6 @@ Master* _11011(int, int, int *);
 
 // type.IV
 Master* _11100(int, int, int *);
-Master* _Star (int, int, int *);
 
 // type.V
 Master* _11110(int, int, int *);

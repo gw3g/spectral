@@ -14,9 +14,11 @@ set key t r
 
 #set tit "{/Symbol r}_V^{nlo} /(gT)^2 - {/Symbol r}_V^{lo}/(2{/Symbol p}T)^2"
 #p 'NLO_rho_{k=0.50}.dat' u 1:(($4+r($1,.5)*($5))) w lp t "k/T=0.5",\
-#  'NLO_rho_{k=1.00}.dat' u 1:(($4+r($1,1.)*($5))) w lp t "   =1.0",\
-#  'NLO_rho_{k=1.50}.dat' u 1:(($4+r($1,1.5)*($5))) w lp t "   =1.5",\
-#  'NLO_rho_{k=0.01}.dat' u 1:(($4+r($1,.005)*($5))) w lp t "   =0",\
+  #'NLO_rho_{k=1.00}.dat' u 1:(($4+r($1,1.)*($5))) w lp t "   =1.0",\
+  #'NLO_rho_{k=1.50}.dat' u 1:(($4+r($1,1.5)*($5))) w lp t "   =1.5",\
+  #OPE(x,.5) lt 1,\
+  #OPE(x,1.) lt 2,\
+  #OPE(x,1.5) lt 3
 
 set tit "{/Symbol r}_{00}/T^2,  O(g^2)"
 p 'NLO_rho_{k=1.50}.dat' u 1:(($4+r($1,1.5)*($5))) w lp t "   =1*kn",\
@@ -28,6 +30,7 @@ p 'NLO_rho_{k=1.50}.dat' u 1:(($4+r($1,1.5)*($5))) w lp t "   =1*kn",\
   OPE(x,3.67) lt 2,\
   OPE(x,5.5) lt 3,\
   OPE(x,1.83) lt 4
+
 pause -1
 # reread
 
