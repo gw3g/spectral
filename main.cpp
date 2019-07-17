@@ -1,7 +1,7 @@
 /*
  *    thermal self-energies, NLO Master functions
  *    @author  GJ
- *    @version 0.0
+ *    @version 0.1
  *
  */
 #include "core.hh"
@@ -9,23 +9,78 @@
 #include <string>
 
 double k0, k;
-int s[] = {+1,-1,-1};
+int s[3];// = {+1,-1,-1};
 char s_name[] = {'-','+'};
 
 using namespace std;
 
 ofstream fout;
+ifstream fin;
 int Print_k0(Master*,double); int elapsed; float percentage;
 void config(Master *rho);
 
-int main() {
+int main(int argc, char *argv[]) {
+  char cc;
+  char *str_in;
+
   Master *rho;
-  rho = _11111(1,1,s);
+  fin.open("config");
+
+  char _t[6]; fin >> _t;
+  char _s[4]; fin >> _s;
+  int _m, _n; fin >> _m; fin >> _n;
+
+  cout << ":: Input [config]\n" << endl;
+  cout << _t       << endl;
+  cout << _s       << endl;
+  cout << _m       << endl;
+  cout << _n       << endl;
+
+  s[0] = (_s[0]=='+') ? +1 : -1;
+  s[1] = (_s[1]=='+') ? +1 : -1;
+  s[2] = (_s[2]=='+') ? +1 : -1;
+
+       if (string(_t)=="01020\0") { rho = _01020(_m,_n,s); }
+  else if (string(_t)=="00120\0") { rho = _00120(_m,_n,s); }
+  else if (string(_t)=="11020\0") { rho = _11020(_m,_n,s); }
+  else if (string(_t)=="10120\0") { rho = _10120(_m,_n,s); }
+  else if (string(_t)=="11010\0") { rho = _11010(_m,_n,s); }
+  else if (string(_t)=="10110\0") { rho = _10110(_m,_n,s); }
+  else if (string(_t)=="11011\0") { rho = _11011(_m,_n,s); }
+  else if (string(_t)=="11100\0") { rho = _11100(_m,_n,s); }
+  else if (string(_t)=="11110\0") { rho = _11110(_m,_n,s); }
+  else if (string(_t)=="Star\0")  { rho = _Star(0,0,s); }
+  else if (string(_t)=="11111\0") { rho = _11111(_m,_n,s); }
+  else    { cout << " Invalid! " << endl; return -1; }
+
   config(rho);
 
-  Print_k0(rho,.1);
-  Print_k0(rho,1.);
-  Print_k0(rho,10.);
+  cout << argc;
+  cout << argv[0] << endl ;
+  --argc; ++argv;
+  cout << argc;
+  cout << argv[0] << endl;
+  while ( (--argc)>0 && (*++argv)[0]=='-' ) {
+    cout << argv[argc];
+    while ((cc = *++(argv[0]))) {
+      switch (cc) {
+        case 'k': // 3 momentum
+          str_in=(*++argv);
+          --argc;
+          cout << str_in;
+          k = atof(str_in);
+          break;
+        case 'h':
+          cout << ":: Ready. What would you like to do?\n" << endl;
+          cin >> k;
+          break;
+      }
+    }
+  }
+
+  //Print_k0(rho,.1);
+  //Print_k0(rho,1.);
+  //Print_k0(rho,k);
   /*double kL = k*(1.-1e-4),
          kR = k*(1.+1e-4);
   double disc= (*rho)(kL,k)*(kL*kL-k*k)
@@ -38,7 +93,7 @@ int main() {
 
 void config(Master *rho) {
   // a small function: prints m,n, etc
-  cout << "\n:: Configuration of master, TYPE-" << rho->type << endl << endl;
+  cout << "\n:: Master, TYPE-" << rho->type << endl << endl;
   cout << "m = " << rho->m << endl;
   cout << "n = " << rho->n << endl;
   cout << "s0 = " << rho->s[0] << 
@@ -75,7 +130,7 @@ int Print_k0(Master *rho, double k_curr) {
   elapsed=0; alarm(1);
 
   // Here are some parameters that can be changed:
-  N_k0=100; 
+  N_k0=1000; 
 
   k0_min=1e-2;
   k0_max=1e+2;
@@ -103,7 +158,15 @@ int Print_k0(Master *rho, double k_curr) {
     //fout << k0 << "    " << res << endl;
     k0*=s; 
   }
-  cout << endl << endl << ":: Saved to file [" << fname << "]" << endl;
+
+  cout << "  "<< setw(2) << setfill('0') << elapsed/60 ;
+  cout << ":" ;
+  cout << setw(2) << setfill('0') << elapsed%60 <<" ";
+  cout << '[';
+  for (int i=0;i<50;i++) { cout << "#"; }
+  cout << "] " << "100%";
+
+  cout << endl << endl << ":: Saved to file [" << fname << "]\n" << endl;
   fout.close();
 
   return 0;
