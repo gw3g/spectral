@@ -88,11 +88,12 @@ double rho11110::eval()
     return 0.;
   }
 
+  //if ( m==0 && n==1 ) { return (this->OPE)(); }
   // Quadrature step! --
-  double epsabs = 1e-6, epsrel = 1e-5;
+  double epsabs = 1e-8, epsrel = 1e-5;
   double rr = 1.;
-  //if (k0>k) { rr = pow(10., -1.*(k0-k)/(100.-k) ); }// smarter (?) error adaption
-  epsabs *= rr;
+  if (k0>k) { rr = pow(10., -1.*(k0-k)/(100.-k) ); }// smarter (?) error adaption
+  //epsabs *= rr;
   epsrel *= rr;
 
   size_t limit = 1e6;

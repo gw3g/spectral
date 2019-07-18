@@ -55,32 +55,26 @@ int main(int argc, char *argv[]) {
 
   config(rho);
 
-  cout << argc;
-  cout << argv[0] << endl ;
-  --argc; ++argv;
-  cout << argc;
-  cout << argv[0] << endl;
-  while ( (--argc)>0 && (*++argv)[0]=='-' ) {
-    cout << argv[argc];
-    while ((cc = *++(argv[0]))) {
+  while ( (++argv)[0] && argv[0][0]=='-' ) { // parse arguments
+    while (cc = *++argv[0]) {
       switch (cc) {
-        case 'k': // 3 momentum
+        case 'k': // 3-momentum
           str_in=(*++argv);
           --argc;
-          cout << str_in;
           k = atof(str_in);
           break;
         case 'h':
-          cout << ":: Ready. What would you like to do?\n" << endl;
+          cout << ":: Ready. Enter k: ";
           cin >> k;
           break;
       }
     }
   }
+  //cout << " k = " << k << endl;
 
   //Print_k0(rho,.1);
   //Print_k0(rho,1.);
-  //Print_k0(rho,k);
+  Print_k0(rho,k);
   /*double kL = k*(1.-1e-4),
          kR = k*(1.+1e-4);
   double disc= (*rho)(kL,k)*(kL*kL-k*k)
