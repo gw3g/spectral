@@ -90,9 +90,9 @@ double rho11110::eval()
 
   //if ( m==0 && n==1 ) { return (this->OPE)(); }
   // Quadrature step! --
-  double epsabs = 1e-8, epsrel = 1e-5;
+  double epsabs = 1e-6, epsrel = 0;
   double rr = 1.;
-  if (k0>k) { rr = pow(10., -1.*(k0-k)/(100.-k) ); }// smarter (?) error adaption
+  //if (k0>k) { rr = pow(10., -5.*(k0-k)/(100.-k) ); }// smarter (?) error adaption
   //epsabs *= rr;
   epsrel *= rr;
 
@@ -113,7 +113,7 @@ double rho11110::eval()
   gsl_integration_qag(  outer, .0+1e-16,1., epsabs, epsrel*2, 
                         limit, 6, wsp2, &res, &err  );
 
-  return (( res ))*CUBE(OOFP);
+  return (( res/K2 ))*CUBE(OOFP);
 }
 
 /*--------------------------------------------------------------------*/
@@ -656,5 +656,5 @@ double rho11110::integrand(double x, double y)
   // still don't have a good way to cater for NaNs
   //if ( isinf(res)||isnan(res) ) { return 0.;}
   //else
-  { return .25*pow(k0,m+n)*res/(k); }
+  { return K2*.25*pow(k0,m+n)*res/(k); }
 }

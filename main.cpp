@@ -124,7 +124,7 @@ int Print_k0(Master *rho, double k_curr) {
   elapsed=0; alarm(1);
 
   // Here are some parameters that can be changed:
-  N_k0=1000; 
+  N_k0=500; 
 
   k0_min=1e-2;
   k0_max=1e+2;

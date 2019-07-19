@@ -18,6 +18,19 @@ the master to be computed as a 2D integral over p and q (3-momenta magnitudes).
 
 See below for a list of which functions have been included.
 (They are defined in `inc/core.hh`)
+By default the program handles a master integral from the
+`config` file which is to be correctly formatted.
+An example input is:
+```
+11020
+++-
+1
+0
+```
+This file sets up a master integral with no propagators for R and V.
+Those with P and Q are single propagators and L is repeated.
+Here s<sub>0</sub>=s<sub>1</sub>=+1 and s<sub>2</sub>=-1.
+Here m=1 and n=0 are  powers of p_0 and q_0 (resp.).
 
 
 ## Usage
@@ -44,23 +57,6 @@ by the makefile.
 **NB** Instances of the masters return a quantity in units
 of the temperature. 
 
-### List of included integrals
-
-| Type     |  Propagators |
-|:---------|:------------:|
-| I        | 01020        |
-|          | 00120        |
-| II       | 11010        |
-|          | 10110        |
-|          | 11020        |
-|          | 10120        |
-| III      | 11011        |
-| IV       | 11100        |
-| V        | 11100        |
-|          | (+"Star")    |
-| VI       | 11111        |
-
-
 ### Dileptons
 
 See files under `spike`, compile with `make dileptons`.
@@ -81,4 +77,21 @@ There are four columns: 1) energy k<sub>0</sub>/T, 2) rho, scaled so that ...
 
 These can be plotted with the helpt of the [gnuplot](https://www.gnuplot.info)
 scripts in the `out` directory.
+
+
+## List of included integrals
+
+| Type     |  Propagators |
+|:---------|:------------:|
+| I        | 01020        |
+|          | 00120        |
+| II       | 11010        |
+|          | 10110        |
+|          | 11020        |
+|          | 10120        |
+| III      | 11011        |
+| IV       | 11100        |
+| V        | 11100        |
+|          | (+"Star")    |
+| VI       | 11111        |
 
