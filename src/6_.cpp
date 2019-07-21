@@ -173,16 +173,16 @@ double rho11111::eval()
   (this->OPE).T4 /= SQR(K2);
 
   //if ( m==2 && n==0 ) { return (this->OPE)(); )
-  double epsabs = 1e-7, epsrel = 1e-3;
+  double epsabs = 1e-3, epsrel = 1e-3;
   //if (k0>2.*k) { epsabs*=.1; }
   //if (k0>3.*k) { epsabs*=.1; }
   //if (k0>20.*k) { epsrel*=.1; }
   //if (k0>50.*k) { epsabs*=.1; epsrel*=.01; }
   double rr = 1.;
   //if (k0>k) { rr = pow(10., -3.*(k0-k)/(100.-k) ); }// smarter (?) error adaption
-  if (k0>k) { rr = pow(k0/k, -1. ); }// smarter (?) error adaption
+  //if (k0>k) { rr = pow(k0/k, -1. ); }// smarter (?) error adaption
   //epsabs *= rr;
-  epsrel *= rr;
+  //epsrel *= rr;
   size_t limit = 1e8;
 
   quad wsp1(limit);
@@ -194,11 +194,11 @@ double rho11111::eval()
     auto inner = make_gsl_function( [&](double y) {
           return (this->integrand)(x,y);
         } );
-    gsl_integration_qag( inner, .0+1e-15,1., epsabs, epsrel,
+    gsl_integration_qag( inner, .0+1e-16,1., epsabs, epsrel,
                          limit, 6, wsp1, &inner_result, &inner_abserr );
     return inner_result;
   } );
-  gsl_integration_qag( outer, .0+1e-15,1., epsabs, epsrel*2,
+  gsl_integration_qag( outer, .0+1e-16,1., epsabs, epsrel*2,
                        limit, 6, wsp2, &res, &err  );//*/
 
   double temp = 0.;
@@ -214,7 +214,10 @@ double rho11111::eval()
     res = ( res - .5*(this->OPE).T0*temp*K2/SQR(k0) );
   }
 
-  res = res*pow(k0,m+n)*CUBE(OOFP)/K2; return res;
+  if ( m==2 && n==0 ) {
+    res = res*CUBE(OOFP)/(K2); return res;
+  }
+  res = res*pow(k0,m+n)*CUBE(OOFP)/SQR(K2); return res;
   //return ( res - (this->OPE).T2 )/(this->OPE).T4;
 }
 
@@ -1365,6 +1368,9 @@ double rho11111::integrand(double x, double y) {
   //if ( isinf(res)||isnan(res) ) { return -1e6;}//for inspection
   //if ( isinf(res)||isnan(res) ) { return 0.;}
   //else 
-  { return .5*res/k; }
+  if ( m==2 && n==0 ) {
+    return .5*k0*k0*res/k;
+  }
+  { return .5*K2*res/k; }
   //else { return res/k; }
 }

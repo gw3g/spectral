@@ -90,17 +90,20 @@ double rho11110::eval()
 
   //if ( m==0 && n==1 ) { return (this->OPE)(); }
   // Quadrature step! --
-  double epsabs = 1e-6, epsrel = 0;
-  double rr = 1.;
-  //if (k0>k) { rr = pow(10., -5.*(k0-k)/(100.-k) ); }// smarter (?) error adaption
+  double epsabs = 1e-7, epsrel = 0;
+  //double rr = 1.;
+  //if (k0>5.*k) { rr = pow(k0/k, 1.*(k0-5.*k)/(100.-5.*k) ); }// smarter (?) error adaption
   //epsabs *= rr;
-  epsrel *= rr;
+  //epsrel *= rr;
+  gsl_set_error_handler_off();
+  int status=1;
 
   size_t limit = 1e6;
 
   quad wsp1(limit);
   quad wsp2(limit);
 
+  while (status) {
   auto outer = make_gsl_function( [&](double x) {
     double inner_result, inner_abserr;
     auto inner = make_gsl_function( [&](double y) {
@@ -110,10 +113,14 @@ double rho11110::eval()
                        limit, 6, wsp1, &inner_result, &inner_abserr );
     return inner_result;
   } );
-  gsl_integration_qag(  outer, .0+1e-16,1., epsabs, epsrel*2, 
+  status = gsl_integration_qag(  outer, .0+1e-16,1., epsabs, epsrel*2, 
                         limit, 6, wsp2, &res, &err  );
+  epsabs*=10.;
+  if (status) {
+    cerr << " !! Error @ k0 = " << k0 << " , k = " << k << endl << " , trying again with eps = " << epsabs << endl; }
+  }
 
-  return (( res/K2 ))*CUBE(OOFP);
+  return (( res*pow(k0,m+n)/K2 ))*CUBE(OOFP);
 }
 
 /*--------------------------------------------------------------------*/
@@ -656,5 +663,5 @@ double rho11110::integrand(double x, double y)
   // still don't have a good way to cater for NaNs
   //if ( isinf(res)||isnan(res) ) { return 0.;}
   //else
-  { return K2*.25*pow(k0,m+n)*res/(k); }
+  { return K2*.25*res/(k); }
 }

@@ -1,4 +1,5 @@
 #include <gsl/gsl_integration.h>
+#include <gsl/gsl_errno.h>
 /*--------------------------------------------------------------------*/
 // wrapper for GSL ∫ methods
 
