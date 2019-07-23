@@ -2,35 +2,36 @@
 
 Here I provide functions to compute the imaginary part of 
 two-loop diagrams, like the one shown below.
-These are thermal self energies, functions of an external four momentum K
+These are thermal self energies, functions of an external four momentum _K_
 and dependent on the statistical configuration.
 
 ![Labelling of generic two-loop diagram](inc/twoloop.png?raw=true "2-loop")
 
-Powers of the internal propagators for P, Q, R, L and V respectively are 
+Powers of the internal propagators for _P_, _Q_, _R_, _L_ and _V_ respectively are 
 used to classify the masters by a string `abcde'.
 Here the powers are all either 0, 1 or 2. 
-(Some propagators in the figure will be absent if the power is 0.)
-The s<sub>i</sub> are statistical factors +1 for bosons
-and -1 for fermions.
-By cutting the diagram, some momenta are put on shall which allows
-the master to be computed as a 2D integral over p and q (3-momenta magnitudes).
+(Propagators in the figure will be absent if the power is 0.)
+The s<sub>i</sub> are statistical factors: +1 for bosons and -1 for fermions.
+By "cutting" the diagram, some momenta are put on-shell which allows
+the master to be computed as a 2-dimensional integral over _p_ and _q_
+(corresponding to the 3-momenta of the loop variables above).
 
-See below for a list of which functions have been included.
+See below for a list of the included functions.
 (They are defined in `inc/core.hh`)
-By default the program handles a master integral from the
-`config` file which is to be correctly formatted.
-An example input is:
+By default, the program handles a master integral that is read from the
+`config` file. 
+An example input, demonstrating the correct formatting, is:
 ```
 11020
 ++-
 1
 0
 ```
-This file sets up a master integral with no propagators for R and V.
-Those with P and Q are single propagators and L is repeated.
+This file sets up a master integral with no propagators for _R_ and _V_.
+Those with _P_ and _Q_ are single propagators and _L_ is repeated.
 Here s<sub>0</sub>=s<sub>1</sub>=+1 and s<sub>2</sub>=-1.
-Here m=1 and n=0 are  powers of p_0 and q_0 (resp.).
+Here `m=1` and `n=0` are  powers of energies 
+_p_<sub>0</sub> and _q_<sub>0</sub> respectively.
 
 
 ## Usage
@@ -42,8 +43,7 @@ the type with energy power and exponents:
 Master *rho;
 rho = _10120(m,n,s);
 ```
-Here `m` and `n` are the powers of p_0 and q_0 (resp.),
-and `s` is an `int [3]` array of entries +1 (boson)
+The `s` pointer is to an `int [3]` array of entries +1 (boson)
 or -1 (fermion) to capture the statistical 
 configuration: (s<sub>0</sub>,s<sub>1</sub>,s<sub>2</sub>).
 
@@ -55,11 +55,13 @@ Any changes to `main.cpp` will require a clean to be picked up
 by the makefile.
 
 **NB** Instances of the masters return a quantity in units
-of the temperature. 
+of the temperature.
 
 ### Dileptons
 
 See files under `spike`, compile with `make dileptons`.
+
+**NB** Still under development.
 
 
 ## Data files
@@ -81,17 +83,7 @@ scripts in the `out` directory.
 
 ## List of included integrals
 
-| Type     |  Propagators |
-|:---------|:------------:|
-| I        | 01020        |
-|          | 00120        |
-| II       | 11010        |
-|          | 10110        |
-|          | 11020        |
-|          | 10120        |
-| III      | 11011        |
-| IV       | 11100        |
-| V        | 11100        |
-|          | (+"Star")    |
-| VI       | 11111        |
+| Type        | I            | II                         | III   | IV    | V           | VI    |
+|:------------|:-------------|:---------------------------|:------|:------|:------------|:------|
+| Propagatars | 01020, 00120 | 11010, 10110, 11020, 10120 | 11011 | 11100 | 11110, Star | 11111 |
 
