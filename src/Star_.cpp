@@ -102,27 +102,35 @@ double rhoStar::eval() {
     (this->OPE).T2 = +( a1 )*.25*OOFP;
     (this->OPE).T4 = +( 3.*(b1-b2)+b3 )*(k0*k0+k*k/3.)/SQR(K2)/6.*OOFP;
   } 
+  //return (this->OPE)();
 
-  double epsabs = 1e-4, epsrel = 1e-2;
-  if (k0>20.) { epsabs*=.1; epsrel*=.1; }
+  double epsabs = 1e-4, epsrel = 0;
+  //if (k0>20.) { epsabs*=.1; epsrel*=.1; }
   size_t limit = 1e5;
+  gsl_set_error_handler_off();
+  //int status=1;
 
   quad wsp1(limit);
   quad wsp2(limit);
 
+  //while (status) {
   auto outer = make_gsl_function( [&](double x) {
     double inner_result, inner_abserr;
     auto inner = make_gsl_function( [&](double y) {
         return (this->integrand)(x,y);
         } );
-    gsl_integration_qag(inner, .0+1e-13,1., epsabs, epsrel, 
+    gsl_integration_qag(inner, .0+1e-16,1., epsabs, epsrel, 
                        limit, 6, wsp1, &inner_result, &inner_abserr );
     return inner_result;
   } );
-  gsl_integration_qag(  outer, .0+1e-13,1., epsabs, 2.*epsrel, 
+  gsl_integration_qag(  outer, .0+1e-16,1., epsabs, 2.*epsrel, 
                         limit, 6, wsp2, &res, &err  );
+  //epsabs*=10.;
+  //if (status) {
+    //cerr << " !! Error @ k0 = " << k0 << " , k = " << k << endl << " , trying again with eps = " << epsabs << endl; }
+  //}
 
-  return (( res ))*CUBE(OOFP);
+  return (( res*(kp/km) ))*CUBE(OOFP);
 }
 
 /*--------------------------------------------------------------------*/
@@ -666,6 +674,6 @@ double rhoStar::integrand(double x, double y)
   }
     // still don't have a good way to cater for NaNs
   if ( isinf(res)||isnan(res) ) { return 0.;}
-  else { return .25*res/(k); }
+  else { return .25*(km/kp)*res/(k); }
 }
 

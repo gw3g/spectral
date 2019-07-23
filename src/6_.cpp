@@ -171,9 +171,10 @@ double rho11111::eval()
   // consistent dimensions
   (this->OPE).T2 /= SQR(K2);
   (this->OPE).T4 /= SQR(K2);
+  //return (this->OPE)();
 
   //if ( m==2 && n==0 ) { return (this->OPE)(); )
-  double epsabs = 1e-3, epsrel = 1e-3;
+  double epsabs = 1e-4, epsrel = 1e-2;
   //if (k0>2.*k) { epsabs*=.1; }
   //if (k0>3.*k) { epsabs*=.1; }
   //if (k0>20.*k) { epsrel*=.1; }
@@ -183,11 +184,14 @@ double rho11111::eval()
   //if (k0>k) { rr = pow(k0/k, -1. ); }// smarter (?) error adaption
   //epsabs *= rr;
   //epsrel *= rr;
+  gsl_set_error_handler_off();
+  //int status=1;
   size_t limit = 1e8;
 
   quad wsp1(limit);
   quad wsp2(limit);
 
+  //while (status) {
   auto outer = make_gsl_function( [&](double x) 
   {
     double inner_result, inner_abserr;
@@ -200,6 +204,10 @@ double rho11111::eval()
   } );
   gsl_integration_qag( outer, .0+1e-16,1., epsabs, epsrel*2,
                        limit, 6, wsp2, &res, &err  );//*/
+  //epsabs*=10.;
+  //if (status) {
+  //  cerr << " !! Error @ k0 = " << k0 << " , k = " << k << endl << " , trying again with eps = " << epsabs << endl; }
+  //}
 
   double temp = 0.;
 

@@ -69,6 +69,7 @@ double rho11020::eval()
     cerr << "Case: (m,n)=("<< m << ","<<n<<") out of bounds!\n";
     return 0.;
   }
+  //return (this->OPE)();
 
   return -F(m,s[1],s[4])*I(n,s[2]); // the minus is from I(..)
 }
@@ -142,6 +143,7 @@ double rho11010::eval()
     cerr << "Case:  m = "<< m << "  out of bounds!\n";
     return 0.;
   }
+  //return (this->OPE)();
 
   double epsabs = 1e-5, epsrel = 1e-5;
   size_t limit = 1e5;

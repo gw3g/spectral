@@ -63,8 +63,9 @@ double rho11100::eval() {
     cerr << "Case: (m,n)=("<< m << ","<<n<<") out of bounds!\n";
     return 0.;
   }
+  //return (this->OPE)();
 
-  double epsabs = 1e-2, epsrel = 0;
+  double epsabs = 1e-3, epsrel = 0;
   size_t limit = 1e5;
 
   quad wsp1(limit);

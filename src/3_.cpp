@@ -81,6 +81,7 @@ double rho11011::eval()
     cerr << "Case: (m,n)=("<< m << ","<<n<<") out of bounds!\n";
     return 0.;
   }
+  //return (this->OPE)();
 
   h0m = h0.val(m,s[1],s[4]);  h0n = h0.val(n,s[2],s[5]);
   h1m = h1.val(m,s[1],s[4]);  h1n = h1.val(n,s[2],s[5]);

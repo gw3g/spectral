@@ -87,6 +87,7 @@ double rho11110::eval()
     cerr << "Case: (m,n)=("<< m << ","<<n<<") out of bounds!\n";
     return 0.;
   }
+  //return (this->OPE)();
 
   //if ( m==0 && n==1 ) { return (this->OPE)(); }
   // Quadrature step! --
