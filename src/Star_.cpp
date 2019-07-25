@@ -104,16 +104,14 @@ double rhoStar::eval() {
   } 
   //return (this->OPE)();
 
-  double epsabs = 1e-4, epsrel = 0;
+  double epsabs = 1e-3, epsrel = 0;
   //if (k0>20.) { epsabs*=.1; epsrel*=.1; }
   size_t limit = 1e5;
-  gsl_set_error_handler_off();
-  //int status=1;
+  gsl_set_error_handler_off(); // live on the edge.
 
   quad wsp1(limit);
   quad wsp2(limit);
 
-  //while (status) {
   auto outer = make_gsl_function( [&](double x) {
     double inner_result, inner_abserr;
     auto inner = make_gsl_function( [&](double y) {
@@ -125,12 +123,9 @@ double rhoStar::eval() {
   } );
   gsl_integration_qag(  outer, .0+1e-16,1., epsabs, 2.*epsrel, 
                         limit, 6, wsp2, &res, &err  );
-  //epsabs*=10.;
-  //if (status) {
-    //cerr << " !! Error @ k0 = " << k0 << " , k = " << k << endl << " , trying again with eps = " << epsabs << endl; }
-  //}
 
-  return (( res*(kp/km) ))*CUBE(OOFP);
+  return (( res*(kp/km) ))*CUBE(OOFP); // mult. by (km/kp) in integrand
+                                       // to soften LC divergence
 }
 
 /*--------------------------------------------------------------------*/

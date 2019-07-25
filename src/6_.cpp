@@ -174,7 +174,7 @@ double rho11111::eval()
   //return (this->OPE)();
 
   //if ( m==2 && n==0 ) { return (this->OPE)(); )
-  double epsabs = 1e-4, epsrel = 1e-2;
+  double epsabs = 1e-2, epsrel = 0;
   //if (k0>2.*k) { epsabs*=.1; }
   //if (k0>3.*k) { epsabs*=.1; }
   //if (k0>20.*k) { epsrel*=.1; }
@@ -219,13 +219,13 @@ double rho11111::eval()
          (1.-((double)(this->s)[2])*ep)*(1.-((double)(this->s)[5])*ep)/(
          (1.-((double)(this->s)[1])*em)*(1.-((double)(this->s)[4])*em)*
          (1.-((double)(this->s)[2])*em)*(1.-((double)(this->s)[5])*em) ))/k;
-    res = ( res - .5*(this->OPE).T0*temp*K2/SQR(k0) );
+    res = ( res*(kp/km) - .5*(this->OPE).T0*temp*K2/SQR(k0) );
   }
 
   if ( m==2 && n==0 ) {
-    res = res*CUBE(OOFP)/(K2); return res;
+    res = res*(kp/km)*CUBE(OOFP)/(K2); return res;
   }
-  res = res*pow(k0,m+n)*CUBE(OOFP)/SQR(K2); return res;
+  res = res*(kp/km)*pow(k0,m+n)*CUBE(OOFP)/SQR(K2); return res;
   //return ( res - (this->OPE).T2 )/(this->OPE).T4;
 }
 
@@ -1377,8 +1377,8 @@ double rho11111::integrand(double x, double y) {
   //if ( isinf(res)||isnan(res) ) { return 0.;}
   //else 
   if ( m==2 && n==0 ) {
-    return .5*k0*k0*res/k;
+    return .5*k0*k0*(km/kp)*res/k;
   }
-  { return .5*K2*res/k; }
+  { return .5*K2*(km/kp)*res/k; }
   //else { return res/k; }
 }

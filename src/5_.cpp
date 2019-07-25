@@ -104,7 +104,7 @@ double rho11110::eval()
   quad wsp1(limit);
   quad wsp2(limit);
 
-  while (status) {
+  //while (status) {
   auto outer = make_gsl_function( [&](double x) {
     double inner_result, inner_abserr;
     auto inner = make_gsl_function( [&](double y) {
@@ -116,10 +116,10 @@ double rho11110::eval()
   } );
   status = gsl_integration_qag(  outer, .0+1e-16,1., epsabs, epsrel*2, 
                         limit, 6, wsp2, &res, &err  );
-  epsabs*=10.;
-  if (status) {
-    cerr << " !! Error @ k0 = " << k0 << " , k = " << k << endl << " , trying again with eps = " << epsabs << endl; }
-  }
+  //epsabs*=10.;
+  //if (status) {
+    //cerr << " !! Error @ k0 = " << k0 << " , k = " << k << endl << " , trying again with eps = " << epsabs << endl; }
+  //}
 
   return (( res*pow(k0,m+n)/K2 ))*CUBE(OOFP);
 }
