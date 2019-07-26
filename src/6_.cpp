@@ -154,8 +154,8 @@ double rho11111::eval()
   if ( m==1 && n==1 ) { // (1,1)
     (this->OPE).T0 = 1./16.;
     (this->OPE).T2 = 0.;
-    (this->OPE).T4 = -(( (b1+b2+b4+b5)*3.-b3*2.      )*.5*K2 -
-                       ( (b1+b2)*9.+b3*2.+(b4+b5)*5. )*k0*k0 )*SQR(k0)/SQR(K2)/12.*OOFP;
+    (this->OPE).T4 = +(( (b1+b2+b4+b5)*3.-b3*2.      )*.5*K2 -
+                       ( (b1+b2)*9.+b3*2.+(b4+b5)*5. )*k0*k0 )/K2/12.*OOFP;
   } else
   if ( m==2 && n==0 ) { // (2)
     (this->OPE).T0 = -.5*( +11./16. -.5 );
@@ -174,7 +174,7 @@ double rho11111::eval()
   //return (this->OPE)();
 
   //if ( m==2 && n==0 ) { return (this->OPE)(); )
-  double epsabs = 1e-2, epsrel = 0;
+  double epsabs = 1e-3, epsrel = 0;
   //if (k0>2.*k) { epsabs*=.1; }
   //if (k0>3.*k) { epsabs*=.1; }
   //if (k0>20.*k) { epsrel*=.1; }
@@ -209,9 +209,9 @@ double rho11111::eval()
   //  cerr << " !! Error @ k0 = " << k0 << " , k = " << k << endl << " , trying again with eps = " << epsabs << endl; }
   //}
 
-  double temp = 0.;
+  //double temp = 0.;
 
-  if ( (m==1)&&(n==1) ) {
+  /*if ( (m==1)&&(n==1) ) {
     temp += ( (k0>k) ? 2. : 0. );
     double ep = exp(-fabs(kp)), em = exp(-fabs(km));
     temp += lga( // thermal coefficient of `vacuum'-part
@@ -220,10 +220,13 @@ double rho11111::eval()
          (1.-((double)(this->s)[1])*em)*(1.-((double)(this->s)[4])*em)*
          (1.-((double)(this->s)[2])*em)*(1.-((double)(this->s)[5])*em) ))/k;
     res = ( res*(kp/km) - .5*(this->OPE).T0*temp*K2/SQR(k0) );
-  }
+  }*/
 
   if ( m==2 && n==0 ) {
     res = res*(kp/km)*CUBE(OOFP)/(K2); return res;
+  }
+  if ( m==1 && n==1 ) {
+  res = res*(kp/km)*CUBE(OOFP)/K2; return res;
   }
   res = res*(kp/km)*pow(k0,m+n)*CUBE(OOFP)/SQR(K2); return res;
   //return ( res - (this->OPE).T2 )/(this->OPE).T4;
@@ -1377,8 +1380,18 @@ double rho11111::integrand(double x, double y) {
   //if ( isinf(res)||isnan(res) ) { return 0.;}
   //else 
   if ( m==2 && n==0 ) {
-    return .5*k0*k0*(km/kp)*res/k;
+    return .5*SQR(k0)*(km/kp)*res/k;
   }
+  if ( (m==1)&&(n==1) ) {
+    double temp = 0.;
+    temp += ( (k0>k) ? 2.*k : 0. );
+    double ep = exp(-fabs(kp)), em = exp(-fabs(km));
+    temp += lga( // thermal coefficient of `vacuum'-part
+         (1.-s1*ep)*(1.-s4*ep)*(1.-s2*ep)*(1.-s5*ep)/(
+         (1.-s1*em)*(1.-s4*em)*(1.-s2*em)*(1.-s5*em) ));
+    return .5*SQR(k0)*(km/kp)*( res - (this->OPE).T0*temp*K2/SQR(k0) )/k;
+  }
+
   { return .5*K2*(km/kp)*res/k; }
   //else { return res/k; }
 }
