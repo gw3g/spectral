@@ -174,7 +174,7 @@ double rho11111::eval()
   //return (this->OPE)();
 
   //if ( m==2 && n==0 ) { return (this->OPE)(); )
-  double epsabs = 1e-3, epsrel = 0;
+  double epsabs = 1e-4, epsrel = 0;
   //if (k0>2.*k) { epsabs*=.1; }
   //if (k0>3.*k) { epsabs*=.1; }
   //if (k0>20.*k) { epsrel*=.1; }

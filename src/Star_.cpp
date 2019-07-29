@@ -104,7 +104,7 @@ double rhoStar::eval() {
   } 
   //return (this->OPE)();
 
-  double epsabs = 1e-3, epsrel = 0;
+  double epsabs = 1e-4, epsrel = 0;
   //if (k0>20.) { epsabs*=.1; epsrel*=.1; }
   size_t limit = 1e5;
   gsl_set_error_handler_off(); // live on the edge.
