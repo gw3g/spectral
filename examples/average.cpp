@@ -57,7 +57,7 @@ int Print_k2av() {
   elapsed=0; alarm(1);
 
   // Here are some parameters that can be changed:
-  N_M=30; 
+  N_M=200; 
 
   M_min=1e-1;
   M_max=1e+2;
