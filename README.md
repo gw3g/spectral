@@ -18,6 +18,9 @@ the master to be computed as a 2-dimensional integral over _p_ and _q_
 
 See below for a list of the included functions.
 (They are defined in `inc/core.hh`)
+
+## Usage
+
 By default, the program handles a master integral that is read from the
 `config` file. 
 An example input, demonstrating the correct formatting, is:
@@ -33,8 +36,19 @@ Here s<sub>0</sub>=s<sub>1</sub>=+1 and s<sub>2</sub>=-1.
 Here `m=1` and `n=0` are  powers of energies 
 _p_<sub>0</sub> and _q_<sub>0</sub> respectively.
 
+After building the project, it can be compiled simply using `make' .
+The executable can be run and, for example,
+```
+./bin/rho -k 1.0
+```
+will set k/T=1.0 and then perform a sweep of energies from
+k<sub>0</sub>/T=10<sup>-2</sup> to 10<sup>+2</sup> using
+500 points (this can be changed by modifying `main.cpp' and 
+recompiling).
 
-## Usage
+Use the flag `-h' for more details.
+
+### How it works
 
 You can use the master integrals by first declaring
 a pointer to a `Master` object, and then constructing
@@ -56,12 +70,6 @@ by the makefile.
 
 **NB** Instances of the masters return a quantity in units
 of the temperature.
-
-### Dileptons
-
-See files under `spike`, compile with `make dileptons`.
-
-**NB** Still under development.
 
 
 ## Data files

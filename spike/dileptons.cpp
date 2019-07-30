@@ -8,14 +8,16 @@ using namespace std;
 
 ofstream fout;
 int Print_D(double); int elapsed; float percentage;
-int Print_k2av();
 
 int main() {
-  //Print_D(1.*2.*M_PI/3.);
-  //Print_D(1.*7.*M_PI/12.);
-  Print_D(sqrt(1.)*M_PI/2.);
-  //Print_D(M_PI);
-  //Print_D(1.);
+
+  /* for lattice comparisons: */
+  // nf=0
+  //Print_D(1.*2.*M_PI/3.); // T=1.1Tc
+  //Print_D(1.*7.*M_PI/12.); // T=1.3Tc
+  // nf=2
+  Print_D(sqrt(1.)*M_PI/2.); // T=1.2Tc
+  //Print_D(M_PI); // T=1.2Tc
 
   //Print_D(.5);
   //Print_D(1.);
@@ -26,15 +28,6 @@ int main() {
   //Print_D(3.);
   //Print_D(6.);
   //Print_D(9.);
-  //Print_k2av();
-}
-
-/*--------------------------------------------------------------------*/
-
-#include <gsl/gsl_sf_bessel.h>
-double k2av(double M) {
-  // worth noting: k0=3*k for k0~26.
-  return 3.*M*gsl_sf_bessel_Kn(3,M)/gsl_sf_bessel_Kn(2,M);
 }
 
 /*--------------------------------------------------------------------*/
@@ -113,12 +106,12 @@ struct Rho_00
 
     S[0] = +1; S[1] = - 1; S[2] = -1; // statistics
 
-    rho_b_0 =  _11020(0,0,S); // notation: rho_<tag>_<power of ..>
-    rho_bb_0=  _10120(0,0,S);
-    rho_b_1 =  _11020(1,0,S);
-    rho_bb_1=  _10120(1,0,S);
-    rho_b_2 =  _11020(2,0,S);
-    rho_bb_2=  _10120(2,0,S);
+    //rho_b_0 =  _11020(0,0,S); // notation: rho_<tag>_<power of ..>
+    //rho_bb_0=  _10120(0,0,S);
+    //rho_b_1 =  _11020(1,0,S);
+    //rho_bb_1=  _10120(1,0,S);
+    //rho_b_2 =  _11020(2,0,S);
+    //rho_bb_2=  _10120(2,0,S);
     rho_g   =  _11011(0,0,S);
     rho_h_0 =  _11110(0,0,S);
     rho_h_1 =  _11110(0,1,S);
@@ -133,12 +126,12 @@ struct Rho_00
     nlo = -cF*Nc*( k*k*psi0(-1,-1) )*CUBE(OOFP);
     //nlo = -cF*Nc*( k*k )*CUBE(OOFP); // large-K2
 
-    _b_0 = (*rho_b_0 )(k0,k)*K2;
-    _bb_0= (*rho_bb_0)(k0,k)*K2;
-    _b_1 = (*rho_b_1 )(k0,k)*k0;
-    _bb_1= (*rho_bb_1)(k0,k)*k0;
-    _b_2 = (*rho_b_2 )(k0,k);
-    _bb_2= (*rho_bb_2)(k0,k);
+    //_b_0 = (*rho_b_0 )(k0,k)*K2;
+    //_bb_0= (*rho_bb_0)(k0,k)*K2;
+    //_b_1 = (*rho_b_1 )(k0,k)*k0;
+    //_bb_1= (*rho_bb_1)(k0,k)*k0;
+    //_b_2 = (*rho_b_2 )(k0,k);
+    //_bb_2= (*rho_bb_2)(k0,k);
     _g   = (*rho_g   )(k0,k)*k*k;
     _h_0 = (*rho_h_0 )(k0,k)*K2;   // TODO: check norm of h, j
     _h_1 = (*rho_h_1 )(k0,k)*k0;
@@ -197,14 +190,16 @@ int Print_D(double k_curr) {
   while (k0<k0_max) {
     //percentage=(float)i/((float)N_k0);
     percentage = k0/k0_max;
+
     rV();
     r00();
-    //cout << k0 << "    " << res << endl;
-    fout << k0     << "    "
-         << rV.lo  << "    "
-         << r00.lo  << "    "
-         << rV.nlo  << "    "
-         << r00.nlo << endl;
+
+    fout << scientific << k0        // k0/T
+         <<     "    " << rV.lo     // leading-order: rho_V ,
+         <<     "    " << r00.lo    //                rho_00
+         <<     "    " << rV.nlo    // next-to-LO   : rho_V ,
+         <<     "    " << r00.nlo   //                rho_00
+         << endl;
 
     k0+=s; 
   }
@@ -214,52 +209,3 @@ int Print_D(double k_curr) {
   return 0;
 }
 
-int Print_k2av() {
-  int N_M;
-  double res, s, M, M_min, M_max;
-
-  cout << ":: Creating table for k = " << k <<  " ..." << endl << endl;
-  Rho_V _R;
-  string fname = "spike/list.Mr_k2av.dat";
-  fout.open(fname);
-  fout << "# Columns: b, bb, d, db, g, h, hp, j" << endl;
-
-  signal( SIGALRM, sigalrm_handler );
-  elapsed=0; alarm(1);
-
-  // Here are some parameters that can be changed:
-  N_M=300; 
-
-  M_min=1e-1;
-  M_max=1e+2;
-  // don't change anything after that.
-
-  s=pow(M_max/M_min,1./(N_M-1));
-  M=M_min;
-
-  for (int i=0;i<N_M;i++) { 
-    percentage=(float)i/((float)N_M);
-
-    k=sqrt( fabs(k2av(M)) );
-    k0=sqrt(M*M+k*k);
-    _R();
-
-    fout << setprecision(9) << M 
-      << "    " <<  _R._b
-      << "    " <<  _R._bb
-      << "    " <<  _R._d
-      << "    " <<  _R._db
-      << "    " <<  _R._g
-      << "    " <<  _R._h
-      << "    " <<  _R._hp
-      << "    " <<  _R._j
-     << endl;
-    M*=s;
-  }
-  cout << endl;
-  cout << endl;
-  cout << endl << ":: Saved to file [" << fname << "]" << endl;
-  fout.close();
-
-  return 0;
-}
