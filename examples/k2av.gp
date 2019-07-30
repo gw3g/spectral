@@ -1,4 +1,5 @@
 # cf. Fig.5 in 1310.0164
+# Spaghetti plot
 
 set yr [-.005:.005]
 set xr [.07:150]

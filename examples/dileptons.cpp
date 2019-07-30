@@ -9,14 +9,14 @@ using namespace std;
 ofstream fout;
 int Print_D(double); int elapsed; float percentage;
 
-int main() {
-
+int main(int argc, char *argv[]) {
   /* for lattice comparisons: */
   // nf=0
+  if (argc>1) { k=atof(argv[1]); Print_D(k); }
   //Print_D(1.*2.*M_PI/3.); // T=1.1Tc
   //Print_D(1.*7.*M_PI/12.); // T=1.3Tc
   // nf=2
-  Print_D(sqrt(1.)*M_PI/2.); // T=1.2Tc
+  //Print_D(sqrt(1.)*M_PI/2.); // T=1.2Tc
   //Print_D(M_PI); // T=1.2Tc
 
   //Print_D(.5);
@@ -122,7 +122,7 @@ struct Rho_00
   };
   void operator ()() {
 
-    lo = -2.*Nc*( k0*k0*( psi1(-1,-1)-psi2(-1,-1) ) - .25*K2*psi0(-1,-1) )*OOFP;
+    lo = -2.*Nc*( k0*k0*(psi1(-1,-1)-psi2(-1,-1))-.25*K2*psi0(-1,-1) )*OOFP;
     nlo = -cF*Nc*( k*k*psi0(-1,-1) )*CUBE(OOFP);
     //nlo = -cF*Nc*( k*k )*CUBE(OOFP); // large-K2
 
@@ -155,11 +155,11 @@ int Print_D(double k_curr) {
   // filename
   char k_name[20];
   sprintf(k_name,"{k=%.2f}",k);
-  string fname = "spike/NLO_rho_"
+  string fname = "NLO_rho_"
                + string(k_name)
                + ".dat";
 
-  cout << ":: Creating table for k = " << k <<  " ..." << endl << endl;
+  cout << "\n:: Creating table for k = " << k <<  " ..." << endl << endl;
   Rho_V rV;
   Rho_00 r00;
   fout.open(fname);
@@ -172,17 +172,17 @@ int Print_D(double k_curr) {
   elapsed=0; alarm(1);
 
   // Here are some parameters that can be changed:
-  N_k0=10; 
+  N_k0=50; 
 
-  k0_min=10.+1e-1;
-  k0_max=20.;
+  k0_min=1e-2;
+  k0_max=2.;
   //k0_min=40.;
   //k0_max=50.;
   // don't change anything after that.
 
   //s=pow(k0_max/k0_min,1./(N_k0-1));
-  //s=(k0_max-k0_min)/((double)N_k0-1.);
-  s = 1e-1;
+  s=(k0_max-k0_min)/((double)N_k0-1.);
+  //s = 10*1e-1;
   k0=k0_min;
 
   int i=0;

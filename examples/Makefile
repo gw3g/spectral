@@ -14,9 +14,9 @@ $(ODIR)/%.o: $(SDIR)/%.$(SRCEXT)
 	$(CC) $(CFLAGS) $(INC) -c -o $@ $<
 
 dileptons: $(OBJ)
-	$(CC) $(CFLAGS) $^ $(INC) dileptons.cpp -o dileptons
+	$(CC) $(CFLAGS) $^ $(INC) dileptons.cpp
 
 average: $(OBJ)
-	$(CC) $(CFLAGS) $^ $(INC) average.cpp -o average
+	$(CC) $(CFLAGS) $^ $(INC) average.cpp
 
 
