@@ -2,7 +2,8 @@
 
 Here I provide functions to compute the imaginary part of 
 two-loop diagrams, like the one shown below.
-These are thermal self energies, functions of an external four momentum _K_
+These are thermal self energies, functions of an external four momentum 
+_K_=(k<sub>0</sub>,**k**)
 and dependent on the statistical configuration.
 
 ![Labelling of generic two-loop diagram](inc/twoloop.png?raw=true "2-loop")
@@ -23,14 +24,15 @@ See below for a list of the included functions.
 
 By default, the program handles a master integral that is read from the
 `config` file in the working directory. 
-An example, to demonstrate the correct formatting, consider:
+As an example, to demonstrate the correct formatting, consider:
 ```
 11020
 ++-
 1
 0
 ```
-This file sets up a master integral with no propagators for _R_ and _V_.
+When read in, this file sets up a master integral with 
+no propagators for _R_ and _V_.
 Those with _P_ and _Q_ are single propagators and _L_ is repeated.
 Here s<sub>0</sub>=s<sub>1</sub>=+1 and s<sub>2</sub>=-1.
 Here `m=1` and `n=0` are  powers of energies 
@@ -44,12 +46,19 @@ It can then be run, for example
 ```
 will set k/T=1.0 and then perform a sweep of energies from
 k<sub>0</sub>/T=10<sup>-2</sup> to 10<sup>+2</sup> using
-500 points (this can be changed by modifying `main.cpp' and 
-recompiling).
+500 points on a logarithmic scale 
+(this can be changed by modifying `main.cpp` and recompiling).
 
 Use the flag `-h` for more details.
-Not that any changes to `main.cpp` will require a clean to be picked up
+Note that any changes to `main.cpp` will require a clean to be picked up
 by the makefile.
+
+### Requirements
+
+* [GNU Science Library](https://www.gnu.org/software/gsl)
+
+* C++14 (preferably)
+
 
 ### How it works
 
