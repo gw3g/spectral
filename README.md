@@ -36,7 +36,7 @@ Here s<sub>0</sub>=s<sub>1</sub>=+1 and s<sub>2</sub>=-1.
 Here `m=1` and `n=0` are  powers of energies 
 _p_<sub>0</sub> and _q_<sub>0</sub> respectively.
 
-The project can be built using `make' in this directory,
+The project can be built using `make` in this directory,
 which puts the executable in `bin/'.
 It can then be run, for example
 ```
@@ -47,7 +47,7 @@ k<sub>0</sub>/T=10<sup>-2</sup> to 10<sup>+2</sup> using
 500 points (this can be changed by modifying `main.cpp' and 
 recompiling).
 
-Use the flag `-h' for more details.
+Use the flag `-h` for more details.
 Not that any changes to `main.cpp` will require a clean to be picked up
 by the makefile.
 
