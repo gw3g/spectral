@@ -22,8 +22,8 @@ See below for a list of the included functions.
 ## Usage
 
 By default, the program handles a master integral that is read from the
-`config` file. 
-An example input, demonstrating the correct formatting, is:
+`config` file in the working directory. 
+An example, to demonstrate the correct formatting, consider:
 ```
 11020
 ++-
@@ -36,8 +36,9 @@ Here s<sub>0</sub>=s<sub>1</sub>=+1 and s<sub>2</sub>=-1.
 Here `m=1` and `n=0` are  powers of energies 
 _p_<sub>0</sub> and _q_<sub>0</sub> respectively.
 
-After building the project, it can be compiled simply using `make' .
-The executable can be run and, for example,
+The project can be built using `make' in this directory,
+which puts the executable in `bin/'.
+It can then be run, for example
 ```
 ./bin/rho -k 1.0
 ```
@@ -47,6 +48,8 @@ k<sub>0</sub>/T=10<sup>-2</sup> to 10<sup>+2</sup> using
 recompiling).
 
 Use the flag `-h' for more details.
+Not that any changes to `main.cpp` will require a clean to be picked up
+by the makefile.
 
 ### How it works
 
@@ -65,8 +68,8 @@ To get the value of the function, one can simply call:
 ```
 (*rho)(k0,k)
 ```
-Any changes to `main.cpp` will require a clean to be picked up
-by the makefile.
+Some examples are provided.
+
 
 **NB** Instances of the masters return a quantity in units
 of the temperature.
