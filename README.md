@@ -22,25 +22,27 @@ See below for a list of the included functions.
 
 ## Usage
 
-By default, the program handles a master integral that is read from the
+The program handles a master integral that is read from the
 `config` file in the working directory. 
-As an example, to demonstrate the correct formatting, consider:
+An example, which demonstrates the correct formatting, reads:
 ```
 11020
 ++-
 1
 0
 ```
-When read in, this file sets up a master integral with 
+When processed, this input sets up a master integral with 
 no propagators for _R_ and _V_.
 Those with _P_ and _Q_ are single propagators and _L_ is repeated.
-Here s<sub>0</sub>=s<sub>1</sub>=+1 and s<sub>2</sub>=-1.
+Here s<sub>0</sub>=s<sub>1</sub>=+1 and s<sub>2</sub>=-1 summarise
+the statistical
+configuration: (s<sub>0</sub>,s<sub>1</sub>,s<sub>2</sub>).
 Here `m=1` and `n=0` are  powers of energies 
 _p_<sub>0</sub> and _q_<sub>0</sub> respectively.
 
-The project can be built using `make` in this directory,
-which puts the executable in `bin/'.
-It can then be run, for example
+The main project can be built using `make` in the same directory as 
+this readme, which puts the executable in `bin/`.
+It can then be run, for example using
 ```
 ./bin/rho -k 1.0
 ```
@@ -49,42 +51,11 @@ k<sub>0</sub>/T=10<sup>-2</sup> to 10<sup>+2</sup> using
 500 points on a logarithmic scale 
 (this can be changed by modifying `main.cpp` and recompiling).
 
-Use the flag `-h` for more details.
+Use the flag `-h` to see more options.
 Note that any changes to `main.cpp` will require a clean to be picked up
 by the makefile.
 
-### Requirements
-
-* [GNU Science Library](https://www.gnu.org/software/gsl)
-
-* C++14 (preferably)
-
-
-### How it works
-
-You can use the master integrals by first declaring
-a pointer to a `Master` object, and then constructing
-the type with energy power and exponents:
-```
-Master *rho;
-rho = _10120(m,n,s);
-```
-The `s` pointer is to an `int [3]` array of entries +1 (boson)
-or -1 (fermion) to capture the statistical 
-configuration: (s<sub>0</sub>,s<sub>1</sub>,s<sub>2</sub>).
-
-To get the value of the function, one can simply call:
-```
-(*rho)(k0,k)
-```
-Some examples are provided.
-
-
-**NB** Instances of the masters return a quantity in units
-of the temperature.
-
-
-## Data files
+### Data files
 
 Output from the main function is stored under `out/data`. 
 (If the file is empty, it will be created by the makefile.)
@@ -99,6 +70,36 @@ There are four columns: 1) energy k<sub>0</sub>/T, 2) rho, scaled so that ...
 
 These can be plotted with the helpt of the [gnuplot](https://www.gnuplot.info)
 scripts in the `out` directory.
+
+
+### Requirements
+
+* [GNU Science Library](https://www.gnu.org/software/gsl)
+
+* C++11 compiler
+
+
+### Abusage
+
+You can manipulate the master integrals by first declaring
+a pointer to a `Master` object, and then constructing
+the type with energy power and exponents:
+```
+Master *rho;
+rho = _11020(m,n,s);
+```
+The `s` pointer is to an `int [3]` array of entries +1 (boson)
+or -1 (fermion).
+
+To get the value of the function, one can simply call:
+```
+(*rho)(k0,k)
+```
+Some examples are provided.
+
+
+**NB** Instances of the masters return a quantity in units
+of the temperature.
 
 
 ## List of included integrals
