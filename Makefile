@@ -1,14 +1,11 @@
 CC	= g++
 CFLAGS	= -lm -lgsl -lgslcblas
+TARGET	= bin/rho
+SRCEXT	= cpp
 SDIR	= src
 ODIR	= build
 OUT	= out
-TARGET	= bin/rho
 
-# need to make a choice of ONE suffix
-SRCEXT	= cpp
-
-# find ALL *.SRCEXT files in ~/src directory
 SRC	= $(wildcard $(SDIR)/*.$(SRCEXT))
 OBJ	= $(patsubst $(SDIR)/%,$(ODIR)/%,$(SRC:.$(SRCEXT)=.o))
 INC	= -I inc
@@ -24,9 +21,6 @@ $(ODIR)/%.o: $(SDIR)/%.$(SRCEXT)
 
 clean:
 	$(RM) -r $(ODIR) $(TARGET); $(RM) bin/*;
-
-dileptons: $(OBJ)
-	$(CC) $(CFLAGS) $^ $(INC) spike/dileptons.cpp -o bin/dileptons
 
 .PHONY: clean
 
