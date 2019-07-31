@@ -1,1 +1,4 @@
 *.dat
+*.swp
+/bin
+/build
