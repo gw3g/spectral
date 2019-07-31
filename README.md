@@ -46,7 +46,7 @@ It can then be run, for example using
 ```
 ./bin/rho -k 1.0
 ```
-will set k/T=1.0 and then perform a sweep of energies from
+which will set k/T=1.0 and then perform a sweep of energies from
 k<sub>0</sub>/T=10<sup>-2</sup> to 10<sup>+2</sup> using
 500 points on a logarithmic scale 
 (this can be changed by modifying `main.cpp` and recompiling).
@@ -72,14 +72,7 @@ These can be plotted with the helpt of the [gnuplot](https://www.gnuplot.info)
 scripts in the `out` directory.
 
 
-### Requirements
-
-* [GNU Science Library](https://www.gnu.org/software/gsl)
-
-* C++11 compiler
-
-
-### Abusage
+## Abusage
 
 You can manipulate the master integrals by first declaring
 a pointer to a `Master` object, and then constructing
@@ -100,6 +93,14 @@ Some examples are provided.
 
 **NB** Instances of the masters return a quantity in units
 of the temperature.
+
+
+## Requirements
+
+* [GNU Science Library](https://www.gnu.org/software/gsl)
+
+* C++11 compiler
+
 
 
 ## List of included integrals
