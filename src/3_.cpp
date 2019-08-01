@@ -63,7 +63,7 @@ double rho11011::eval()
   if ( m==1 && n==0 ) { // (1)
     (this->OPE).T0 = -1.;
     (this->OPE).T2 = ( a2+2.*a4+a5 )*.125*OOFP*k0/K2;
-    (this->OPE).T4 = ( -(b1-b4)*K2 
+    (this->OPE).T4 = ( +(b1-b4)*K2 
                        +(b2+2.*b4+b5)*(k0*k0+k*k/3.) )*k0/CUBE(K2)*.5*OOFP;
   } else
   if ( m==0 && n==1 ) { // (0,1)
