@@ -89,14 +89,9 @@ double rho11110::eval()
   }
   //return (this->OPE)();
 
-  //if ( m==0 && n==1 ) { return (this->OPE)(); }
   // Quadrature step! --
   double epsabs = 1e-7, epsrel = 0;
-  //double rr = 1.;
-  //if (k0>5.*k) { rr = pow(k0/k, 1.*(k0-5.*k)/(100.-5.*k) ); }// smarter (?) error adaption
-  //epsabs *= rr;
-  //epsrel *= rr;
-  gsl_set_error_handler_off();
+  gsl_set_error_handler_off(); // live on the edge
   int status=1;
 
   size_t limit = 1e6;
@@ -116,8 +111,8 @@ double rho11110::eval()
   } );
   status = gsl_integration_qag(  outer, .0+1e-16,1., epsabs, epsrel*2, 
                         limit, 6, wsp2, &res, &err  );
-  //epsabs*=10.;
   //if (status) {
+    //epsabs*=10.;
     //cerr << " !! Error @ k0 = " << k0 << " , k = " << k << endl << " , trying again with eps = " << epsabs << endl; }
   //}
 

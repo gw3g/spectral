@@ -104,9 +104,9 @@ double rhoStar::eval() {
   } 
   //return (this->OPE)();
 
-  double epsabs = 1e-4, epsrel = 0;
+  double epsabs = 1e-6, epsrel = 0;
   //if (k0>20.) { epsabs*=.1; epsrel*=.1; }
-  size_t limit = 1e5;
+  size_t limit = 2e2;
   gsl_set_error_handler_off(); // live on the edge.
 
   quad wsp1(limit);
@@ -117,11 +117,11 @@ double rhoStar::eval() {
     auto inner = make_gsl_function( [&](double y) {
         return (this->integrand)(x,y);
         } );
-    gsl_integration_qag(inner, .0+1e-16,1., epsabs, epsrel, 
+    gsl_integration_qag(inner, .0+1e-13,1., epsabs, epsrel, 
                        limit, 6, wsp1, &inner_result, &inner_abserr );
     return inner_result;
   } );
-  gsl_integration_qag(  outer, .0+1e-16,1., epsabs, 2.*epsrel, 
+  gsl_integration_qag(  outer, .0+1e-13,1., epsabs, 2.*epsrel, 
                         limit, 6, wsp2, &res, &err  );
 
   return (( res*(kp/km) ))*CUBE(OOFP); // mult. by (km/kp) in integrand
@@ -668,7 +668,8 @@ double rhoStar::integrand(double x, double y)
 
   }
     // still don't have a good way to cater for NaNs
-  if ( isinf(res)||isnan(res) ) { return 0.;}
-  else { return .25*(km/kp)*res/(k); }
+  //if ( isinf(res)||isnan(res) ) { return 0.;}
+  //else { 
+  return .25*(km/kp)*res/(k);
 }
 
