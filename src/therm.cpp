@@ -10,7 +10,7 @@
 
 double nB( double x ) {
   // Bose-Einstein
-  if (x>10.) {double e=exp(-x); return e/(1.-e);}
+  if (x>20.) {double e=exp(-x); return e/(1.-e);}
   else return 1./expm1(x) ;
 };
 
@@ -33,7 +33,7 @@ double bf(double e, int X) {
 };
 
 double I(int n, int s_) {
-  // tadpole
+  // tadpole, needed for OPEs
   double res;
   res = gsl_sf_zeta_int(n+2)/( 2.*SQR(M_PI) );
   for (int i=n+1;i>0;i--) res*=(double)i;
