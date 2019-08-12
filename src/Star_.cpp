@@ -104,11 +104,11 @@ double rhoStar::eval() {
   } 
   //return (this->OPE)();
 
+  // Quadrature step! --
   double epsabs = 1e-6, epsrel = 0;
-  //if (k0>20.) { epsabs*=.1; epsrel*=.1; }
   size_t limit = 2e2;
-  gsl_set_error_handler_off(); // live on the edge.
 
+  gsl_set_error_handler_off(); // live on the edge.
   quad wsp1(limit);
   quad wsp2(limit);
 

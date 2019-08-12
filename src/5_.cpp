@@ -91,15 +91,12 @@ double rho11110::eval()
 
   // Quadrature step! --
   double epsabs = 1e-7, epsrel = 0;
-  gsl_set_error_handler_off(); // live on the edge
-  int status=1;
-
   size_t limit = 1e6;
 
+  gsl_set_error_handler_off(); // live on the edge
   quad wsp1(limit);
   quad wsp2(limit);
 
-  //while (status) {
   auto outer = make_gsl_function( [&](double x) {
     double inner_result, inner_abserr;
     auto inner = make_gsl_function( [&](double y) {
@@ -109,12 +106,8 @@ double rho11110::eval()
                        limit, 6, wsp1, &inner_result, &inner_abserr );
     return inner_result;
   } );
-  status = gsl_integration_qag(  outer, .0+1e-16,1., epsabs, epsrel*2, 
+  gsl_integration_qag(  outer, .0+1e-16,1., epsabs, epsrel*2, 
                         limit, 6, wsp2, &res, &err  );
-  //if (status) {
-    //epsabs*=10.;
-    //cerr << " !! Error @ k0 = " << k0 << " , k = " << k << endl << " , trying again with eps = " << epsabs << endl; }
-  //}
 
   return (( res*pow(k0,m+n)/K2 ))*CUBE(OOFP);
 }
