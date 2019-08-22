@@ -128,7 +128,7 @@ double H0::val(int _nu, int _sA, int _sB)
   sB=_sB;
   double res=0.,err;
 
-  double epsabs = 1e-5, epsrel = 1e-6;
+  double epsabs = 1e-7, epsrel = 1e-8;
   size_t limit = 1e5;
 
   quad wsp(limit);

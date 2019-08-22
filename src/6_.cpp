@@ -174,7 +174,7 @@ double rho11111::eval()
   //return (this->OPE)();
 
   //if ( m==2 && n==0 ) { return (this->OPE)(); )
-  double epsabs = 1e-4, epsrel = 0;
+  double epsabs = 1e-3, epsrel = 0;
   //if (k0>2.*k) { epsabs*=.1; }
   //if (k0>3.*k) { epsabs*=.1; }
   //if (k0>20.*k) { epsrel*=.1; }
@@ -185,24 +185,24 @@ double rho11111::eval()
   //epsabs *= rr;
   //epsrel *= rr;
   gsl_set_error_handler_off();
-  //int status=1;
-  size_t limit = 1e8;
+  size_t limit = 5e2;
 
   quad wsp1(limit);
   quad wsp2(limit);
 
-  //while (status) {
+  if ( m==2 && n==0 ) { epsabs = 1e-4; }//return (this->OPE)(); }
+
   auto outer = make_gsl_function( [&](double x) 
   {
     double inner_result, inner_abserr;
     auto inner = make_gsl_function( [&](double y) {
           return (this->integrand)(x,y);
         } );
-    gsl_integration_qag( inner, .0+1e-16,1., epsabs, epsrel,
+    gsl_integration_qag( inner, .0+1e-15,1., epsabs, epsrel,
                          limit, 6, wsp1, &inner_result, &inner_abserr );
     return inner_result;
   } );
-  gsl_integration_qag( outer, .0+1e-16,1., epsabs, epsrel*2,
+  gsl_integration_qag( outer, .0+1e-15,1., epsabs, epsrel*2,
                        limit, 6, wsp2, &res, &err  );//*/
   //epsabs*=10.;
   //if (status) {
