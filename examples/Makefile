@@ -19,4 +19,6 @@ dileptons: $(OBJ)
 average: $(OBJ)
 	$(CC) $(CFLAGS) $^ $(INC) average.cpp
 
+relations: $(OBJ)
+	$(CC) $(CFLAGS) $^ $(INC) relations.cpp
 
