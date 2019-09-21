@@ -10,9 +10,11 @@ using namespace std;
 ofstream fout;
 int elapsed; float percentage;
 int Print_k2av();
+int V_k2av();
 
 int main() {
-  Print_k2av();
+  //Print_k2av();
+  V_k2av();
 }
 
 /*--------------------------------------------------------------------*/
@@ -24,6 +26,63 @@ double k2av(double M) {
 }
 
 /*--------------------------------------------------------------------*/
+
+int V_k2av() {
+  int N_M;
+  double res, s, M, M_min, M_max;
+
+  Master
+    *rho_1;
+  double
+    _1;
+
+  S[0]=+1; S[1]=+1; S[2]=-1;
+  rho_1 =  _11111(2,0,S);
+
+
+  cout << ":: Creating table ..." << endl << endl;
+
+  string fname = "diag.6.(++-).k2av.dat";
+  fout.open(fname);
+
+  fout << "# Columns: M/T, rho*k0/T2, ope (LO), ope (NLO)" << endl;
+
+  signal( SIGALRM, sigalrm_handler );
+  elapsed=0; alarm(1);
+
+  // Here are some parameters that can be changed:
+  N_M=200; 
+
+  M_min=1e-1;
+  M_max=1e+2;
+  // don't change anything after that.
+
+  s=pow(M_max/M_min,1./(N_M-1));
+  M=M_min;
+
+  for (int i=0;i<N_M;i++) { 
+    percentage=(float)i/((float)N_M);
+
+    k=sqrt( fabs(k2av(M)) );
+    k0=sqrt(M*M+k*k);
+
+    _1 = (*rho_1 )(k0,k);
+
+    fout << scientific  <<  M      // M/T
+         << "    "      <<  _1*K2
+         << "    "      <<  (rho_1->OPE).T2*K2
+         << "    "      <<  (rho_1->OPE).T4*K2
+         << endl;
+
+    M*=s;
+  }
+  cout << endl;
+  cout << endl;
+  cout << endl << ":: Saved to file [" << fname << "]" << endl;
+  fout.close();
+
+  return 0;
+}
 
 int Print_k2av() {
   int N_M;

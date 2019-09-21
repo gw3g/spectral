@@ -2,8 +2,13 @@
 #include "quad.hh"
 #include "map.hh"
 
+double checker(double x) {
+  if ( isinf(x)||isnan(x) ) { return 0.;}
+  else return x;
+}
+
 using namespace std;
-double E = 1e1; // control param for large momenta: used to \
+double E = 1e2; // control param for large momenta: used to \
                    switch between expanded or full integrand\
                    See: L_div(...) and L_int(...)
 
@@ -60,6 +65,9 @@ double rho11111::F_123(double p, double q, double r) {
   int _n = this->n;
 
   double fp=f(p,s1), fq=f(q,s2), fr= f(r,s3);
+  //double fp = f(p,s1) ? p>0 : -1.-f(-p,s1);
+  //double fq = f(q,s2) ? q>0 : -1.-f(-q,s2);
+  //double fr = f(r,s3) ? r>0 : -1.-f(-r,s3);
 
   res = ( ((double) s1*s2*s3)*exp(k0)-1. )*fp*fq*fr;
   //res = 1. + fp + fq + fr + fp*fq + fp*fr + fq*fr;
@@ -79,6 +87,9 @@ double rho11111::F_345(double r, double l, double v) {
   int _n = this->n;
 
   double fr=f(r,s3), fl=f(l,s4), fv= f(v,s5);
+  //double fr = f(r,s3) ? r>0 : -1.-f(-r,s3);
+  //double fl = f(l,s4) ? l>0 : -1.-f(-l,s4);
+  //double fv = f(v,s5) ? v>0 : -1.-f(-v,s5);
 
   res = ( ((double) s3*s4*s5)*exp(k0)-1. )*fr*fl*fv;
   //res = 1. + fl + fv + fr + fl*fv + fl*fr + fv*fr;
@@ -96,6 +107,8 @@ double rho11111::F_14(double p, double l) {
   int _m = this->m;
 
   double fp=f(p,s1), fl=f(l,s4);
+  //double fp = f(p,s1) ? p>0 : -1.-f(-p,s1);
+  //double fl = f(l,s4) ? l>0 : -1.-f(-l,s4);
 
   res = ( ((double) s1*s4)*exp(k0)-1. )*fp*fl;
   //res = 1. + fp + fl;
@@ -113,6 +126,8 @@ double rho11111::F_25(double q, double v) {
   int _n = this->n;
 
   double fq=f(q,s2), fv=f(v,s5);
+  //double fq = f(q,s2) ? q>0 : -1.-f(-q,s2);
+  //double fv = f(v,s5) ? v>0 : -1.-f(-v,s5);
 
   res = ( ((double) s2*s5)*exp(k0)-1. )*fq*fv;
   //res = 1. + fq + fv;
@@ -174,7 +189,7 @@ double rho11111::eval()
   //return (this->OPE)();
 
   //if ( m==2 && n==0 ) { return (this->OPE)(); )
-  double epsabs = 1e-3, epsrel = 0;
+  double epsabs = 1e-4, epsrel = 0;
   //if (k0>2.*k) { epsabs*=.1; }
   //if (k0>3.*k) { epsabs*=.1; }
   //if (k0>20.*k) { epsrel*=.1; }
@@ -190,7 +205,7 @@ double rho11111::eval()
   quad wsp1(limit);
   quad wsp2(limit);
 
-  if ( m==2 && n==0 ) { epsabs = 1e-4; }//return (this->OPE)(); }
+  if ( m==2 && n==0 ) { epsabs = 2e-3; }//return (this->OPE)(); }
 
   auto outer = make_gsl_function( [&](double x) 
   {
@@ -198,11 +213,11 @@ double rho11111::eval()
     auto inner = make_gsl_function( [&](double y) {
           return (this->integrand)(x,y);
         } );
-    gsl_integration_qag( inner, .0+1e-15,1., epsabs, epsrel,
+    gsl_integration_qag( inner, .0+1e-12,1., epsabs, epsrel,
                          limit, 6, wsp1, &inner_result, &inner_abserr );
     return inner_result;
   } );
-  gsl_integration_qag( outer, .0+1e-15,1., epsabs, epsrel*2,
+  gsl_integration_qag( outer, .0+1e-12,1., epsabs, epsrel*2,
                        limit, 6, wsp2, &res, &err  );//*/
   //epsabs*=10.;
   //if (status) {
@@ -268,10 +283,13 @@ inline double L_int(int j, double a, double p) {
     res = temp/(a*k0);
   } else
   if (j==2) { //return 0.;
-    res =  ( - 5.
+    res =  ( - 5.5
              + lga(.25*k*k/((km-a)*(kp-a)))
-             + ( 6.*a*(k0-a)-k*k )/K2
-             - lga(SQR(p-a)/K2)                   )/(2.*k0*k0);
+             //+ 2. // WORKS!
+             //+ .5+ ( 6.*a*(k0-a)-k*k )/K2 // ALSO WORKS.
+             //+ 1.5 + ( 2.*a*(k0-a)-k*k )/K2
+             + 1. + ( 10.*a*(k0-a)-k*k )/K2
+             - lga( SQR(p-a)/K2 )                 )/(2.*k0*k0);
     // div = 1/eps + 2*log(mu2/K2) + 11/2.
   }
   return res*(K2/16.); // Why 16? I can't remember ...
@@ -814,7 +832,17 @@ double rho11111::integrand(double x, double y) {
   //\
   return _4D;
 
-  res += _1A + _1B + _1D + _2A + _2B + _2C + _2D + _4A + _4B + _4D;
+  res += 
+  checker(_1A) + 
+  checker(_1B) + 
+  checker(_1D) + 
+  checker(_2A) + 
+  checker(_2B) + 
+  checker(_2C) + 
+  checker(_2D) + 
+  checker(_4A) + 
+  checker(_4B) + 
+  checker(_4D);
 
   } else {
 
@@ -1372,7 +1400,16 @@ double rho11111::integrand(double x, double y) {
   //  #] from '6'
 
   res +=
-  _2A + _2B + _4A + _4B + _4D + _5A + _5B + _6A + _6B + _6C;
+  checker(_2A) + 
+  checker(_2B) + 
+  checker(_4A) + 
+  checker(_4B) + 
+  checker(_4D) + 
+  checker(_5A) + 
+  checker(_5B) + 
+  checker(_6A) + 
+  checker(_6B) + 
+  checker(_6C);
   }
 
   // still don't have a good way to cater for NaNs
