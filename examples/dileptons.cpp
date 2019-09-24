@@ -12,12 +12,13 @@ int Print_D(double); int elapsed; float percentage;
 int main(int argc, char *argv[]) {
   /* for lattice comparisons: */
   // nf=0
-  if (argc>1) { k=atof(argv[1]); Print_D(k); }
-  //Print_D(1.*2.*M_PI/3.); // T=1.1Tc
-  //Print_D(1.*7.*M_PI/12.); // T=1.3Tc
+  //if (argc>1) { k=atof(argv[1]); Print_D(k); }
+  //Print_D(3.*2.*M_PI/3.); // T=1.1Tc
+  //Print_D(3.*7.*M_PI/12.); // T=1.3Tc
   // nf=2
   //Print_D(sqrt(1.)*M_PI/2.); // T=1.2Tc
-  //Print_D(M_PI); // T=1.2Tc
+  //Print_D(1.5*M_PI); // T=1.2Tc
+  Print_D(.5*M_PI*sqrt(14)); // T=1.2Tc
 
   //Print_D(.5);
   //Print_D(1.);
@@ -172,17 +173,17 @@ int Print_D(double k_curr) {
   elapsed=0; alarm(1);
 
   // Here are some parameters that can be changed:
-  N_k0=50; 
+  N_k0=10; 
 
-  k0_min=1e-2;
-  k0_max=2.;
+  k0_min=1e-1;
+  k0_max=30.;
   //k0_min=40.;
   //k0_max=50.;
   // don't change anything after that.
 
   //s=pow(k0_max/k0_min,1./(N_k0-1));
-  s=(k0_max-k0_min)/((double)N_k0-1.);
-  //s = 10*1e-1;
+  //s=(k0_max-k0_min)/((double)N_k0-1.);
+  s = 1e-1;
   k0=k0_min;
 
   int i=0;

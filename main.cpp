@@ -70,10 +70,10 @@ int main(int argc, char *argv[]) {
           config(rho);
           break;
         case 'h':
-          cerr << "\n:: Usage, './bin/rho' ..." << endl << endl;
+          cerr << "\n:: Usage, './bin/rho' ..."                         << endl << endl;
           cerr << "         [-k momentum] (in units of T, default=1.0)" << endl;
-          cerr << "         [-c] (show master config)" << endl;
-          cerr << "         [-h] (prints this help)" << endl;
+          cerr << "         [-c] (show master config)"                  << endl;
+          cerr << "         [-h] (prints this help)"                    << endl;
           break;
       }
     }

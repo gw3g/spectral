@@ -8,7 +8,7 @@ double checker(double x) {
 }
 
 using namespace std;
-double E = 1e2; // control param for large momenta: used to \
+double E = 1e1; // control param for large momenta: used to \
                    switch between expanded or full integrand\
                    See: L_div(...) and L_int(...)
 
@@ -186,26 +186,18 @@ double rho11111::eval()
   // consistent dimensions
   (this->OPE).T2 /= SQR(K2);
   (this->OPE).T4 /= SQR(K2);
-  //return (this->OPE)();
+  //return (this->OPE)(); 
 
-  //if ( m==2 && n==0 ) { return (this->OPE)(); )
-  double epsabs = 1e-4, epsrel = 0;
-  //if (k0>2.*k) { epsabs*=.1; }
-  //if (k0>3.*k) { epsabs*=.1; }
-  //if (k0>20.*k) { epsrel*=.1; }
-  //if (k0>50.*k) { epsabs*=.1; epsrel*=.01; }
+  double epsabs = 1e-3, epsrel = 0;
   double rr = 1.;
-  //if (k0>k) { rr = pow(10., -3.*(k0-k)/(100.-k) ); }// smarter (?) error adaption
-  //if (k0>k) { rr = pow(k0/k, -1. ); }// smarter (?) error adaption
-  //epsabs *= rr;
-  //epsrel *= rr;
+
   gsl_set_error_handler_off();
   size_t limit = 5e2;
 
   quad wsp1(limit);
   quad wsp2(limit);
 
-  if ( m==2 && n==0 ) { epsabs = 2e-3; }//return (this->OPE)(); }
+  if ( m==2 && n==0 ) { epsabs = 1e-2; }//return (this->OPE)(); }
 
   auto outer = make_gsl_function( [&](double x) 
   {
@@ -213,11 +205,11 @@ double rho11111::eval()
     auto inner = make_gsl_function( [&](double y) {
           return (this->integrand)(x,y);
         } );
-    gsl_integration_qag( inner, .0+1e-12,1., epsabs, epsrel,
+    gsl_integration_qag( inner, .0+1e-15,1., epsabs, epsrel,
                          limit, 6, wsp1, &inner_result, &inner_abserr );
     return inner_result;
   } );
-  gsl_integration_qag( outer, .0+1e-12,1., epsabs, epsrel*2,
+  gsl_integration_qag( outer, .0+1e-15,1., epsabs, epsrel*2,
                        limit, 6, wsp2, &res, &err  );//*/
   //epsabs*=10.;
   //if (status) {
@@ -226,17 +218,6 @@ double rho11111::eval()
 
   //double temp = 0.;
 
-  /*if ( (m==1)&&(n==1) ) {
-    temp += ( (k0>k) ? 2. : 0. );
-    double ep = exp(-fabs(kp)), em = exp(-fabs(km));
-    temp += lga( // thermal coefficient of `vacuum'-part
-         (1.-((double)(this->s)[1])*ep)*(1.-((double)(this->s)[4])*ep)*
-         (1.-((double)(this->s)[2])*ep)*(1.-((double)(this->s)[5])*ep)/(
-         (1.-((double)(this->s)[1])*em)*(1.-((double)(this->s)[4])*em)*
-         (1.-((double)(this->s)[2])*em)*(1.-((double)(this->s)[5])*em) ))/k;
-    res = ( res*(kp/km) - .5*(this->OPE).T0*temp*K2/SQR(k0) );
-  }*/
-
   if ( m==2 && n==0 ) {
     res = res*(kp/km)*CUBE(OOFP)/(K2); return res;
   }
@@ -244,7 +225,6 @@ double rho11111::eval()
   res = res*(kp/km)*CUBE(OOFP)/K2; return res;
   }
   res = res*(kp/km)*pow(k0,m+n)*CUBE(OOFP)/SQR(K2); return res;
-  //return ( res - (this->OPE).T2 )/(this->OPE).T4;
 }
 
 /*--------------------------------------------------------------------*/
@@ -263,8 +243,8 @@ inline double L_div(double p, double l, double pp, double pm) {
       Rm *= km/p;
       R0 *= k0/p;
       res -= ( Rp+Rm-R0 )/((double)n);
-    }; // first term omitted!!
-       // ( it is K2/(4*p^2) )
+    }; // --> first term omitted
+       //     ( it is K2/(4*p^2) )
 
   }
   return res;
@@ -285,14 +265,11 @@ inline double L_int(int j, double a, double p) {
   if (j==2) { //return 0.;
     res =  ( - 5.5
              + lga(.25*k*k/((km-a)*(kp-a)))
-             //+ 2. // WORKS!
-             //+ .5+ ( 6.*a*(k0-a)-k*k )/K2 // ALSO WORKS.
-             //+ 1.5 + ( 2.*a*(k0-a)-k*k )/K2
-             + 1. + ( 10.*a*(k0-a)-k*k )/K2
+             + 2. // finite part, consistent w/ cut-off
              - lga( SQR(p-a)/K2 )                 )/(2.*k0*k0);
     // div = 1/eps + 2*log(mu2/K2) + 11/2.
   }
-  return res*(K2/16.); // Why 16? I can't remember ...
+  return res*(K2/16.); // Why 16? Long story ...
 }
 
 double rho11111::integrand(double x, double y) { 
@@ -1339,7 +1316,7 @@ double rho11111::integrand(double x, double y) {
   }, kp,E*kp    )(x);                     //*/
   _6B += remap([&](double p, double pd) {             // p=[E*kp,+inf)
      return 
-      remap([&](double q, double qd) {                // p=[-E*kp,km]
+      remap([&](double q, double qd) {                // q=[-E*kp,km]
         double temp = 0., r=k0-p-q, v=k0-q, l=k0-p;
         pm = km-p; pp = kp-p;
         qm = km-q; qp = kp-q;
@@ -1349,7 +1326,7 @@ double rho11111::integrand(double x, double y) {
         temp += pow(l/k0,m)*F_25(v,q)*L_div(l,p,pm,pp);
         return .25*temp/r;
       }, -E*kp,km )(y)+
-      remap([&](double q, double qd) {                // p=(-inf,E*kp]
+      remap([&](double q, double qd) {                // q=(-inf,E*kp]
         double temp = 0., r=k0-p-q, v=k0-q, l=k0-p;
         pm = km-p; pp = kp-p;
         qm = km-q; qp = kp-q;
@@ -1359,7 +1336,7 @@ double rho11111::integrand(double x, double y) {
         temp += pow(l/k0,m)*F_25(v,q)*L_div(l,p,pm,pp);
         return .25*temp/r;
       }, -E*kp )(y)
-      - F_25(p,k0-p)*L_int(m,k0-p,-E*kp)*2.
+      - F_25(p,k0-p)*L_int(m,k0-p,-E*kp)*2. // NB, see also 5A
       - F_14(p,k0-p)*L_int(n,k0-p,-E*kp)*2.;
   }, E*kp    )(x);                     //*/
   /*_6B += remap([&](double q, double qd) {             // q=[kp,+inf)
