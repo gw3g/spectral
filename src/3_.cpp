@@ -31,7 +31,7 @@ struct G0 {
 /*--------------------------------------------------------------------*/
 
 struct rho11011 : Master {
-
+  double integrand(double,double) { return 0.; };
   double eval();
 
   H0 h0;

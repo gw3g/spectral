@@ -43,6 +43,7 @@ struct Master {
   int type; // = {1..6}
   Expand OPE;
   virtual double eval()=0;
+  virtual double integrand(double,double)=0;
   Master(int _m, int _n, int _s[3])
     : m(_m), n(_n) {
         // provided:

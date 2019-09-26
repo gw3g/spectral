@@ -30,6 +30,7 @@ double F(int nu, int sA, int sB) {
 /*--------------------------------------------------------------------*/
 
 struct rho11020 : Master {
+  double integrand(double,double) { return 0.; };
   double eval();
   rho11020(int _m, int _n, int _s[3]) : Master(_m,_n,_s) { type=2; }
 };
@@ -78,6 +79,7 @@ double rho11020::eval()
 /*--------------------------------------------------------------------*/
 
 struct rho11010 : Master {
+  double integrand(double,double) { return 0.; };
   double integrand(double);           // supported on [0,1]
 
   double F_14(double,double);         // = f1f4/f0
