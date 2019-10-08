@@ -9,12 +9,16 @@ using namespace std;
 int check_1(int,int); 
 int check_2(int,int); 
 int elapsed; float percentage;
-int main() {
-  /* for lattice comparisons: */
+
+int main(int argc, char *argv[]) {
+
+  if (argc>1) { k0=atof(argv[1]); k=atof(argv[2]); }
+
   check_2(+1,+1);
   check_2(+1,-1);
   check_2(-1,+1);
   check_2(-1,-1);
+
 }
 
 // RULE 1
@@ -32,7 +36,6 @@ int check_1(int sA, int sB)
   rho_2 =  _11110(1,0,S);
   rho_3 =  _11110(0,1,S);
 
-  k0 = 5.; k = 1.;
   x = (*rho_1)(k0,k);
   y = (*rho_2)(k0,k);
   z = (*rho_3)(k0,k);
