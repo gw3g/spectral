@@ -65,10 +65,10 @@ diag.[type]{k=[k/T]}.([s0][s1][s2]).[m][n].dat
 ```
 where `[...]` takes the value specified within the square brackets.
 Each file tabulates the energy master integrals, as a function of energy.
-There are four columns: 1) energy k<sub>0</sub>/T, 2) rho, scaled so that ...
-3) is the leading OPE and 4) the next-to-leading OPE.
+There are four columns: (1) energy k<sub>0</sub>/T, (2) rho scaled with T=1,
+(3) the leading OPE and (4) the next-to-leading OPE.
 
-These can be plotted with the helpt of the [gnuplot](https://www.gnuplot.info)
+These can be plotted with the help of the [gnuplot](https://www.gnuplot.info)
 scripts in the `out` directory.
 
 
@@ -91,15 +91,15 @@ To get the value of the function, one can simply call:
 Some examples are provided.
 
 
-**NB** Instances of the masters return a quantity in units
-of the temperature.
+**NB**, Instances of the master functions return a quantity in units
+of the temperature (i.e. T=1).
 
 
 ## Requirements
 
 * [GNU Science Library](https://www.gnu.org/software/gsl)
 
-* C++11 compiler
+* C++ compiler (v11 or higher)
 
 
 
@@ -107,5 +107,5 @@ of the temperature.
 
 | Type        | I            | II                         | III   | IV    | V           | VI    |
 |:------------|:-------------|:---------------------------|:------|:------|:------------|:------|
-| Propagatars | 01020, 00120 | 11010, 10110, 11020, 10120 | 11011 | 11100 | 11110, Star | 11111 |
+| Propagators | 01020, 00120 | 11010, 10110, 11020, 10120 | 11011 | 11100 | 11110, Star | 11111 |
 
