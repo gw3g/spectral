@@ -14,7 +14,11 @@ int Print_D(double); int elapsed; float percentage;
 void D(double,double);
 
 int main(int argc, char *argv[]) {
+
+  // Enter: k0, k
   if (argc>1) { k0=atof(argv[1]); k=atof(argv[2]); }
+
+  // Return: k0/T, rhoV_LO/T2, rho00_LO/T2, rhoV_NLO/(g2*T2), rho00_NLO/(g2*T2)" 
   D(k0,k);
 
   /* for lattice comparisons: */
