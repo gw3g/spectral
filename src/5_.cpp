@@ -90,7 +90,7 @@ double rho11110::eval()
   //return (this->OPE)();
 
   // Quadrature step! --
-  double epsabs = 1e-7, epsrel = 0;
+  double epsabs = 1e-5, epsrel = 0;
   size_t limit = 1e6;
 
   gsl_set_error_handler_off(); // live on the edge
@@ -102,11 +102,11 @@ double rho11110::eval()
     auto inner = make_gsl_function( [&](double y) {
         return (this->integrand)(x,y);
         } );
-    gsl_integration_qag(inner, .0+1e-16,1., epsabs, epsrel, 
+    gsl_integration_qag(inner, .0+1e-10,1., epsabs, epsrel, 
                        limit, 6, wsp1, &inner_result, &inner_abserr );
     return inner_result;
   } );
-  gsl_integration_qag(  outer, .0+1e-16,1., epsabs, epsrel*2, 
+  gsl_integration_qag(  outer, .0+1e-10,1., epsabs, epsrel*2, 
                         limit, 6, wsp2, &res, &err  );
 
   return (( res*pow(k0,m+n)/K2 ))*CUBE(OOFP);
