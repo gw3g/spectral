@@ -8,7 +8,7 @@ double checker(double x) {
 }
 
 using namespace std;
-double E = 1e1; // control param for large momenta: used to \
+double E = 1e2; // control param for large momenta: used to \
                    switch between expanded or full integrand\
                    See: L_div(...) and L_int(...)
 
@@ -30,26 +30,6 @@ struct rho11111 : Master {
 Master* _11111(int m, int n, int s[3]) {
   Master *R =  new rho11111(m,n,s); return R;
 }
-
-#include <fstream>
-using namespace std;
-void print_integrand(int m, int n, int s[3]) {
-  ofstream fout;
-  rho11111 *R =  new rho11111(m,n,s);
-  fout.open("out/data/test_integrand.dat");
-  double x=-.0125*.5;
-  double y;
-  for (int i=0;i<80;i++) {
-    x+=.025*.5;
-    y=-.0125*.5;
-    for (int j=0;j<80;j++) {
-      y+=.025*.5;
-      fout << x << "    " << y << "    " << (  
-          (R->integrand)(x,y)  
-          ) << endl; }
-  }
-  fout.close(); 
-}//*/
 
 /*--------------------------------------------------------------------*/
 // all the thermal weights for cuts from this topology
