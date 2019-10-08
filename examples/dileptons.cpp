@@ -5,23 +5,28 @@
 #include <string>
 
 double k0,k;
+double tol = 1e-4; // absolute tolerance
 
 using namespace std;
 
 ofstream fout;
 int Print_D(double); int elapsed; float percentage;
+void D(double,double);
 
 int main(int argc, char *argv[]) {
+  if (argc>1) { k0=atof(argv[1]); k=atof(argv[2]); }
+  D(k0,k);
+
   /* for lattice comparisons: */
   // nf=0
-  //if (argc>1) { k=atof(argv[1]); Print_D(k); }
-  //Print_D(3.*2.*M_PI/3.); // T=1.1Tc
-  //Print_D(3.*7.*M_PI/12.); // T=1.3Tc
+  //Print_D(3.*2.*M_PI/3.);     // T=1.1Tc
+  //Print_D(3.*7.*M_PI/12.);    // T=1.3Tc
   // nf=2
   //Print_D(sqrt(1.)*M_PI/2.); // T=1.2Tc
-  //Print_D(1.5*M_PI); // T=1.2Tc
-  Print_D(.5*M_PI*sqrt(14)); // T=1.2Tc
+  //Print_D(1.5*M_PI);         // T=1.2Tc
+  //Print_D(.5*M_PI*sqrt(14)); // T=1.2Tc
 
+  /* Others: */
   //Print_D(.5);
   //Print_D(1.);
   //Print_D(1.5);
@@ -34,6 +39,7 @@ int main(int argc, char *argv[]) {
 }
 
 /*--------------------------------------------------------------------*/
+// assemble masters
 
 struct Rho_V
 {
@@ -67,42 +73,32 @@ struct Rho_V
     //lo = Nc*K2*OOFP; // large-K2
     nlo= lo*3.*cF*SQR(OOFP);
 
+    // Quadrature step! --
     double res, err;
-    ////////////////////////////////////
-  double epsabs = 1e-3, epsrel = 0;
-  double rr = 1.;
 
-  gsl_set_error_handler_off();
-  size_t limit = 5e2;
+    gsl_set_error_handler_off();
+    size_t limit = 5e2;
 
-  quad wsp1(limit);
-  quad wsp2(limit);
+    quad wsp1(limit);
+    quad wsp2(limit);
 
-  cout << 
-          2.*(rho_h->integrand)(.1,.3)+
-          2.*(rho_hp->integrand)(.1,.3)*(kp/km)+
-          -(rho_j->integrand)(.1,.3)*(kp/km)
-          << endl;
+    auto outer = make_gsl_function( [&](double x) 
+    {
+      double inner_result, inner_abserr;
+      auto inner = make_gsl_function( [&](double y) {
+            return (  2.*(rho_h ->integrand)(x,y)
+                     +2.*(rho_hp->integrand)(x,y)*(kp/km)
+                     -   (rho_j ->integrand)(x,y)*(kp/km)
+                   )/SQR(kp);
+          } );
+      gsl_integration_qag( inner, .0+1e-10,1., tol, 0,
+                          limit, 6, wsp1, &inner_result, &inner_abserr );
+      return inner_result;
+    } );
+    gsl_integration_qag( outer, .0+1e-10,1., tol*2.,  0,
+                        limit, 6, wsp2, &res, &err  );//*/
 
-
-  auto outer = make_gsl_function( [&](double x) 
-  {
-    double inner_result, inner_abserr;
-    auto inner = make_gsl_function( [&](double y) {
-          return
-          2.*(rho_h->integrand)(x,y)+
-          2.*(rho_hp->integrand)(x,y)*(kp/km)+
-          -(rho_j->integrand)(x,y)*(kp/km)
-          ;
-        } );
-    gsl_integration_qag( inner, .0+1e-10,1., epsabs, epsrel,
-                         limit, 6, wsp1, &inner_result, &inner_abserr );
-    return inner_result;
-  } );
-  gsl_integration_qag( outer, .0+1e-10,1., epsabs, epsrel*2,
-                       limit, 6, wsp2, &res, &err  );//*/
-    ////////////////////////////////////
-
+    // Simpler masters --
     _b = (*rho_b )(k0,k)*K2;
     _bb= (*rho_bb)(k0,k)*K2;
     _d = (*rho_d )(k0,k);
@@ -114,7 +110,7 @@ struct Rho_V
 
     nlo -=
     //8.*Nc*cF*( 2.*(_b-_bb+_d-_db) - 1.5*_g + 2.*(_h+_hp) - _j );
-    8.*Nc*cF*( 2.*(_b-_bb+_d-_db) - 1.5*_g + res*CUBE(OOFP) );
+    8.*Nc*cF*( 2.*(_b-_bb+_d-_db) - 1.5*_g + res*CUBE(OOFP)*SQR(kp) );
 
   };
 };
@@ -134,7 +130,6 @@ struct Rho_00
     *rho_hp,
     *rho_j_0, *rho_j_2;
   double
-    _b_0, _bb_0,
     _b_1, _bb_1,
     _b_2, _bb_2,
     _g,
@@ -165,44 +160,35 @@ struct Rho_00
     lo = -2.*Nc*( k0*k0*(psi1(-1,-1)-psi2(-1,-1))-.25*K2*psi0(-1,-1) )*OOFP;
     nlo = -cF*Nc*( k*k*psi0(-1,-1) )*CUBE(OOFP);
     //nlo = -cF*Nc*( k*k )*CUBE(OOFP); // large-K2
+
+    // Quadrature step! --
     double res, err;
-    ////////////////////////////////////
-  double epsabs = 1e-3, epsrel = 0;
-  double rr = 1.;
 
-  gsl_set_error_handler_off();
-  size_t limit = 5e2;
+    gsl_set_error_handler_off();
+    size_t limit = 5e2;
 
-  quad wsp1(limit);
-  quad wsp2(limit);
+    quad wsp1(limit);
+    quad wsp2(limit);
 
-  cout <<
-          2*(rho_h_0->integrand)(.1,.3)+
-          2*(rho_hp->integrand)(.1,.3)*(kp/km)+
-          -8*(rho_h_1->integrand)(.1,.3)*k0*k0/K2
-          +  (rho_j_0->integrand)(.1,.3)*(k0*k0+k*k)*(kp/km)/K2
-          -4*(rho_j_2->integrand)(.1,.3)*(kp/km) << endl;
-
-  auto outer = make_gsl_function( [&](double x) 
-  {
-    double inner_result, inner_abserr;
-    auto inner = make_gsl_function( [&](double y) {
-          return
-          2*(rho_h_0->integrand)(x,y)+
-          2*(rho_hp->integrand)(x,y)*(kp/km)+
-          -8*(rho_h_1->integrand)(x,y)*k0*k0/K2
-          +  (rho_j_0->integrand)(x,y)*(k0*k0+k*k)*(kp/km)/K2
-          -4*(rho_j_2->integrand)(x,y)*(kp/km)
-          ;
-        } );
-    gsl_integration_qag( inner, .0+1e-10,1., epsabs, epsrel,
-                         limit, 6, wsp1, &inner_result, &inner_abserr );
-    return inner_result;
-  } );
-  gsl_integration_qag( outer, .0+1e-10,1., epsabs, epsrel*2,
+    auto outer = make_gsl_function( [&](double x) 
+    {
+      double inner_result, inner_abserr;
+      auto inner = make_gsl_function( [&](double y) {
+            return (  2.*(rho_h_0->integrand)(x,y)
+                     +2.*(rho_hp ->integrand)(x,y)*(kp/km)+
+                     -8.*(rho_h_1->integrand)(x,y)*(k0*k0)/K2
+                     +   (rho_j_0->integrand)(x,y)*(k0*k0+k*k)*(kp/km)/K2
+                     -4.*(rho_j_2->integrand)(x,y)*(kp/km)
+                   )/SQR(kp);
+          } );
+      gsl_integration_qag( inner, .0+1e-10,1., tol, 0,
+                          limit, 6, wsp1, &inner_result, &inner_abserr );
+      return inner_result;
+    } );
+    gsl_integration_qag( outer, .0+1e-10,1., tol*2., 0,
                        limit, 6, wsp2, &res, &err  );//*/
-    ////////////////////////////////////
 
+    // Simpler master(s) --
     //_b_0 = (*rho_b_0 )(k0,k)*K2;
     //_bb_0= (*rho_bb_0)(k0,k)*K2;
     //_b_1 = (*rho_b_1 )(k0,k)*k0;
@@ -218,12 +204,31 @@ struct Rho_00
 
     nlo -=
     4.*Nc*cF*( //2.*(_b_0-_bb_0-4.*(_b_1-_bb_1)+4.*(_b_2-_bb_2)) // =0 
-             //+ _g + 2.*(_h_0+_hp) - 8.*_h_1 + _j_0 - 4.*_j_2 );
-             + _g + res*CUBE(OOFP) );
+              //+ _g + 2.*(_h_0+_hp) - 8.*_h_1 + _j_0 - 4.*_j_2 );
+             + _g + res*CUBE(OOFP)*SQR(kp) );
 
   };
 };
 
+/*--------------------------------------------------------------------*/
+// evaluation
+
+void D(double k0_curr, double k_curr) {
+  k0=k0_curr; k=k_curr;
+
+  Rho_V   rV; // assign ptrs
+  Rho_00 r00;
+
+  rV(); r00();
+
+
+  cout << scientific << k0        // k0/T
+       <<     "    " << rV.lo     // leading-order: rho_V ,
+       <<     "    " << r00.lo    //                rho_00
+       <<     "    " << rV.nlo    // next-to-LO   : rho_V ,
+       <<     "    " << r00.nlo   //                rho_00
+       << endl;
+}
 
 int Print_D(double k_curr) {
   int N_k0;
@@ -250,17 +255,15 @@ int Print_D(double k_curr) {
   elapsed=0; alarm(1);
 
   // Here are some parameters that can be changed:
-  N_k0=10; 
+  N_k0=300; 
 
-  k0_min=15.+1e-1;
-  k0_max=30.;
-  //k0_min=40.;
-  //k0_max=50.;
+  k0_min=1e-2;
+  k0_max=2.;
   // don't change anything after that.
 
   //s=pow(k0_max/k0_min,1./(N_k0-1));
-  //s=(k0_max-k0_min)/((double)N_k0-1.);
-  s = 1e-1;
+  s=(k0_max-k0_min)/((double)N_k0-1.);
+  //s = 1e-1;
   k0=k0_min;
 
   int i=0;
