@@ -168,16 +168,15 @@ double rho11111::eval()
   (this->OPE).T4 /= SQR(K2);
   //return (this->OPE)(); 
 
-  double epsabs = 1e-3, epsrel = 0;
-  double rr = 1.;
-
-  gsl_set_error_handler_off();
+  // Quadrature step! --
+  double epsabs = 1e-4, epsrel = 0;
   size_t limit = 5e2;
 
+  gsl_set_error_handler_off();
   quad wsp1(limit);
   quad wsp2(limit);
 
-  if ( m==2 && n==0 ) { epsabs = 1e-2; }//return (this->OPE)(); }
+  if ( m==2 && n==0 ) { epsabs = 2e-3; } // lower tol for m=2 master
 
   auto outer = make_gsl_function( [&](double x) 
   {
@@ -185,19 +184,14 @@ double rho11111::eval()
     auto inner = make_gsl_function( [&](double y) {
           return (this->integrand)(x,y);
         } );
-    gsl_integration_qag( inner, .0+1e-15,1., epsabs, epsrel,
+    gsl_integration_qag( inner, .0+1e-13,1., epsabs, epsrel,
                          limit, 6, wsp1, &inner_result, &inner_abserr );
     return inner_result;
   } );
-  gsl_integration_qag( outer, .0+1e-15,1., epsabs, epsrel*2,
+  gsl_integration_qag( outer, .0+1e-13,1., epsabs, epsrel*2,
                        limit, 6, wsp2, &res, &err  );//*/
-  //epsabs*=10.;
-  //if (status) {
-  //  cerr << " !! Error @ k0 = " << k0 << " , k = " << k << endl << " , trying again with eps = " << epsabs << endl; }
-  //}
 
-  //double temp = 0.;
-
+  // Rescalings --
   if ( m==2 && n==0 ) {
     res = res*(kp/km)*CUBE(OOFP)/(K2); return res;
   }
