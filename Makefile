@@ -19,6 +19,18 @@ $(ODIR)/%.o: $(SDIR)/%.$(SRCEXT)
 	@mkdir -p $(ODIR)
 	$(CC) $(CFLAGS) $(INC) -c -o $@ $<
 
+dileptons: $(OBJ)
+	$(CC) $(CFLAGS) $^ $(INC) examples/dileptons.cpp -o bin/dil
+
+average: $(OBJ)
+	$(CC) $(CFLAGS) $^ $(INC) examples/average.cpp -o bin/ave
+
+integrand: $(OBJ)
+	$(CC) $(CFLAGS) $^ $(INC) examples/integrand.cpp -o bin/int
+
+relations: $(OBJ)
+	$(CC) $(CFLAGS) $^ $(INC) examples/relations.cpp -o bin/rel
+
 clean:
 	$(RM) -r $(ODIR) $(TARGET); $(RM) bin/*;
 
