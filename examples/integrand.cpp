@@ -6,7 +6,6 @@
 double k0,k;
 
 using namespace std;
-int elapsed; float percentage;
 
 void print_integrand(int m, int n, int s[3]) {
   ofstream fout;

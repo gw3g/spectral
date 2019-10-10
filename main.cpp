@@ -5,6 +5,7 @@
  *
  */
 #include "core.hh"
+#include "timer.hh"
 #include <fstream>
 #include <string>
 
