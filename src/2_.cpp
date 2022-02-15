@@ -2,11 +2,12 @@
 #include "quad.hh"
 #include "map.hh"
 
-double F(int nu, int sA, int sB) {
+double F(int nu, int sA, int sB, double muA = 0.) {
   // here F_m for m={0,1,2}
   double res=0.;
-  res += pow(kp,nu)*f(kp,sA)*f(km,sB)/km;
-  res -= pow(km,nu)*f(km,sA)*f(kp,sB)/kp;
+  double muB=-muA;
+  res += pow(kp,nu)*f(kp-muA,sA)*f(km-muB,sB)/km;
+  res -= pow(km,nu)*f(km-muA,sA)*f(kp-muB,sB)/kp;
   res *= ((double)sA*sB)*exp(k0)-1.; // = F_0
 
   // Old stuff: (all wrong!)
@@ -48,9 +49,9 @@ Master* _10120(int m, int n, int s[3]) {
 
 double rho11020::eval() 
 {
-  double a1=I(0,(this->s)[1]), b1=I(2,(this->s)[1]), // tadpole ints
-         a2=I(0,(this->s)[2]), b2=I(2,(this->s)[2]),
-         a4=I(0,(this->s)[4]), b4=I(2,(this->s)[4]);
+  double a1=I(0,(this->s)[1],MOT1), b1=I(2,(this->s)[1],MOT1), // tadpole ints
+         a2=I(0,(this->s)[2],MOT2), b2=I(2,(this->s)[2],MOT2),
+         a4=I(0,(this->s)[4],MOT4), b4=I(2,(this->s)[4],MOT4);
 
   if ( m==0 && n==0 ) { // (0)
     (this->OPE).T0 = 0.;
@@ -72,7 +73,7 @@ double rho11020::eval()
   }
   //return (this->OPE)();
 
-  return -F(m,s[1],s[4])*I(n,s[2]); // the minus is from I(..)
+  return -F(m,s[1],s[4],MOT1)*I(n,s[2],MOT2); // the minus is from I(..)
 }
 
 
@@ -112,7 +113,7 @@ double rho11010::F_14(double p, double l) {
 
   int _m = this->m;
 
-  double fp=f(p,s1), fl=f(l,s4);
+  double fp=f(p-MOT1,s1), fl=f(l-MOT4,s4);
 
   res = ( ((double) s1*s4)*exp(k0)-1. )*fp*fl;
   res*= pow(k0,-_m)*pow(p,_m)*sgn(km);
@@ -128,9 +129,9 @@ double rho11010::eval()
 {
   double res, err;
 
-  double a1=I(n,(this->s)[1]), // tadpole ints
-         a2=I(n,(this->s)[2]),
-         a4=I(n,(this->s)[4]);
+  double a1=I(n,(this->s)[1],MOT1), // tadpole ints
+         a2=I(n,(this->s)[2],MOT2),
+         a4=I(n,(this->s)[4],MOT4);
 
   if ( m==0 ) { // (0)
     (this->OPE).T0 = 0.;

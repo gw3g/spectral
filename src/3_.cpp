@@ -6,6 +6,7 @@
 struct H0 {
   // integrand for function H^[0]_m
   int nu, sA, sB;
+  double muA = 0., muB = 0.;
   double operator ()(double p, double);
   double operator ()(double p);
   double val(int _nu, int _sA, int _sB);
@@ -15,6 +16,7 @@ struct H1 {
   // integrand for function H^[1]_m
   // O(eps) terms
   int nu, sA, sB;
+  double muA = 0., muB = 0.;
   double operator ()(double p, double del);
   double operator ()(double p);
   double val(int _nu, int _sA, int _sB);
@@ -23,6 +25,7 @@ struct H1 {
 struct G0 {
   // integrand for G^[0]_m
   int nu, sA, sB;
+  double muA = 0., muB = 0.;
   double operator ()(double p, double del);
   double operator ()(double p);
   double val(int _nu, int _sA, int _sB);
@@ -37,6 +40,11 @@ struct rho11011 : Master {
   H0 h0;
   H1 h1;
   G0 g0;
+
+  //h0.muA = MOT1; h0.muB = MOT2;
+  //h1.muA = MOT1; h1.muB = MOT2;
+  //g0.muA = MOT1; g0.muB = MOT2;
+
   double h0m, h0n, h1m, h1n, g0m, g0n, g1m, g1n;
   map *S; 
   rho11011(int _m, int _n, int _s[3]) : Master(_m,_n,_s) { type=3; }
@@ -50,10 +58,10 @@ double rho11011::eval()
 {
   double res=0.;
 
-  double a1=I(0,(this->s)[1]), b1=I(2,(this->s)[1]), // tadpole ints
-         a2=I(0,(this->s)[2]), b2=I(2,(this->s)[2]),
-         a4=I(0,(this->s)[4]), b4=I(2,(this->s)[4]),
-         a5=I(0,(this->s)[5]), b5=I(2,(this->s)[5]);
+  double a1=I(0,(this->s)[1],MOT1), b1=I(2,(this->s)[1],MOT1), // tadpole ints
+         a2=I(0,(this->s)[2],MOT2), b2=I(2,(this->s)[2],MOT2),
+         a4=I(0,(this->s)[4],MOT4), b4=I(2,(this->s)[4],MOT4),
+         a5=I(0,(this->s)[5],MOT5), b5=I(2,(this->s)[5],MOT5);
 
   if ( m==0 && n==0 ) { // (0)
     (this->OPE).T0 = -2.;
@@ -106,16 +114,16 @@ double H0::operator ()(double x)
   if (k0>k) {
     res =
     remap([&](double p, double del) {                 // p=[km,kp]
-        return pow(p/k0,nu)*f(p,sA)*f(k0-p,sB);
+        return pow(p/k0,nu)*f(p-muA,sA)*f(k0-p-muB,sB);
     }, km,kp )(x);
   } else {
     res =
     remap([&](double p, double del) {                 // p=[kp,+inf)
-        return pow(p/k0,nu)*f(p,sA)*f(k0-p,sB);
+        return pow(p/k0,nu)*f(p-muA,sA)*f(k0-p-muB,sB);
     }, kp )(x);
     res +=
     remap([&](double p, double del) {                 // p=(-inf,km]
-        return pow(p/k0,nu)*f(p,sA)*f(k0-p,sB);
+        return pow(p/k0,nu)*f(p-muA,sA)*f(k0-p-muB,sB);
     }, km )(x);
   }
   return (((double)sA*sB)*exp(k0)-1.)*res/k*sgn(km);  //*/
@@ -149,7 +157,7 @@ double H1::operator ()(double x)
     res =
     remap([&](double p, double del) {                 // p=[km,kp]
         double temp;
-        temp  = pow(p/k0,nu)*f(p,sA)*f(k0-p,sB)  ;
+        temp  = pow(p/k0,nu)*f(p-muA,sA)*f(k0-p-muB,sB)  ;
         pm    = (fabs(p-km)<.1*k) ? del : (p-km) ;    // p=km (!)
         pp    = (fabs(p-kp)<.1*k) ? del : (p-kp) ;    //  =kp (!)
         temp *= lga(k*k/(pp*pm)); return temp;
@@ -158,7 +166,7 @@ double H1::operator ()(double x)
     res =
     remap([&](double p, double del) {                 // p=[kp,+inf)
         double temp;
-        temp  = pow(p/k0,nu)*f(p,sA)*f(k0-p,sB)  ;
+        temp  = pow(p/k0,nu)*f(p-muA,sA)*f(k0-p-muB,sB)  ;
         pm    = (p-km) ;
         pp    = (fabs(p-kp)<.1*k) ? del : (p-kp) ;    // p=kp (!)
         temp *= lga(k*k/(pp*pm)); return temp;
@@ -166,7 +174,7 @@ double H1::operator ()(double x)
     res +=
     remap([&](double p, double del) {                 // p=(-inf,km]
         double temp;
-        temp  = pow(p/k0,nu)*f(p,sA)*f(k0-p,sB)  ;
+        temp  = pow(p/k0,nu)*f(p-muA,sA)*f(k0-p-muB,sB)  ;
         pm    = (fabs(p-km)<.1*k) ? del : (p-km) ;    // p=km (!)
         pp    = (p-kp) ;
         temp *= lga(k*k/(pp*pm)); return temp;
@@ -221,8 +229,8 @@ double G0::operator ()(double x)
       lg2-= lga(pp/pm);
       lg1+= lga(pp/pm);
 
-      if (nu==0) temp = ( f(p,sA)+f(p,sB) )*lg1;
-      if (nu==1) temp = f(p,sB)*lg1 + (p/k0)*( f(p,sA)-f(p,sB) )*lg2;
+      if (nu==0) temp = ( f(p-muA,sA)+f(p-muB,sB) )*lg1;
+      if (nu==1) temp = f(p,sB)*lg1 + (p/k0)*( f(p-muA,sA)-f(p-muB,sB) )*lg2;
       return temp;
   }, 0,fabs(km) )(x);                                 //*/
 
@@ -241,8 +249,8 @@ double G0::operator ()(double x)
       lg2-= lga(pp/pm);
       lg1+= lga(pp/pm);
 
-      if (nu==0) temp = ( f(p,sA)+f(p,sB) )*lg1;
-      if (nu==1) temp = f(p,sB)*lg1 + (p/k0)*( f(p,sA)-f(p,sB) )*lg2;
+      if (nu==0) temp = ( f(p-muA,sA)+f(p-muB,sB) )*lg1;
+      if (nu==1) temp = f(p-muB,sB)*lg1 + (p/k0)*( f(p-muA,sA)-f(p-muB,sB) )*lg2;
       return temp;
   }, fabs(km),kp )(x);                                //*/
 
@@ -259,8 +267,8 @@ double G0::operator ()(double x)
       lg2-= lga(pp/pm);
       lg1+= lga(pp/pm);
 
-      if (nu==0) temp = ( f(p,sA)+f(p,sB) )*lg1;
-      if (nu==1) temp = f(p,sB)*lg1 + (p/k0)*( f(p,sA)-f(p,sB) )*lg2;
+      if (nu==0) temp = ( f(p-muA,sA)+f(p-muB,sB) )*lg1;
+      if (nu==1) temp = f(p-muA,sB)*lg1 + (p/k0)*( f(p-muA,sA)-f(p-muB,sB) )*lg2;
       return temp;
   }, kp )(x);                                         //*/
 

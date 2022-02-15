@@ -37,7 +37,7 @@ double rho11100::F_123(double p, double q, double r) {
   int _m = this->m;
   int _n = this->n;
 
-  double fp=f(p,s1), fq=f(q,s2), fr= f(r,s3);
+  double fp=f(p-MOT1,s1), fq=f(q-MOT2,s2), fr=f(r-MOT3,s3);
 
   res = ( ((double) s1*s2*s3)*exp(k0)-1. )*fp*fq*fr;
   res*= pow(k0,-_m-_n)*pow(p,_m)*pow(q,_n) ;
@@ -51,9 +51,9 @@ double rho11100::F_123(double p, double q, double r) {
 double rho11100::eval() {
   double res, err;
 
-  double a1=I(0,(this->s)[1]), b1=I(2,(this->s)[1]), // tadpole ints
-         a2=I(0,(this->s)[2]), b2=I(2,(this->s)[2]),
-         a3=I(0,(this->s)[3]), b3=I(2,(this->s)[3]);
+  double a1=I(0,(this->s)[1],MOT1), b1=I(2,(this->s)[1],MOT1), // tadpole ints
+         a2=I(0,(this->s)[2],MOT2), b2=I(2,(this->s)[2],MOT2),
+         a3=I(0,(this->s)[3],MOT3), b3=I(2,(this->s)[3],MOT3);
 
   if ( m==0 && n==0 ) { // (0)
     (this->OPE).T0 = +K2/8.;

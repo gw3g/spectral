@@ -33,7 +33,7 @@ double rhoStar::F_123(double p, double q, double r) {
   int _m = this->m;
   int _n = this->n;
 
-  double fp=f(p,s1), fq=f(q,s2), fr= f(r,s3);
+  double fp=f(p-MOT1,s1), fq=f(q-MOT2,s2), fr= f(r-MOT3,s3);
 
   res = ( ((double) s1*s2*s3)*exp(k0)-1. )*fp*fq*fr;
   res*= pow(k0,-_m-_n)*pow(p,_m)*pow(q,_n) ;
@@ -49,7 +49,7 @@ double rhoStar::F_14(double p, double l) {
 
   int _m = this->m;
 
-  double fp=f(p,s1), fl=f(l,s4);
+  double fp=f(p-MOT1,s1), fl=f(l-MOT4,s4);
 
   res = ( ((double) s1*s4)*exp(k0)-1. )*fp*fl;
   res*= pow(k0,-_m)*pow(p,_m)*sgn(km);
@@ -92,10 +92,10 @@ double rhoStar::g_(double p, double q) {
 double rhoStar::eval() {
   double res, err;
 
-  double a1=I(0,(this->s)[1]), b1=I(2,(this->s)[1]), // tadpole ints
-         a2=I(0,(this->s)[2]), b2=I(2,(this->s)[2]),
-         a3=I(0,(this->s)[3]), b3=I(2,(this->s)[3]),
-         a4=I(0,(this->s)[4]), b4=I(2,(this->s)[4]);
+  double a1=I(0,(this->s)[1],MOT1), b1=I(2,(this->s)[1],MOT1), // tadpole ints
+         a2=I(0,(this->s)[2],MOT2), b2=I(2,(this->s)[2],MOT2),
+         a3=I(0,(this->s)[3],MOT3), b3=I(2,(this->s)[3],MOT3),
+         a4=I(0,(this->s)[4],MOT4), b4=I(2,(this->s)[4],MOT4);
 
   if ( m==0 && n==0 ) { // K.Q
     (this->OPE).T0 = -K2*5./4.;
@@ -377,15 +377,15 @@ double rhoStar::integrand(double x, double y)
       tempp += remap([&](double q, double qd) { // [0,2l]
         double temp = 0., r=k0-p-q, rp=k0-p+q;
 
-        temp += lga( q/r )*(sgn(r)*f(fabs(r),s3))*( +q) ;
-        temp += lga( q/rp)*(sgn(rp)*f(fabs(rp),s3))*( -q )  ;
+        temp += lga( q/r )*(sgn(r)*f(fabs(r)-MOT3,s3))*( +q) ;
+        temp += lga( q/rp)*(sgn(rp)*f(fabs(rp)-MOT3,s3))*( -q )  ;
         return temp;
       },  0.,2.*(k0-p) )(y); 
       tempp += remap([&](double q, double qd) { // [2l,+inf)
         double temp = 0., r=k0-p-q, rp=k0-p+q;
 
-        temp += lga( q/r )*(sgn(r)*f(fabs(r),s3))*( +q) ;
-        temp += lga( q/rp)*(sgn(rp)*f(fabs(rp),s3))*( -q) ;
+        temp += lga( q/r )*(sgn(r)*f(fabs(r)-MOT3,s3))*( +q) ;
+        temp += lga( q/rp)*(sgn(rp)*f(fabs(rp)-MOT3,s3))*( -q) ;
         return temp;
       },  2.*(k0-p) )(y); 
 
@@ -616,14 +616,14 @@ double rhoStar::integrand(double x, double y)
     pp = (fabs(pp)<1e-1*k0) ? pd : pp; // q=kp (!)
     tempp += remap([&](double q, double qd) { // [0,2l]
       double temp = 0., r=k0-p-q, rp=k0-p+q;
-      temp += lga( q/r )*(sgn(r)*f(fabs(r),s3))*( +q ) ;
-      temp += lga( q/rp)*(sgn(rp)*f(fabs(rp),s3))*( -q ) ;
+      temp += lga( q/r )*(sgn(r)*f(fabs(r)-MOT3,s3))*( +q ) ;
+      temp += lga( q/rp)*(sgn(rp)*f(fabs(rp)-MOT3,s3))*( -q ) ;
       return temp;
     },  0.,2.*fabs(k0-p) )(y); 
     tempp += remap([&](double q, double qd) { // [2l,+inf)
       double temp = 0., r=k0-p-q, rp=k0-p+q;
-      temp += lga( q/r )*(sgn(r)*f(fabs(r),s3))*( +q ) ;
-      temp += lga( q/rp)*(sgn(rp)*f(fabs(rp),s3))*( -q ) ;
+      temp += lga( q/r )*(sgn(r)*f(fabs(r)-MOT3,s3))*( +q ) ;
+      temp += lga( q/rp)*(sgn(rp)*f(fabs(rp)-MOT3,s3))*( -q ) ;
       return temp;
     },  2.*fabs(k0-p) )(y);
     //
@@ -642,14 +642,14 @@ double rhoStar::integrand(double x, double y)
     pm = (fabs(pm)<1e-1*k0) ? pd : pm; // q=km (!)
     tempp += remap([&](double q, double qd) { // [0,2l]
         double temp = 0., r=k0-p-q, rp=k0-p+q;
-        temp += lga( q/r )*(sgn(r)*f(fabs(r),s3))*( +q ) ;
-        temp += lga( q/rp)*(sgn(rp)*f(fabs(rp),s3))*( -q ) ;
+        temp += lga( q/r )*(sgn(r)*f(fabs(r)-MOT3,s3))*( +q ) ;
+        temp += lga( q/rp)*(sgn(rp)*f(fabs(rp)-MOT3,s3))*( -q ) ;
         return temp;
     },  0.,2.*fabs(k0-p) )(y); 
     tempp += remap([&](double q, double qd) { // [2l,+inf)
         double temp = 0., r=k0-p-q, rp=k0-p+q;
-        temp += lga( q/r )*(sgn(r)*f(fabs(r),s3))*( +q ) ;
-        temp += lga( q/rp)*(sgn(rp)*f(fabs(rp),s3))*( -q ) ;
+        temp += lga( q/r )*(sgn(r)*f(fabs(r)-MOT3,s3))*( +q ) ;
+        temp += lga( q/rp)*(sgn(rp)*f(fabs(rp)-MOT3,s3))*( -q ) ;
         return temp;
     },  2.*fabs(k0-p) )(y); 
     //

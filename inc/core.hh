@@ -17,11 +17,11 @@ inline T CUBE(const T x) {return x*SQR(x);}
 double  f(double,int),
        fb(double,int);
 
-double I(int,int); // tadpole
+double I(int,int,double); // tadpole
 
-double psi0(int sA, int sB); // moments
-double psi1(int sA, int sB);
-double psi2(int sA, int sB);
+double psi0(int sA, int sB, double); // moments
+double psi1(int sA, int sB, double);
+double psi2(int sA, int sB, double);
 
 void print_integrand(int m, int n, int s[3]); // for checking
 
@@ -31,6 +31,8 @@ void print_integrand(int m, int n, int s[3]); // for checking
 #define km ((k0-k)*.5)
 #define K2 (k0*k0-k*k)
 extern double k0, k; // external 4-momentum
+extern bool CHEM_POT;
+extern double MOT1, MOT2, MOT3, MOT4, MOT5;// mu over T
 
 struct Expand {
   double T0, T2, T4; // coeffs of T^n

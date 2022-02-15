@@ -32,12 +32,16 @@ double bf(double e, int X) {
   return exp(-e);
 };
 
-double I(int n, int s_) {
+double I(int n, int s_, double mu_ = 0.) {
   // tadpole, needed for OPEs
   double res;
   res = gsl_sf_zeta_int(n+2)/( 2.*SQR(M_PI) );
   for (int i=n+1;i>0;i--) res*=(double)i;
   res*= (double)s_ + (s_<0?pow(2.,-n-1):0.);
+  if (s_<0) { 
+    if (n==0) res *= 1.+3.*SQR(4.*OOFP*mu_);
+    if (n==2) res *= 1.+60.*SQR(4.*OOFP*mu_)/7.+30.*SQR(SQR(4.*OOFP*mu_))/7.;
+  }
   return res;
 }
 
@@ -48,16 +52,17 @@ double I(int n, int s_) {
 #define Ep exp(-fabs(kp))
 #define Em exp(-fabs(km))
 
-double psi0(int sA, int sB) {
+double psi0(int sA, int sB, double muA = 0.) {
   double res  = (km>0) ? 1. : 0.;
-  res += lga( (1.-((double)sA)*Ep)/(1.-((double)sA)*Em) )/k;
-  res += lga( (1.-((double)sB)*Ep)/(1.-((double)sB)*Em) )/k;
+  double exA = exp(-muA), exB = exp(+muA);
+  res += lga( (1.-((double)sA)*Ep*exA)/(1.-((double)sA)*Em*exA) )/k;
+  res += lga( (1.-((double)sB)*Ep*exB)/(1.-((double)sB)*Em*exB) )/k;
   return res;
 }
 
 double Li2(double z) { return gsl_sf_dilog(z); }
 
-double psi1(int sA, int sB) {
+double psi1(int sA, int sB, double muA = 0.) {
   double res  = (km>0) ? .5 : 0.,
          ap = ((double)sA)*Ep,
          am = ((double)sA)*Em,
@@ -93,7 +98,7 @@ double Li3(double z) { // z=[-1,1]
   return res;
 }
 
-double psi2(int sA, int sB) {
+double psi2(int sA, int sB, double muA = 0.) {
   double res  = (km>0) ? .25 : 0.,
          ap = ((double)sA)*Ep,
          am = ((double)sA)*Em,

@@ -9,6 +9,9 @@
 #include <string>
 
 double k0, k;
+double mu_q = 0.;
+bool  CHEM_POT = false;
+double MOT1, MOT2, MOT3, MOT4, MOT5;// mu over T
 int s[3];// = {+1,-1,-1};
 char s_name[] = {'-','+'};
 
@@ -66,6 +69,17 @@ int main(int argc, char *argv[]) {
           }
           Print_k0(rho,k);
           break;
+        case 'm':
+          CHEM_POT = true;
+          if (argc==0) { mu_q=.0; }
+          else { 
+            str_in=(*++argv);
+            mu_q = atof(str_in);
+          }
+          MOT1 = mu_q; MOT2 = -mu_q;
+          MOT3 = - MOT1 - MOT2; MOT4 = -MOT1; MOT5 = -MOT2;
+          Print_k0(rho,1.);
+          break;
         case 'c':
           config(rho);
           break;
@@ -104,15 +118,18 @@ int Print_k0(Master *rho, double k_curr) {
 
   // filename
   char k_name[20];
+  char mu_name[20];
   sprintf(k_name,"{k=%.2f}",k);
+  sprintf(mu_name,"{mu=%.2f}",mu_q);
   string fname = "out/data/diag."
                + to_string(rho->type)
                + string(k_name)
                + ".("+s_name[(rho->s[0]+1)/2]+
                       s_name[(rho->s[1]+1)/2]+
                       s_name[(rho->s[2]+1)/2]+")."
-               + to_string(rho->m)+to_string(rho->n)
-               + ".dat";
+               + to_string(rho->m)+to_string(rho->n);
+  if (CHEM_POT) {fname = fname+"."+string(mu_name); }
+  fname = fname + ".dat";
 
   cout << "\n:: Creating table for k = " << k <<  " ..." << endl << endl;
   fout.open(fname);
@@ -122,9 +139,9 @@ int Print_k0(Master *rho, double k_curr) {
   elapsed=0; alarm(1);
 
   // Here are some parameters that can be changed:
-  N_k0=500; 
+  N_k0=20; 
 
-  k0_min=1e-2;
+  k0_min=1e+1;
   k0_max=1e+2;
 
   // don't change anything after that.
