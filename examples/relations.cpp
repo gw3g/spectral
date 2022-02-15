@@ -8,7 +8,6 @@ using namespace std;
 
 int check_1(int,int); 
 int check_2(int,int); 
-int elapsed; float percentage;
 
 int main(int argc, char *argv[]) {
 

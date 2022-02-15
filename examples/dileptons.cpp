@@ -70,6 +70,10 @@ struct Rho_V
   double
     _b, _bb, _d, _db, _g, _h, _hp, _j;
 
+  size_t limit = 5e2;
+  quad *wsp1;
+  quad *wsp2;
+
   Rho_V() {
 
     S[0] = +1; S[1] = - 1; S[2] = -1; // statistics
@@ -83,6 +87,10 @@ struct Rho_V
     rho_hp=  _Star( 0,0,S);
     rho_j =  _11111(0,0,S);
 
+    wsp1 = new quad(limit); // prepare workspace quadrature
+    wsp2 = new quad(limit);
+    gsl_set_error_handler_off();
+
   };
   void operator ()() {
 
@@ -93,12 +101,6 @@ struct Rho_V
     // Quadrature step! --
     double res, err;
 
-    gsl_set_error_handler_off();
-    size_t limit = 5e2;
-
-    quad wsp1(limit);
-    quad wsp2(limit);
-
     auto outer = make_gsl_function( [&](double x) 
     {
       double inner_result, inner_abserr;
@@ -108,12 +110,12 @@ struct Rho_V
                      -   (rho_j ->integrand)(x,y)*(kp/km)
                    )/SQR(kp);
           } );
-      gsl_integration_qag( inner, .0+1e-10,1., tol, 0,
-                          limit, 6, wsp1, &inner_result, &inner_abserr );
+      gsl_integration_qag( inner, .0,1., tol, 0,
+                          limit, 6, *wsp1, &inner_result, &inner_abserr );
       return inner_result;
     } );
-    gsl_integration_qag( outer, .0+1e-10,1., tol*2.,  0,
-                        limit, 6, wsp2, &res, &err  );//*/
+    gsl_integration_qag( outer, .0,1., tol*2.,  0,
+                        limit, 6, *wsp2, &res, &err  );//*/
 
     // Simpler masters --
     _b = (*rho_b )(k0,k)*K2;
@@ -154,6 +156,10 @@ struct Rho_00
     _hp,
     _j_0, _j_2;
 
+  size_t limit = 5e2;
+  quad *wsp1;
+  quad *wsp2;
+
   Rho_00() {
 
     S[0] = +1; S[1] = - 1; S[2] = -1; // statistics
@@ -171,6 +177,10 @@ struct Rho_00
     rho_j_0 =  _11111(0,0,S);
     rho_j_2 =  _11111(2,0,S);
 
+    wsp1 = new quad(limit);
+    wsp2 = new quad(limit);
+    gsl_set_error_handler_off();
+
   };
   void operator ()() {
 
@@ -180,12 +190,6 @@ struct Rho_00
 
     // Quadrature step! --
     double res, err;
-
-    gsl_set_error_handler_off();
-    size_t limit = 5e2;
-
-    quad wsp1(limit);
-    quad wsp2(limit);
 
     auto outer = make_gsl_function( [&](double x) 
     {
@@ -198,12 +202,12 @@ struct Rho_00
                      -4.*(rho_j_2->integrand)(x,y)*(kp/km)
                    )/SQR(kp);
           } );
-      gsl_integration_qag( inner, .0+1e-10,1., tol, 0,
-                          limit, 6, wsp1, &inner_result, &inner_abserr );
+      gsl_integration_qag( inner, .0,1., tol, 0,
+                          limit, 6, *wsp1, &inner_result, &inner_abserr );
       return inner_result;
     } );
-    gsl_integration_qag( outer, .0+1e-10,1., tol*2., 0,
-                       limit, 6, wsp2, &res, &err  );//*/
+    gsl_integration_qag( outer, .0,1., tol*2., 0,
+                       limit, 6, *wsp2, &res, &err  );//*/
 
     // Simpler master(s) --
     //_b_0 = (*rho_b_0 )(k0,k)*K2;
@@ -268,14 +272,14 @@ int Print_D(double k_curr,double mu=0.) {
   cout << "\n:: Creating table for k = " << k <<  " ..." << endl << endl;
   Rho_V rV, rV2;
   Rho_00 r00;
-  fout.open(fname);
-  fout << 
+  //fout.open(fname);
+  cout << 
   "# Columns: k0/T, rhoV_LO/T2, rho00_LO/T2, rhoV_NLO/(g2*T2), rho00_NLO/(g2*T2)" 
        << endl
        << "# ( k=" << k << " )" << endl;
 
-  signal( SIGALRM, sigalrm_handler );
-  elapsed=0; alarm(1);
+  //signal( SIGALRM, sigalrm_handler );
+  //elapsed=0; alarm(1);
 
   // Here are some parameters that can be changed:
   N_k0=400; 
@@ -309,12 +313,12 @@ int Print_D(double k_curr,double mu=0.) {
          <<     "    " << 0.//r00.lo    //                rho_00
          <<     "    " << .5*(rV.nlo+rV2.nlo)    // next-to-LO   : rho_V ,
          <<     "    " << 0.//r00.nlo   //                rho_00
-         << endl;
+        << endl;
 
     k0+=s; 
   }
-  cout << endl << ":: Saved to file [" << fname << "]" << endl;
-  fout.close();
+  //cout << endl << ":: Saved to file [" << fname << "]" << endl;
+  //fout.close();
 
   return 0;
 }
