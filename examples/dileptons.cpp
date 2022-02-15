@@ -5,13 +5,21 @@
 #include <string>
 
 double k0,k;
-double tol = 1e-4; // absolute tolerance
+double mu_q = 0.;
+bool  CHEM_POT = false;
+double MOT1, MOT2, MOT3, MOT4, MOT5;// mu over T
+double tol = 1e0; // absolute tolerance
 
 using namespace std;
 
 ofstream fout;
+ifstream fin;
 int Print_D(double); int elapsed; float percentage;
+int Print_D(double,double); 
 void D(double,double);
+int hydro_table();
+int hydro_table2();
+int hydro_table_T_L();
 
 int main(int argc, char *argv[]) {
 
@@ -19,19 +27,24 @@ int main(int argc, char *argv[]) {
   if (argc>1) { k0=atof(argv[1]); k=atof(argv[2]); }
 
   // Return: k0/T, rhoV_LO/T2, rho00_LO/T2, rhoV_NLO/(g2*T2), rho00_NLO/(g2*T2)" 
-  D(k0,k);
+  //D(k0,k);
 
   /* for lattice comparisons: */
-  // nf=0
-  //Print_D(3.*2.*M_PI/3.);     // T=1.1Tc
+  //nf=0
+  Print_D(1.*2.*M_PI/3.,0.);     // T=1.1Tc
+  Print_D(1.*2.*M_PI/3.,1.);     // T=1.1Tc
+  Print_D(1.*2.*M_PI/3.,2.);     // T=1.1Tc
   //Print_D(3.*7.*M_PI/12.);    // T=1.3Tc
   // nf=2
   //Print_D(sqrt(1.)*M_PI/2.); // T=1.2Tc
   //Print_D(1.5*M_PI);         // T=1.2Tc
   //Print_D(.5*M_PI*sqrt(14)); // T=1.2Tc
+  //
+  /* for hydro run: */
+  //hydro_table_T_L();
 
   /* Others: */
-  //Print_D(.5);
+  //Print_D(.02);
   //Print_D(1.);
   //Print_D(1.5);
 
@@ -73,7 +86,7 @@ struct Rho_V
   };
   void operator ()() {
 
-    lo = +Nc*K2*psi0(-1,-1)*OOFP; // note sign convention
+    lo = +Nc*K2*psi0(-1,-1,MOT1)*OOFP; // note sign convention
     //lo = Nc*K2*OOFP; // large-K2
     nlo= lo*3.*cF*SQR(OOFP);
 
@@ -161,8 +174,8 @@ struct Rho_00
   };
   void operator ()() {
 
-    lo = -2.*Nc*( k0*k0*(psi1(-1,-1)-psi2(-1,-1))-.25*K2*psi0(-1,-1) )*OOFP;
-    nlo = -cF*Nc*( k*k*psi0(-1,-1) )*CUBE(OOFP);
+    lo = -2.*Nc*( k0*k0*(psi1(-1,-1,MOT1)-psi2(-1,-1,MOT1))-.25*K2*psi0(-1,-1,MOT1) )*OOFP;
+    nlo = -cF*Nc*( k*k*psi0(-1,-1,MOT1) )*CUBE(OOFP);
     //nlo = -cF*Nc*( k*k )*CUBE(OOFP); // large-K2
 
     // Quadrature step! --
@@ -223,7 +236,7 @@ void D(double k0_curr, double k_curr) {
   Rho_V   rV; // assign ptrs
   Rho_00 r00;
 
-  rV(); r00();
+  rV(); //r00();
 
 
   cout << scientific << k0        // k0/T
@@ -234,20 +247,26 @@ void D(double k0_curr, double k_curr) {
        << endl;
 }
 
-int Print_D(double k_curr) {
+int Print_D(double k_curr,double mu=0.) {
   int N_k0;
   double res, s, k0_min, k0_max;
   k=k_curr;
 
+  CHEM_POT=true;
+  MOT1 = mu; MOT2 = -mu;
+  MOT3 = - MOT1 - MOT2; MOT4 = -MOT1; MOT5 = -MOT2;
   // filename
   char k_name[20];
+  char mu_name[20];
   sprintf(k_name,"{k=%.2f}",k);
+  sprintf(mu_name,"{mu=%.2f}",mu);
   string fname = "NLO_rho_"
-               + string(k_name)
-               + ".dat";
+               + string(k_name);
+  if (CHEM_POT) {fname = fname+"."+string(mu_name); }
+  fname = fname + ".2.dat";
 
   cout << "\n:: Creating table for k = " << k <<  " ..." << endl << endl;
-  Rho_V rV;
+  Rho_V rV, rV2;
   Rho_00 r00;
   fout.open(fname);
   fout << 
@@ -259,37 +278,236 @@ int Print_D(double k_curr) {
   elapsed=0; alarm(1);
 
   // Here are some parameters that can be changed:
-  N_k0=300; 
+  N_k0=400; 
 
-  k0_min=1e-2;
-  k0_max=2.;
+  k0_min=1e-4;
+  k0_max=10.;
   // don't change anything after that.
 
   //s=pow(k0_max/k0_min,1./(N_k0-1));
   s=(k0_max-k0_min)/((double)N_k0-1.);
   //s = 1e-1;
+  k0+=s;
   k0=k0_min;
 
   int i=0;
   //for (int i=0;i<N_k0;i++) { 
   while (k0<k0_max) {
     //percentage=(float)i/((float)N_k0);
-    percentage = k0/k0_max;
+    percentage = (k0-k0_min)/(k0_max-k0_min);
 
+    MOT1 = mu; MOT2 = -mu;
+    MOT3 = - MOT1 - MOT2; MOT4 = -MOT1; MOT5 = -MOT2;
     rV();
-    r00();
+    MOT1 = -mu; MOT2 = mu;
+    MOT3 = - MOT1 - MOT2; MOT4 = -MOT1; MOT5 = -MOT2;
+    rV2();
+    //r00();
 
     fout << scientific << k0        // k0/T
-         <<     "    " << rV.lo     // leading-order: rho_V ,
-         <<     "    " << r00.lo    //                rho_00
-         <<     "    " << rV.nlo    // next-to-LO   : rho_V ,
-         <<     "    " << r00.nlo   //                rho_00
+         <<     "    " << .5*(rV.lo+rV2.lo)     // leading-order: rho_V ,
+         <<     "    " << 0.//r00.lo    //                rho_00
+         <<     "    " << .5*(rV.nlo+rV2.nlo)    // next-to-LO   : rho_V ,
+         <<     "    " << 0.//r00.nlo   //                rho_00
          << endl;
 
     k0+=s; 
   }
   cout << endl << ":: Saved to file [" << fname << "]" << endl;
   fout.close();
+
+  return 0;
+}
+
+#include "gauss.h"
+
+// some physical units, at last:
+
+double    hbarc = .19732698041522198110 ; // GeV.fm
+double alpha_em = 1./137.0359991;
+double      m_e = .0005109895, // GeV
+            m_m = .10565837;   // GeV
+
+double B_(double x) {
+  if (4.*x>1.) return 0.;
+  else return (1.+2.*x)*sqrt(1.-4.*x);
+}
+
+// TO BE TIDIED UP!!
+int hydro_table() { //
+  int N_kT;
+  double res_e, res_m, s, kT_min=0., kT_max=15.;
+  double y = 0.;
+  double alpha, B_e, B_mu;
+  double ai, ti;
+
+  string fname = "mesh_GJ_kT_integrated.dat";
+  fout.open(fname);
+  fout << "# Columns: T/GeV, M/GeV, rate" << endl;
+
+  Rho_V rV;
+  Rho_00 r00;
+
+  double T,M;
+  fin.open("mesh_alpha2.dat");
+  //for (int i=0;i<32000;i++) 
+  fin.ignore(64,'\n');
+
+  while (!fin.eof()) {
+    fin >> T >> M >> alpha;
+    fin.ignore(64,'\n');
+
+    cout << "T=" << T << ", M=" << M << ", alpha=" << alpha << endl;
+    B_e  = B_(m_e*m_e/(M*M))*(2./3.)*pow(hbarc,-4.)*pow(alpha_em,2.); // units:
+    B_mu = B_(m_m*m_m/(M*M))*(2./3.)*pow(hbarc,-4.)*pow(alpha_em,2.); // GeV^-4.fm^-4
+
+    M = M/T;
+
+    res_e = 0.;
+    res_m = 0.;
+    for (int i=0;i<32;i++) {
+      ai  = .5*G32pt[i][0]; ti = .5*(G32pt[i][1]+1.);
+      ai *= kT_max-kT_min;
+      k   = kT_min*(1.-ti) + kT_max*ti;// = k/T
+      k0  = sqrt( M*M+k*k );
+      rV();
+      res_e += ai*k*( rV.lo + alpha*4.*M_PI*rV.nlo )*exp(-k0)/(1.-exp(-k0));
+      res_m += ai*k*( rV.lo + alpha*4.*M_PI*rV.nlo )*exp(-k0)/(1.-exp(-k0));
+    }
+    res_e *= 2.*M_PI*pow(T,3.)*B_e/(3.*pow(M_PI,3.)*M);
+    res_m *= 2.*M_PI*pow(T,3.)*B_mu/(3.*pow(M_PI,3.)*M);
+
+    fout << scientific << T
+         <<     "    " << M*T
+         <<     "    " << res_e
+         <<     "    " << res_m
+         << endl;
+
+    //cout << "temp/GeV = " << T << ", M/GeV=" << M << ", k/GeV=" << k << endl;
+  }
+  cout << endl << ":: Saved to file [" << fname << "]" << endl;
+  fout.close();//*/
+
+  return 0;
+}
+
+
+int hydro_table_T_L() { //
+  int N_kT;
+  double res_T_e, res_T_m, 
+         res_L_e, res_L_m,
+         s, kT_min=0., kT_max=15.;
+  double y = 0.;
+  double alpha, B_e, B_mu;
+  double ai, ti;
+
+  string fname = "mesh_GJ_kT_integrated_T_L.dat";
+  fout.open(fname);
+  fout << "# Columns: T/GeV, M/GeV, rate_T(e+e-), rate_T(mu+mu-), rate_L(e+e-), rate_L(mu+mu-)" << endl;
+
+  Rho_V rV;
+  Rho_00 r00;
+
+  double T,M;
+  fin.open("mesh_alpha2.dat");
+  //for (int i=0;i<32000;i++) 
+  fin.ignore(64,'\n');
+
+  while (!fin.eof()) {
+    fin >> T >> M >> alpha;
+    fin.ignore(64,'\n');
+
+    cout << "T=" << T << ", M=" << M << ", alpha=" << alpha << endl;
+    B_e  = B_(m_e*m_e/(M*M))*(2./3.)*pow(hbarc,-4.)*pow(alpha_em,2.); // units:
+    B_mu = B_(m_m*m_m/(M*M))*(2./3.)*pow(hbarc,-4.)*pow(alpha_em,2.); // GeV^-4.fm^-4
+
+    M = M/T;
+
+    res_T_e = 0.;
+    res_T_m = 0.;
+    res_L_e = 0.;
+    res_L_m = 0.;
+
+    for (int i=0;i<32;i++) {
+      ai  = .5*G32pt[i][0]; ti = .5*(G32pt[i][1]+1.);
+      ai *= kT_max-kT_min;
+      k   = kT_min*(1.-ti) + kT_max*ti;// = k/T
+      k0  = sqrt( M*M+k*k );
+
+      rV();
+      r00();
+
+      res_T_e += ai*k*.5*( rV.lo + r00.lo*(M*M/(k*k)) + alpha*4.*M_PI*( rV.nlo + r00.nlo*(M*M/(k*k)) ) )*exp(-k0)/(1.-exp(-k0));
+      res_T_m += ai*k*.5*( rV.lo + r00.lo*(M*M/(k*k)) + alpha*4.*M_PI*( rV.nlo + r00.nlo*(M*M/(k*k)) ) )*exp(-k0)/(1.-exp(-k0));
+      res_L_e += ai*k*(-M*M/(k*k))*( r00.lo + alpha*4.*M_PI*r00.nlo )*exp(-k0)/(1.-exp(-k0));
+      res_L_m += ai*k*(-M*M/(k*k))*( r00.lo + alpha*4.*M_PI*r00.nlo )*exp(-k0)/(1.-exp(-k0));
+    }
+    res_T_e *= 2.*M_PI*pow(T,3.)*B_e/(3.*pow(M_PI,3.)*M);
+    res_T_m *= 2.*M_PI*pow(T,3.)*B_mu/(3.*pow(M_PI,3.)*M);
+    res_L_e *= 2.*M_PI*pow(T,3.)*B_e/(3.*pow(M_PI,3.)*M);
+    res_L_m *= 2.*M_PI*pow(T,3.)*B_mu/(3.*pow(M_PI,3.)*M);
+
+    fout << scientific << T
+         <<     "    " << M*T
+         <<     "    " << res_T_e
+         <<     "    " << res_T_m
+         <<     "    " << res_L_e
+         <<     "    " << res_L_m
+         << endl;
+
+    //cout << "temp/GeV = " << T << ", M/GeV=" << M << ", k/GeV=" << k << endl;
+  }
+  cout << endl << ":: Saved to file [" << fname << "]" << endl;
+  fout.close();//*/
+
+  return 0;
+}
+
+
+
+int hydro_table2() { //
+  int N_kT;
+  double res, s, kT_min, kT_max;
+  double y = 0.;
+  double alpha, B_e, B_mu;
+
+  string fname = "mesh_GJ_nlo.dat";
+  fout.open(fname);
+  fout << "# Columns: T/GeV, M/GeV, k/GeV, rate" << endl;
+
+  Rho_V rV;
+  Rho_00 r00;
+
+  double T,M;
+  fin.open("mesh_alpha.dat");
+  //for (int i=0;i<32000;i++) 
+  fin.ignore(64,'\n');
+
+  while (!fin.eof()) {
+    fin >> T >> M >> k >> alpha;
+    fin.ignore(64,'\n');
+
+    cout << "T=" << T << ", M=" << M << ", k=" << k << ", alpha=" << alpha << endl;
+    B_e  = B_(m_e*m_e/(M*M))*(2./3.)*pow(hbarc,-4.)*pow(alpha_em,2.);
+    B_mu = B_(m_m*m_m/(M*M))*(2./3.)*pow(hbarc,-4.)*pow(alpha_em,2.);
+    M = M/T;
+    k = k/T;
+    k0= sqrt( M*M+k*k );
+
+    rV();
+    //r00();
+
+    fout << scientific << T
+         <<     "    " << M*T
+         <<     "    " << k*T
+         <<     "    " << B_e*( rV.lo + alpha*4.*M_PI*rV.nlo )*exp(-k0)/(3.*pow(M_PI,3.)*M*M*(1.-exp(-k0)))
+         <<     "    " << B_mu*( rV.lo + alpha*4.*M_PI*rV.nlo )*exp(-k0)/(3.*pow(M_PI,3.)*M*M*(1.-exp(-k0)))
+         << endl;
+
+    //cout << "temp/GeV = " << T << ", M/GeV=" << M << ", k/GeV=" << k << endl;
+  }
+  cout << endl << ":: Saved to file [" << fname << "]" << endl;
+  fout.close();//*/
 
   return 0;
 }
