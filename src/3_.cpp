@@ -41,10 +41,6 @@ struct rho11011 : Master {
   H1 h1;
   G0 g0;
 
-  //h0.muA = MOT1; h0.muB = MOT2;
-  //h1.muA = MOT1; h1.muB = MOT2;
-  //g0.muA = MOT1; g0.muB = MOT2;
-
   double h0m, h0n, h1m, h1n, g0m, g0n, g1m, g1n;
   map *S; 
   rho11011(int _m, int _n, int _s[3]) : Master(_m,_n,_s) { type=3; }
@@ -57,6 +53,10 @@ Master* _11011(int m, int n, int s[3]) {
 double rho11011::eval() 
 {
   double res=0.;
+
+  h0.muA = MOT1; h0.muB = MOT2;
+  h1.muA = MOT1; h1.muB = MOT2;
+  g0.muA = MOT1; g0.muB = MOT2;
 
   double a1=I(0,(this->s)[1],MOT1), b1=I(2,(this->s)[1],MOT1), // tadpole ints
          a2=I(0,(this->s)[2],MOT2), b2=I(2,(this->s)[2],MOT2),

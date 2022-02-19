@@ -8,14 +8,15 @@ double k0,k;
 double mu_q = 0.;
 bool  CHEM_POT = false;
 double MOT1, MOT2, MOT3, MOT4, MOT5;// mu over T
-double tol = 1e0; // absolute tolerance
+double tol = 1e-1; // absolute tolerance
 
 using namespace std;
 
 ofstream fout;
 ifstream fin;
 int Print_D(double); int elapsed; float percentage;
-int Print_D(double,double); 
+int Print_D(double,double);
+int Print_k2ave(double); 
 void D(double,double);
 int hydro_table();
 int hydro_table2();
@@ -31,9 +32,10 @@ int main(int argc, char *argv[]) {
 
   /* for lattice comparisons: */
   //nf=0
-  Print_D(1.*2.*M_PI/3.,0.);     // T=1.1Tc
-  Print_D(1.*2.*M_PI/3.,1.);     // T=1.1Tc
-  Print_D(1.*2.*M_PI/3.,2.);     // T=1.1Tc
+  //Print_D(1.*2.*M_PI/3.,0.);     // T=1.1Tc
+  //Print_D(1.*2.*M_PI/3.,1.);     // T=1.1Tc
+  //Print_D(1.*2.*M_PI/3.,2.);     // T=1.1Tc
+  Print_k2ave(2.);     // T=1.1Tc
   //Print_D(3.*7.*M_PI/12.);    // T=1.3Tc
   // nf=2
   //Print_D(sqrt(1.)*M_PI/2.); // T=1.2Tc
@@ -70,10 +72,6 @@ struct Rho_V
   double
     _b, _bb, _d, _db, _g, _h, _hp, _j;
 
-  size_t limit = 5e2;
-  quad *wsp1;
-  quad *wsp2;
-
   Rho_V() {
 
     S[0] = +1; S[1] = - 1; S[2] = -1; // statistics
@@ -87,10 +85,6 @@ struct Rho_V
     rho_hp=  _Star( 0,0,S);
     rho_j =  _11111(0,0,S);
 
-    wsp1 = new quad(limit); // prepare workspace quadrature
-    wsp2 = new quad(limit);
-    gsl_set_error_handler_off();
-
   };
   void operator ()() {
 
@@ -101,6 +95,12 @@ struct Rho_V
     // Quadrature step! --
     double res, err;
 
+    gsl_set_error_handler_off();
+    size_t limit = 5e2;
+
+    quad wsp1(limit);
+    quad wsp2(limit);
+
     auto outer = make_gsl_function( [&](double x) 
     {
       double inner_result, inner_abserr;
@@ -110,12 +110,12 @@ struct Rho_V
                      -   (rho_j ->integrand)(x,y)*(kp/km)
                    )/SQR(kp);
           } );
-      gsl_integration_qag( inner, .0,1., tol, 0,
-                          limit, 6, *wsp1, &inner_result, &inner_abserr );
+      gsl_integration_qag( inner, .0+1e-10,1., tol, 0,
+                          limit, 6, wsp1, &inner_result, &inner_abserr );
       return inner_result;
     } );
-    gsl_integration_qag( outer, .0,1., tol*2.,  0,
-                        limit, 6, *wsp2, &res, &err  );//*/
+    gsl_integration_qag( outer, .0+1e-10,1., tol*2.,  0,
+                        limit, 6, wsp2, &res, &err  );//*/
 
     // Simpler masters --
     _b = (*rho_b )(k0,k)*K2;
@@ -156,10 +156,6 @@ struct Rho_00
     _hp,
     _j_0, _j_2;
 
-  size_t limit = 5e2;
-  quad *wsp1;
-  quad *wsp2;
-
   Rho_00() {
 
     S[0] = +1; S[1] = - 1; S[2] = -1; // statistics
@@ -177,10 +173,6 @@ struct Rho_00
     rho_j_0 =  _11111(0,0,S);
     rho_j_2 =  _11111(2,0,S);
 
-    wsp1 = new quad(limit);
-    wsp2 = new quad(limit);
-    gsl_set_error_handler_off();
-
   };
   void operator ()() {
 
@@ -190,6 +182,12 @@ struct Rho_00
 
     // Quadrature step! --
     double res, err;
+
+    gsl_set_error_handler_off();
+    size_t limit = 5e2;
+
+    quad wsp1(limit);
+    quad wsp2(limit);
 
     auto outer = make_gsl_function( [&](double x) 
     {
@@ -202,12 +200,12 @@ struct Rho_00
                      -4.*(rho_j_2->integrand)(x,y)*(kp/km)
                    )/SQR(kp);
           } );
-      gsl_integration_qag( inner, .0,1., tol, 0,
-                          limit, 6, *wsp1, &inner_result, &inner_abserr );
+      gsl_integration_qag( inner, .0+1e-10,1., tol, 0,
+                          limit, 6, wsp1, &inner_result, &inner_abserr );
       return inner_result;
     } );
-    gsl_integration_qag( outer, .0,1., tol*2., 0,
-                       limit, 6, *wsp2, &res, &err  );//*/
+    gsl_integration_qag( outer, .0+1e-10,1., tol*2., 0,
+                       limit, 6, wsp2, &res, &err  );//*/
 
     // Simpler master(s) --
     //_b_0 = (*rho_b_0 )(k0,k)*K2;
@@ -272,14 +270,14 @@ int Print_D(double k_curr,double mu=0.) {
   cout << "\n:: Creating table for k = " << k <<  " ..." << endl << endl;
   Rho_V rV, rV2;
   Rho_00 r00;
-  //fout.open(fname);
-  cout << 
+  fout.open(fname);
+  fout << 
   "# Columns: k0/T, rhoV_LO/T2, rho00_LO/T2, rhoV_NLO/(g2*T2), rho00_NLO/(g2*T2)" 
        << endl
        << "# ( k=" << k << " )" << endl;
 
-  //signal( SIGALRM, sigalrm_handler );
-  //elapsed=0; alarm(1);
+  signal( SIGALRM, sigalrm_handler );
+  elapsed=0; alarm(1);
 
   // Here are some parameters that can be changed:
   N_k0=400; 
@@ -313,15 +311,98 @@ int Print_D(double k_curr,double mu=0.) {
          <<     "    " << 0.//r00.lo    //                rho_00
          <<     "    " << .5*(rV.nlo+rV2.nlo)    // next-to-LO   : rho_V ,
          <<     "    " << 0.//r00.nlo   //                rho_00
-        << endl;
+         << endl;
 
     k0+=s; 
   }
-  //cout << endl << ":: Saved to file [" << fname << "]" << endl;
-  //fout.close();
+  cout << endl << ":: Saved to file [" << fname << "]" << endl;
+  fout.close();
 
   return 0;
 }
+
+/*--------------------------------------------------------------------*/
+
+#include <gsl/gsl_sf_bessel.h>
+double k2av(double M) {
+  // worth noting: k0=3*k for k0~26.
+  return 3.*M*gsl_sf_bessel_Kn(3,M)/gsl_sf_bessel_Kn(2,M);
+}
+
+int Print_k2ave(double mu=0.) {
+  int N_M;
+  double res, s, M, M_min, M_max;
+
+  CHEM_POT=true;
+  MOT1 = mu; MOT2 = -mu;
+  MOT3 = - MOT1 - MOT2; MOT4 = -MOT1; MOT5 = -MOT2;
+  // filename
+  char k_name[20];
+  char mu_name[20];
+  sprintf(k_name,"k2ave");
+  sprintf(mu_name,"{mu=%.2f}",mu);
+  string fname = "NLO_rho_"
+               + string(k_name);
+  if (CHEM_POT) {fname = fname+"."+string(mu_name); }
+  fname = fname + ".dat";
+
+  cout << "\n:: Creating table for k = " << k <<  " ..." << endl << endl;
+  Rho_V rV, rV2;
+  Rho_00 r00;
+  fout.open(fname);
+  cout << 
+  "# Columns: M/T, rhoV_LO/T2, rho00_LO/T2, rhoV_NLO/(g2*T2), rho00_NLO/(g2*T2)" 
+       << endl
+       << "# ( mu=" << mu << " )" << endl;
+
+  //signal( SIGALRM, sigalrm_handler );
+  //elapsed=0; alarm(1);
+
+  // Here are some parameters that can be changed:
+  N_M=20; 
+
+  M_min=1e1;
+  M_max=1e2;
+  // don't change anything after that.
+
+  s=pow(M_max/M_min,1./(N_M-1));
+  //s=(k0_max-k0_min)/((double)N_k0-1.);
+  //s = 1e-1;
+  //M*=s;
+  M=M_min;
+
+  for (int i=0;i<N_M;i++) { 
+  //while (M<M_max) {
+    percentage=(float)i/((float)N_M);
+    //percentage = (M-M_min)/(M_max-M_min);
+    k=sqrt( fabs(k2av(M)) );
+    k0=sqrt(M*M+k*k);
+
+    cout << "percentage = " << 100*percentage << endl;
+    MOT1 = mu; MOT2 = -mu;
+    MOT3 = - MOT1 - MOT2; MOT4 = -MOT1; MOT5 = -MOT2;
+    rV();
+    MOT1 = -mu; MOT2 = mu;
+    MOT3 = - MOT1 - MOT2; MOT4 = -MOT1; MOT5 = -MOT2;
+    rV2();
+    //r00();
+
+    fout << scientific << M        // M/T
+         <<     "    " << .5*(rV.lo+rV2.lo)     // leading-order: rho_V ,
+         <<     "    " << 0.//r00.lo    //                rho_00
+         <<     "    " << .5*(rV.nlo+rV2.nlo)    // next-to-LO   : rho_V ,
+         <<     "    " << 0.//r00.nlo   //                rho_00
+        << endl;
+
+    M*=s; 
+  }
+  cout << endl << ":: Saved to file [" << fname << "]" << endl;
+  fout.close();
+
+  return 0;
+}
+
+/*--------------------------------------------------------------------*/
 
 #include "gauss.h"
 
@@ -337,8 +418,7 @@ double B_(double x) {
   else return (1.+2.*x)*sqrt(1.-4.*x);
 }
 
-// TO BE TIDIED UP!!
-int hydro_table() { //
+int hydro_table() { // for JC
   int N_kT;
   double res_e, res_m, s, kT_min=0., kT_max=15.;
   double y = 0.;
@@ -396,7 +476,7 @@ int hydro_table() { //
 }
 
 
-int hydro_table_T_L() { //
+int hydro_table_T_L() { // for JC
   int N_kT;
   double res_T_e, res_T_m, 
          res_L_e, res_L_m,
@@ -469,7 +549,7 @@ int hydro_table_T_L() { //
 
 
 
-int hydro_table2() { //
+int hydro_table2() { // for JC
   int N_kT;
   double res, s, kT_min, kT_max;
   double y = 0.;
