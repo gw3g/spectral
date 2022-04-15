@@ -1,5 +1,5 @@
 CC	= g++
-CFLAGS	= -mfpmath=387 -lm -lgsl -lgslcblas
+CFLAGS	= -std=c++11 -lm -lgsl -lgslcblas
 TARGET	= bin/rho
 SRCEXT	= cpp
 SDIR	= src

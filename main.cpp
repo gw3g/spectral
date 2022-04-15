@@ -60,7 +60,7 @@ int main(int argc, char *argv[]) {
   --argc;
   while ( (++argv)[0] && argv[0][0]=='-' ) { // parse arguments
     --argc;
-    while (cc = *++argv[0]) {
+    while ((cc = *(++argv[0]))) {
       switch (cc) {
         case 'k': // 3-momentum
           if (argc==0) { k=1.0; }
