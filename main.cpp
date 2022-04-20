@@ -89,7 +89,7 @@ int main(int argc, char *argv[]) {
           cerr << "         [-k momentum] (in units of T, default=1.0)" << endl;
           cerr << "         [-m chemical potential] (in units of T, default=0.0)" << endl;
           cerr << "         [-c] (show master config)"                  << endl;
-          cerr << "         [-h] (prints this help)"                    << endl; << endl;
+          cerr << "         [-h] (prints this help)"                    << endl << endl;
           return 0;
       }
     }

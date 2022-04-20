@@ -33,10 +33,10 @@ int main(int argc, char *argv[]) {
 
   /* for lattice comparisons: */
   //nf=0
-  //Print_D(1.*2.*M_PI/3.,0.);     // T=1.1Tc
-  //Print_D(1.*2.*M_PI/3.,1.);     // T=1.1Tc
-  //Print_D(1.*2.*M_PI/3.,2.);     // T=1.1Tc
-  Print_k2ave(2.);     // T=1.1Tc
+  Print_D(3.*2.*M_PI/3.,0.);     // T=1.1Tc
+  Print_D(3.*2.*M_PI/3.,1.);     // T=1.1Tc
+  Print_D(3.*2.*M_PI/3.,2.);     // T=1.1Tc
+  //Print_k2ave(2.);     // T=1.1Tc
   //Print_D(3.*7.*M_PI/12.);    // T=1.3Tc
   // nf=2
   //Print_D(sqrt(1.)*M_PI/2.); // T=1.2Tc
@@ -209,12 +209,12 @@ struct Rho_00
                        limit, 6, wsp2, &res, &err  );//*/
 
     // Simpler master(s) --
-    _b_0 = (*rho_b_0 )(k0,k)*K2;
-    _bb_0= (*rho_bb_0)(k0,k)*K2;
-    _b_1 = (*rho_b_1 )(k0,k)*k0;
-    _bb_1= (*rho_bb_1)(k0,k)*k0;
-    _b_2 = (*rho_b_2 )(k0,k);
-    _bb_2= (*rho_bb_2)(k0,k);
+    //_b_0 = (*rho_b_0 )(k0,k)*K2;
+    //_bb_0= (*rho_bb_0)(k0,k)*K2;
+    //_b_1 = (*rho_b_1 )(k0,k)*k0;
+    //_bb_1= (*rho_bb_1)(k0,k)*k0;
+    //_b_2 = (*rho_b_2 )(k0,k);
+    //_bb_2= (*rho_bb_2)(k0,k);
     _g   = (*rho_g   )(k0,k)*k*k;
     //_h_0 = (*rho_h_0 )(k0,k)*K2;
     //_h_1 = (*rho_h_1 )(k0,k)*k0;
@@ -223,7 +223,7 @@ struct Rho_00
     //_j_2 = (*rho_j_2 )(k0,k)*K2;
 
     nlo -=
-    4.*Nc*cF*( 2.*(_b_0-_bb_0-4.*(_b_1-_bb_1)+4.*(_b_2-_bb_2)) // =0  (when did I write this???)
+    4.*Nc*cF*(// 2.*(_b_0-_bb_0-4.*(_b_1-_bb_1)+4.*(_b_2-_bb_2)) // =0  (when did I write this???)
               //+ _g + 2.*(_h_0+_hp) - 8.*_h_1 + _j_0 - 4.*_j_2 );
              + _g + res*CUBE(OOFP)*SQR(kp) );
 
@@ -239,7 +239,7 @@ void D(double k0_curr, double k_curr) {
   Rho_V   rV; // assign ptrs
   Rho_00 r00;
 
-  rV(); //r00();
+  rV(); r00();
 
 
   cout << scientific << k0        // k0/T
@@ -269,8 +269,8 @@ int Print_D(double k_curr,double mu=0.) {
   fname = fname + ".2.dat";
 
   cout << "\n:: Creating table for k = " << k <<  " ..." << endl << endl;
-  Rho_V rV, rV2;
-  Rho_00 r00;
+  Rho_V rV, rrV;
+  Rho_00 r00, rr00;
   fout.open(fname);
   fout << 
   "# Columns: k0/T, rhoV_LO/T2, rho00_LO/T2, rhoV_NLO/(g2*T2), rho00_NLO/(g2*T2)" 
@@ -281,7 +281,7 @@ int Print_D(double k_curr,double mu=0.) {
   elapsed=0; alarm(1);
 
   // Here are some parameters that can be changed:
-  N_k0=400; 
+  N_k0=40; 
 
   k0_min=1e-4;
   k0_max=10.;
@@ -302,16 +302,17 @@ int Print_D(double k_curr,double mu=0.) {
     MOT1 = mu; MOT2 = -mu;
     MOT3 = - MOT1 - MOT2; MOT4 = -MOT1; MOT5 = -MOT2;
     rV();
+    r00();
     MOT1 = -mu; MOT2 = mu;
     MOT3 = - MOT1 - MOT2; MOT4 = -MOT1; MOT5 = -MOT2;
-    rV2();
-    //r00();
+    rrV();
+    rr00();
 
     fout << scientific << k0        // k0/T
-         <<     "    " << .5*(rV.lo+rV2.lo)     // leading-order: rho_V ,
-         <<     "    " << 0.//r00.lo    //                rho_00
-         <<     "    " << .5*(rV.nlo+rV2.nlo)    // next-to-LO   : rho_V ,
-         <<     "    " << 0.//r00.nlo   //                rho_00
+         <<     "    " << .5*(rV.lo+rrV.lo)     // leading-order: rho_V ,
+         <<     "    " << .5*(r00.lo+rr00.lo)   //                rho_00
+         <<     "    " << .5*(rV.nlo+rrV.nlo)   // next-to-LO   : rho_V ,
+         <<     "    " << .5*(r00.nlo+rr00.nlo) //                rho_00
          << endl;
 
     k0+=s; 
