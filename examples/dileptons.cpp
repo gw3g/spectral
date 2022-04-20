@@ -1,6 +1,7 @@
 #include "core.hh"
 #include "quad.hh"
 #include "map.hh"
+#include "timer.hh"
 #include <fstream>
 #include <string>
 
@@ -123,7 +124,7 @@ struct Rho_V
     _d = (*rho_d )(k0,k);
     _db= (*rho_db)(k0,k);
     _g = (*rho_g )(k0,k)*K2;
-    //_h = (*rho_h )(k0,k)*K2;
+    //_h = (*rho_h )(k0,k)*K2; // these masters are commented b/c I compute them above
     //_hp= (*rho_hp)(k0,k);
     //_j = (*rho_j )(k0,k)*SQR(K2);
 
@@ -160,12 +161,12 @@ struct Rho_00
 
     S[0] = +1; S[1] = - 1; S[2] = -1; // statistics
 
-    //rho_b_0 =  _11020(0,0,S); // notation: rho_<tag>_<power of ..>
-    //rho_bb_0=  _10120(0,0,S);
-    //rho_b_1 =  _11020(1,0,S);
-    //rho_bb_1=  _10120(1,0,S);
-    //rho_b_2 =  _11020(2,0,S);
-    //rho_bb_2=  _10120(2,0,S);
+    rho_b_0 =  _11020(0,0,S); // notation: rho_<tag>_<power of ..>
+    rho_bb_0=  _10120(0,0,S);
+    rho_b_1 =  _11020(1,0,S);
+    rho_bb_1=  _10120(1,0,S);
+    rho_b_2 =  _11020(2,0,S);
+    rho_bb_2=  _10120(2,0,S);
     rho_g   =  _11011(0,0,S);
     rho_h_0 =  _11110(0,0,S);
     rho_h_1 =  _11110(0,1,S);
@@ -208,12 +209,12 @@ struct Rho_00
                        limit, 6, wsp2, &res, &err  );//*/
 
     // Simpler master(s) --
-    //_b_0 = (*rho_b_0 )(k0,k)*K2;
-    //_bb_0= (*rho_bb_0)(k0,k)*K2;
-    //_b_1 = (*rho_b_1 )(k0,k)*k0;
-    //_bb_1= (*rho_bb_1)(k0,k)*k0;
-    //_b_2 = (*rho_b_2 )(k0,k);
-    //_bb_2= (*rho_bb_2)(k0,k);
+    _b_0 = (*rho_b_0 )(k0,k)*K2;
+    _bb_0= (*rho_bb_0)(k0,k)*K2;
+    _b_1 = (*rho_b_1 )(k0,k)*k0;
+    _bb_1= (*rho_bb_1)(k0,k)*k0;
+    _b_2 = (*rho_b_2 )(k0,k);
+    _bb_2= (*rho_bb_2)(k0,k);
     _g   = (*rho_g   )(k0,k)*k*k;
     //_h_0 = (*rho_h_0 )(k0,k)*K2;
     //_h_1 = (*rho_h_1 )(k0,k)*k0;
@@ -222,7 +223,7 @@ struct Rho_00
     //_j_2 = (*rho_j_2 )(k0,k)*K2;
 
     nlo -=
-    4.*Nc*cF*( //2.*(_b_0-_bb_0-4.*(_b_1-_bb_1)+4.*(_b_2-_bb_2)) // =0 
+    4.*Nc*cF*( 2.*(_b_0-_bb_0-4.*(_b_1-_bb_1)+4.*(_b_2-_bb_2)) // =0  (when did I write this???)
               //+ _g + 2.*(_h_0+_hp) - 8.*_h_1 + _j_0 - 4.*_j_2 );
              + _g + res*CUBE(OOFP)*SQR(kp) );
 

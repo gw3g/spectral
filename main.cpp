@@ -68,7 +68,7 @@ int main(int argc, char *argv[]) {
             str_in=(*++argv);
             k = atof(str_in);
           }
-          Print_k0(rho,k);
+          //Print_k0(rho,k);
           break;
         case 'm':
           CHEM_POT = true;
@@ -79,20 +79,22 @@ int main(int argc, char *argv[]) {
           }
           MOT1 = mu_q; MOT2 = -mu_q;
           MOT3 = - MOT1 - MOT2; MOT4 = -MOT1; MOT5 = -MOT2;
-          Print_k0(rho,1.);
+          //Print_k0(rho,1.);
           break;
         case 'c':
-          config(rho);
-          break;
+          config(rho); cerr << endl;
+          return 0;
         case 'h':
           cerr << "\n:: Usage, './bin/rho' ..."                         << endl << endl;
           cerr << "         [-k momentum] (in units of T, default=1.0)" << endl;
+          cerr << "         [-m chemical potential] (in units of T, default=0.0)" << endl;
           cerr << "         [-c] (show master config)"                  << endl;
-          cerr << "         [-h] (prints this help)"                    << endl;
-          break;
+          cerr << "         [-h] (prints this help)"                    << endl; << endl;
+          return 0;
       }
     }
   }
+  Print_k0(rho,k);
   cout << endl; return 0;
 }
 

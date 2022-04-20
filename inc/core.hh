@@ -19,7 +19,7 @@ double  f(double,int),
 
 double I(int,int,double); // tadpole
 
-double psi0(int sA, int sB, double); // moments
+double psi0(int sA, int sB, double); // moments (last arg is MOT)
 double psi1(int sA, int sB, double);
 double psi2(int sA, int sB, double);
 
