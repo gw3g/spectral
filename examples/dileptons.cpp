@@ -19,9 +19,11 @@ int Print_D(double); int elapsed; float percentage;
 int Print_D(double,double);
 int Print_k2ave(double); 
 void D(double,double);
-int hydro_table();
-int hydro_table2();
-int hydro_table_T_L();
+
+// heavy ion rates:
+int hydro_table_integrated(string);
+int hydro_table_unintegrated(string);
+int hydro_table_integrated_T_L(string);
 
 int main(int argc, char *argv[]) {
 
@@ -33,9 +35,9 @@ int main(int argc, char *argv[]) {
 
   /* for lattice comparisons: */
   //nf=0
-  Print_D(3.*2.*M_PI/3.,0.);     // T=1.1Tc
-  Print_D(3.*2.*M_PI/3.,1.);     // T=1.1Tc
-  Print_D(3.*2.*M_PI/3.,2.);     // T=1.1Tc
+  //Print_D(1.*2.*M_PI/3.,0.);     // T=1.1Tc
+  //Print_D(1.*2.*M_PI/3.,1.);     // T=1.1Tc
+  //Print_D(1.*2.*M_PI/3.,2.);     // T=1.1Tc
   //Print_k2ave(2.);     // T=1.1Tc
   //Print_D(3.*7.*M_PI/12.);    // T=1.3Tc
   // nf=2
@@ -47,9 +49,10 @@ int main(int argc, char *argv[]) {
   //hydro_table_T_L();
 
   /* Others: */
-  //Print_D(.02);
-  //Print_D(1.);
-  //Print_D(1.5);
+  Print_D(.02,1.);
+  Print_D(.5,1.);
+  Print_D(1.,1.);
+  Print_D(1.5,1.);
 
   //Print_D(.3);
   //Print_D(1.5);
@@ -223,7 +226,8 @@ struct Rho_00
     //_j_2 = (*rho_j_2 )(k0,k)*K2;
 
     nlo -=
-    4.*Nc*cF*(// 2.*(_b_0-_bb_0-4.*(_b_1-_bb_1)+4.*(_b_2-_bb_2)) // =0  (when did I write this???)
+    4.*Nc*cF*(// 2.*(_b_0-_bb_0-4.*(_b_1-_bb_1)+4.*(_b_2-_bb_2)) // =0  (GJ: when did I write this???)
+                                                                 // (GJ: eq(7.1) of your paper, you loskop!)
               //+ _g + 2.*(_h_0+_hp) - 8.*_h_1 + _j_0 - 4.*_j_2 );
              + _g + res*CUBE(OOFP)*SQR(kp) );
 
@@ -266,7 +270,7 @@ int Print_D(double k_curr,double mu=0.) {
   string fname = "NLO_rho_"
                + string(k_name);
   if (CHEM_POT) {fname = fname+"."+string(mu_name); }
-  fname = fname + ".2.dat";
+  fname = fname + ".dat";
 
   cout << "\n:: Creating table for k = " << k <<  " ..." << endl << endl;
   Rho_V rV, rrV;
@@ -281,10 +285,10 @@ int Print_D(double k_curr,double mu=0.) {
   elapsed=0; alarm(1);
 
   // Here are some parameters that can be changed:
-  N_k0=40; 
+  N_k0=100; 
 
   k0_min=1e-4;
-  k0_max=10.;
+  k0_max=2.;
   // don't change anything after that.
 
   //s=pow(k0_max/k0_min,1./(N_k0-1));
@@ -301,14 +305,12 @@ int Print_D(double k_curr,double mu=0.) {
 
     MOT1 = mu; MOT2 = -mu;
     MOT3 = - MOT1 - MOT2; MOT4 = -MOT1; MOT5 = -MOT2;
-    rV();
-    r00();
+    rV(); r00();
     MOT1 = -mu; MOT2 = mu;
     MOT3 = - MOT1 - MOT2; MOT4 = -MOT1; MOT5 = -MOT2;
-    rrV();
-    rr00();
+    rrV(); rr00();
 
-    fout << scientific << k0        // k0/T
+    fout << scientific << k0                    // k0/T
          <<     "    " << .5*(rV.lo+rrV.lo)     // leading-order: rho_V ,
          <<     "    " << .5*(r00.lo+rr00.lo)   //                rho_00
          <<     "    " << .5*(rV.nlo+rrV.nlo)   // next-to-LO   : rho_V ,
@@ -349,8 +351,8 @@ int Print_k2ave(double mu=0.) {
   fname = fname + ".dat";
 
   cout << "\n:: Creating table for k = " << k <<  " ..." << endl << endl;
-  Rho_V rV, rV2;
-  Rho_00 r00;
+  Rho_V rV, rrV;
+  Rho_00 r00, rr00;
   fout.open(fname);
   cout << 
   "# Columns: M/T, rhoV_LO/T2, rho00_LO/T2, rhoV_NLO/(g2*T2), rho00_NLO/(g2*T2)" 
@@ -383,17 +385,16 @@ int Print_k2ave(double mu=0.) {
     cout << "percentage = " << 100*percentage << endl;
     MOT1 = mu; MOT2 = -mu;
     MOT3 = - MOT1 - MOT2; MOT4 = -MOT1; MOT5 = -MOT2;
-    rV();
+    rV(); r00();
     MOT1 = -mu; MOT2 = mu;
     MOT3 = - MOT1 - MOT2; MOT4 = -MOT1; MOT5 = -MOT2;
-    rV2();
-    //r00();
+    rrV(); rr00();
 
-    fout << scientific << M        // M/T
-         <<     "    " << .5*(rV.lo+rV2.lo)     // leading-order: rho_V ,
-         <<     "    " << 0.//r00.lo    //                rho_00
-         <<     "    " << .5*(rV.nlo+rV2.nlo)    // next-to-LO   : rho_V ,
-         <<     "    " << 0.//r00.nlo   //                rho_00
+    fout << scientific << M                     // M/T
+         <<     "    " << .5*(rV.lo+rrV.lo)     // leading-order: rho_V ,
+         <<     "    " << .5*(r00.lo+rr00.lo)   //                rho_00
+         <<     "    " << .5*(rV.nlo+rrV.nlo)   // next-to-LO   : rho_V ,
+         <<     "    " << .5*(r00.nlo+rr00.nlo) //                rho_00
         << endl;
 
     M*=s; 
@@ -420,7 +421,7 @@ double B_(double x) {
   else return (1.+2.*x)*sqrt(1.-4.*x);
 }
 
-int hydro_table() { // for JC
+int hydro_table_integrated(string mesh_name) {
   int N_kT;
   double res_e, res_m, s, kT_min=0., kT_max=15.;
   double y = 0.;
@@ -435,7 +436,7 @@ int hydro_table() { // for JC
   Rho_00 r00;
 
   double T,M;
-  fin.open("mesh_alpha2.dat");
+  fin.open(mesh_name);
   //for (int i=0;i<32000;i++) 
   fin.ignore(64,'\n');
 
@@ -478,13 +479,13 @@ int hydro_table() { // for JC
 }
 
 
-int hydro_table_T_L() { // for JC
+int hydro_table_integrated_T_L(string mesh_name) {
   int N_kT;
   double res_T_e, res_T_m, 
          res_L_e, res_L_m,
          s, kT_min=0., kT_max=15.;
   double y = 0.;
-  double alpha, B_e, B_mu;
+  double alpha, B_e, B_mu, prefactor;
   double ai, ti;
 
   string fname = "mesh_GJ_kT_integrated_T_L.dat";
@@ -494,8 +495,8 @@ int hydro_table_T_L() { // for JC
   Rho_V rV;
   Rho_00 r00;
 
-  double T,M;
-  fin.open("mesh_alpha2.dat");
+  double T,M, M2, k2, g2, emk0;
+  fin.open(mesh_name);
   //for (int i=0;i<32000;i++) 
   fin.ignore(64,'\n');
 
@@ -518,20 +519,24 @@ int hydro_table_T_L() { // for JC
       ai  = .5*G32pt[i][0]; ti = .5*(G32pt[i][1]+1.);
       ai *= kT_max-kT_min;
       k   = kT_min*(1.-ti) + kT_max*ti;// = k/T
-      k0  = sqrt( M*M+k*k );
+      k2  = k*k; M2 = M*M;
+      k0  = sqrt( M2+k2 );
+      g2  = alpha*4.*M_PI;
+      emk0= exp(-k0);
 
       rV();
       r00();
 
-      res_T_e += ai*k*.5*( rV.lo + r00.lo*(M*M/(k*k)) + alpha*4.*M_PI*( rV.nlo + r00.nlo*(M*M/(k*k)) ) )*exp(-k0)/(1.-exp(-k0));
-      res_T_m += ai*k*.5*( rV.lo + r00.lo*(M*M/(k*k)) + alpha*4.*M_PI*( rV.nlo + r00.nlo*(M*M/(k*k)) ) )*exp(-k0)/(1.-exp(-k0));
-      res_L_e += ai*k*(-M*M/(k*k))*( r00.lo + alpha*4.*M_PI*r00.nlo )*exp(-k0)/(1.-exp(-k0));
-      res_L_m += ai*k*(-M*M/(k*k))*( r00.lo + alpha*4.*M_PI*r00.nlo )*exp(-k0)/(1.-exp(-k0));
+      res_T_e += ai*k*.5*( rV.lo + r00.lo*(M2/k2) + g2*( rV.nlo + r00.nlo*(M2/k2) ) )*emk0/(1.-emk0);
+      res_T_m += ai*k*.5*( rV.lo + r00.lo*(M2/k2) + g2*( rV.nlo + r00.nlo*(M2/k2) ) )*emk0/(1.-emk0);
+      res_L_e += ai*k*(-M2/k2)*( r00.lo + g2*r00.nlo )*emk0/(1.-emk0);
+      res_L_m += ai*k*(-M2/k2)*( r00.lo + g2*r00.nlo )*emk0/(1.-emk0);
     }
-    res_T_e *= 2.*M_PI*pow(T,3.)*B_e/(3.*pow(M_PI,3.)*M);
-    res_T_m *= 2.*M_PI*pow(T,3.)*B_mu/(3.*pow(M_PI,3.)*M);
-    res_L_e *= 2.*M_PI*pow(T,3.)*B_e/(3.*pow(M_PI,3.)*M);
-    res_L_m *= 2.*M_PI*pow(T,3.)*B_mu/(3.*pow(M_PI,3.)*M);
+    prefactor = 2.*M_PI*pow(T,3.)/(3.*pow(M_PI,3.)*M);
+    res_T_e *= prefactor*B_e;
+    res_T_m *= prefactor*B_mu;
+    res_L_e *= prefactor*B_e;
+    res_L_m *= prefactor*B_mu;
 
     fout << scientific << T
          <<     "    " << M*T
@@ -550,8 +555,7 @@ int hydro_table_T_L() { // for JC
 }
 
 
-
-int hydro_table2() { // for JC
+int hydro_table_unintegrated(string mesh_name) {
   int N_kT;
   double res, s, kT_min, kT_max;
   double y = 0.;
