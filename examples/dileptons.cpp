@@ -9,7 +9,7 @@ double k0,k;
 double mu_q = 0.;
 bool  CHEM_POT = false;
 double MOT1, MOT2, MOT3, MOT4, MOT5;// mu over T
-double tol = 1e-1; // absolute tolerance
+double tol = 1e-2; // absolute tolerance
 
 using namespace std;
 
@@ -19,6 +19,9 @@ int Print_D(double); int elapsed; float percentage;
 int Print_D(double,double);
 int Print_k2ave(double); 
 void D(double,double);
+
+// lattice
+int ReadIn(string,string,double,double);
 
 // heavy ion rates:
 int hydro_table_integrated(string);
@@ -35,9 +38,9 @@ int main(int argc, char *argv[]) {
 
   /* for lattice comparisons: */
   //nf=0
-  //Print_D(1.*2.*M_PI/3.,0.);     // T=1.1Tc
-  //Print_D(1.*2.*M_PI/3.,1.);     // T=1.1Tc
-  //Print_D(1.*2.*M_PI/3.,2.);     // T=1.1Tc
+  //Print_D(3.*2.*M_PI/3.,0.);     // T=1.1Tc
+  //Print_D(1.*2.*M_PI/3.,3./3.);     // T=1.1Tc
+  //Print_D(1.*2.*M_PI/3.,3./3.);     // T=1.1Tc
   //Print_k2ave(2.);     // T=1.1Tc
   //Print_D(3.*7.*M_PI/12.);    // T=1.3Tc
   // nf=2
@@ -45,14 +48,28 @@ int main(int argc, char *argv[]) {
   //Print_D(1.5*M_PI);         // T=1.2Tc
   //Print_D(.5*M_PI*sqrt(14)); // T=1.2Tc
   //
+  /* lattice table */
+  char  name_in[100];
+  char  name_out[100];
+  char *tag;
+  double MUq;
+
+  tag = ".R1(5)";
+  int Nf=3; k = 1*2.*M_PI/3.; double t=1.8; 
+  MUq = 3./3.;
+  sprintf(name_in ,"coupling_nf%d_{k=%.2f,t=%.2f,mu=%.2f}%s.dat",Nf,k,t,MUq,tag);
+  sprintf(name_out,"out/NLO_rho_{k=%.2f,mu=%.2f}.dat",Nf,k,MUq);
+  ReadIn(string(name_in),string(name_out),k,MUq);
+
+
   /* for hydro run: */
   //hydro_table_T_L();
 
   /* Others: */
-  Print_D(.02,1.);
-  Print_D(.5,1.);
-  Print_D(1.,1.);
-  Print_D(1.5,1.);
+  //Print_D(.02,1.);
+  //Print_D(.5,1.);
+  //Print_D(1.,1.);
+  //Print_D(1.5,1.);
 
   //Print_D(.3);
   //Print_D(1.5);
@@ -287,14 +304,14 @@ int Print_D(double k_curr,double mu=0.) {
   // Here are some parameters that can be changed:
   N_k0=100; 
 
-  k0_min=1e-4;
-  k0_max=2.;
+  k0_min=1e-1;
+  k0_max=20.;
   // don't change anything after that.
 
   //s=pow(k0_max/k0_min,1./(N_k0-1));
   s=(k0_max-k0_min)/((double)N_k0-1.);
-  //s = 1e-1;
-  k0+=s;
+  s = 1e-1;
+  //k0+=s;
   k0=k0_min;
 
   int i=0;
@@ -404,6 +421,92 @@ int Print_k2ave(double mu=0.) {
 
   return 0;
 }
+
+/*--------------------------------------------------------------------*/
+
+int ReadIn(string _IN, string _OUT, double k_curr, double mu=0.) {
+  double k0_curr;
+  double mubar, aM, aL, aH; // <-- not needed
+  k=k_curr;
+
+  CHEM_POT=true;
+  MOT1 = mu; MOT2 = -mu;
+  MOT3 = - MOT1 - MOT2; MOT4 = -MOT1; MOT5 = -MOT2;
+  // filename
+  fin.open(_IN);
+  cout << " Opening input file [" << _IN << "]" << endl;
+  fin.ignore(64,'\n');
+  fin.ignore(64,'\n');
+  fin.ignore(64,'\n');
+
+  fout.open(_OUT);
+  /*char opt = 'O';
+  if (fout) {
+    fout.ignore(64,'\n');
+    fout.ignore(64,'\n');
+    fout.ignore(64,'\n');
+    cout << "\n ... output file exists: overwrite (O) or update (U)? " << endl;
+    cin  >> opt;
+  }//*/
+
+  /*if ((opt=='U')||(opt=='u')) { // UPDATE
+    printf(" Updating.\n");
+    while (!fin.eof()) {
+      fin  >> k0 >> mubar >> aM >> aL >> aH; fin.ignore(64,'\n');
+      fout >> k0_curr >> mubar >> aM >> aL >> aH; fout.ignore(64,'\n');
+      if (k0==k0_curr) {
+        printf(" done: k0=%f\n",k0_curr);
+      }
+      else {
+        printf("Mismatch! Cannot update, exiting ... \n");
+        return;
+      }
+    }
+  }//*/
+
+  //if ((opt=='O')||(opt=='o')) { // OVERWRITE
+    k0 = -1.;
+    fout << 
+    "# Columns: k0/T, rhoV_LO/T2, rho00_LO/T2, rhoV_NLO/(g2*T2), rho00_NLO/(g2*T2)" 
+         << endl
+         << "# ( k=" << k << " )" << endl;
+
+  //}
+
+  cout << "\n:: Creating table for k = " << k <<  " ..." << endl << endl;
+  Rho_V rV, rrV;
+  Rho_00 r00, rr00;
+
+  //signal( SIGALRM, sigalrm_handler );
+  //elapsed=0; alarm(1);
+
+  while (k0<20.) {
+    fin >> k0 >> mubar >> aM >> aL >> aH; fin.ignore(64,'\n');
+    cout << "k0 = " << k0 << endl;
+
+    MOT1 = mu; MOT2 = -mu;
+    MOT3 = - MOT1 - MOT2; MOT4 = -MOT1; MOT5 = -MOT2;
+    rV(); r00();
+    MOT1 = -mu; MOT2 = mu;
+    MOT3 = - MOT1 - MOT2; MOT4 = -MOT1; MOT5 = -MOT2;
+    rrV(); rr00();
+
+    fout << scientific << k0                    // k0/T
+         <<     "    " << .5*(rV.lo+rrV.lo)     // leading-order: rho_V ,
+         <<     "    " << .5*(r00.lo+rr00.lo)   //                rho_00
+         <<     "    " << .5*(rV.nlo+rrV.nlo)   // next-to-LO   : rho_V ,
+         <<     "    " << .5*(r00.nlo+rr00.nlo) //                rho_00
+         << endl;
+
+    //k0+=s; 
+  }
+  cout << endl << ":: Saved to file [" << _OUT << "]" << endl;
+  fin.close();
+  fout.close();
+
+  return 0;
+}
+
 
 /*--------------------------------------------------------------------*/
 
