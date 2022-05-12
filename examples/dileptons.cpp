@@ -65,7 +65,7 @@ int main(int argc, char *argv[]) {
 
   /* for hydro run: */
   //hydro_table_T_L();
-  hydro_table_integrated_T_L("mesh_alpha.dat");
+  hydro_table_integrated_T_L("mesh_test2_alpha.dat");
 
   /* Others: */
   //Print_D(.02,1.);
@@ -595,6 +595,7 @@ int hydro_table_integrated_T_L(string mesh_name) {
 
   string fname = "mesh_NLO_kT_integrated_T_L.dat";
   fout.open(fname);
+  cout << " Opening input file [" << fname << "]\n\n";
   //fout << "# Columns: T/GeV, M/GeV, rate_T(e+e-), rate_T(mu+mu-), rate_L(e+e-), rate_L(mu+mu-)" << endl;
   fout << "# Columns: T/GeV, muB/GeV, M/GeV, rate_T(e+e-), rate_T(mu+mu-), rate_L(e+e-), rate_L(mu+mu-)" << endl;
 
@@ -614,7 +615,7 @@ int hydro_table_integrated_T_L(string mesh_name) {
     fin >> T >> muB >> M >> alpha;
     fin.ignore(64,'\n');
 
-    cout << "T=" << T << ", mu_B=" << muB << ", M=" << M << ", alpha=" << alpha << endl;
+    cout << "  T = " << T << " ,  mu_B = " << muB << " ,  M = " << M << endl;
     B_e  = B_(m_e*m_e/(M*M))*(2./3.)*pow(hbarc,-4.)*pow(alpha_em,2.); // units:
     B_mu = B_(m_m*m_m/(M*M))*(2./3.)*pow(hbarc,-4.)*pow(alpha_em,2.); // GeV^-4.fm^-4
 
@@ -664,8 +665,8 @@ int hydro_table_integrated_T_L(string mesh_name) {
     res_L_m *= prefactor*B_mu;
 
     fout << scientific << T
-         <<     "    " << M*T
          <<     "    " << muB
+         <<     "    " << M*T
          <<     "    " << res_T_e
          <<     "    " << res_T_m
          <<     "    " << res_L_e
@@ -695,7 +696,7 @@ int hydro_table_unintegrated(string mesh_name) {
   Rho_00 r00;
 
   double T,M;
-  fin.open("mesh_alpha.dat");
+  fin.open("mesh2_alpha.dat");
   //for (int i=0;i<32000;i++) 
   fin.ignore(64,'\n');
 
