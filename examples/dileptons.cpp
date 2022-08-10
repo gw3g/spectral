@@ -9,7 +9,7 @@ double k0,k;
 double mu_q = 0.;
 bool  CHEM_POT = false;
 double MOT1, MOT2, MOT3, MOT4, MOT5;// mu over T
-double tol = 1e-2; // absolute tolerance
+double tol = 1e-1; // absolute tolerance
 
 using namespace std;
 
@@ -65,6 +65,7 @@ int main(int argc, char *argv[]) {
 
   /* for hydro run: */
   //hydro_table_T_L();
+  hydro_table_integrated_T_L("mesh_test2_alpha.dat");
 
   /* Others: */
   Print_D(.02,2.);
@@ -594,23 +595,29 @@ int hydro_table_integrated_T_L(string mesh_name) {
   double alpha, B_e, B_mu, prefactor;
   double ai, ti;
 
-  string fname = "mesh_GJ_kT_integrated_T_L.dat";
+  string fname = "mesh_NLO_kT_integrated_T_L.dat";
   fout.open(fname);
-  fout << "# Columns: T/GeV, M/GeV, rate_T(e+e-), rate_T(mu+mu-), rate_L(e+e-), rate_L(mu+mu-)" << endl;
+  cout << " Opening input file [" << fname << "]\n\n";
+  //fout << "# Columns: T/GeV, M/GeV, rate_T(e+e-), rate_T(mu+mu-), rate_L(e+e-), rate_L(mu+mu-)" << endl;
+  fout << "# Columns: T/GeV, muB/GeV, M/GeV, rate_T(e+e-), rate_T(mu+mu-), rate_L(e+e-), rate_L(mu+mu-)" << endl;
 
   Rho_V rV;
   Rho_00 r00;
 
-  double T,M, M2, k2, g2, emk0;
+  CHEM_POT=true;
+  Rho_V rrV;
+  Rho_00 rr00;
+
+  double T,muB,M, M2, k2, g2, emk0;
   fin.open(mesh_name);
   //for (int i=0;i<32000;i++) 
   fin.ignore(64,'\n');
 
   while (!fin.eof()) {
-    fin >> T >> M >> alpha;
+    fin >> T >> muB >> M >> alpha;
     fin.ignore(64,'\n');
 
-    cout << "T=" << T << ", M=" << M << ", alpha=" << alpha << endl;
+    cout << "  T = " << T << " ,  mu_B = " << muB << " ,  M = " << M << endl;
     B_e  = B_(m_e*m_e/(M*M))*(2./3.)*pow(hbarc,-4.)*pow(alpha_em,2.); // units:
     B_mu = B_(m_m*m_m/(M*M))*(2./3.)*pow(hbarc,-4.)*pow(alpha_em,2.); // GeV^-4.fm^-4
 
@@ -621,8 +628,8 @@ int hydro_table_integrated_T_L(string mesh_name) {
     res_L_e = 0.;
     res_L_m = 0.;
 
-    for (int i=0;i<32;i++) {
-      ai  = .5*G32pt[i][0]; ti = .5*(G32pt[i][1]+1.);
+    for (int i=0;i<16;i++) {
+      ai  = .5*G16pt[i][0]; ti = .5*(G16pt[i][1]+1.);
       ai *= kT_max-kT_min;
       k   = kT_min*(1.-ti) + kT_max*ti;// = k/T
       k2  = k*k; M2 = M*M;
@@ -630,13 +637,28 @@ int hydro_table_integrated_T_L(string mesh_name) {
       g2  = alpha*4.*M_PI;
       emk0= exp(-k0);
 
+      MOT1 = muB/(3.*T); MOT2 = -muB/(3.*T);
+      MOT3 = - MOT1 - MOT2; MOT4 = -MOT1; MOT5 = -MOT2;
       rV();
       r00();
 
-      res_T_e += ai*k*.5*( rV.lo + r00.lo*(M2/k2) + g2*( rV.nlo + r00.nlo*(M2/k2) ) )*emk0/(1.-emk0);
-      res_T_m += ai*k*.5*( rV.lo + r00.lo*(M2/k2) + g2*( rV.nlo + r00.nlo*(M2/k2) ) )*emk0/(1.-emk0);
-      res_L_e += ai*k*(-M2/k2)*( r00.lo + g2*r00.nlo )*emk0/(1.-emk0);
-      res_L_m += ai*k*(-M2/k2)*( r00.lo + g2*r00.nlo )*emk0/(1.-emk0);
+      MOT1 = -muB/(3.*T); MOT2 = muB/(3.*T);
+      MOT3 = - MOT1 - MOT2; MOT4 = -MOT1; MOT5 = -MOT2;
+      rrV();
+      rr00();
+
+
+      res_T_e += ai*k*.25*( rV.lo + r00.lo*(M2/k2) + g2*( rV.nlo + r00.nlo*(M2/k2) ) )*emk0/(1.-emk0);
+      res_T_e += ai*k*.25*(rrV.lo +rr00.lo*(M2/k2) + g2*(rrV.nlo +rr00.nlo*(M2/k2) ) )*emk0/(1.-emk0);
+
+      res_T_m += ai*k*.25*( rV.lo + r00.lo*(M2/k2) + g2*( rV.nlo + r00.nlo*(M2/k2) ) )*emk0/(1.-emk0);
+      res_T_m += ai*k*.25*(rrV.lo +rr00.lo*(M2/k2) + g2*(rrV.nlo +rr00.nlo*(M2/k2) ) )*emk0/(1.-emk0);
+
+      res_L_e += ai*k*.5*(-M2/k2)*( r00.lo + g2*r00.nlo )*emk0/(1.-emk0);
+      res_L_e += ai*k*.5*(-M2/k2)*(rr00.lo +g2*rr00.nlo )*emk0/(1.-emk0);
+
+      res_L_m += ai*k*.5*(-M2/k2)*( r00.lo + g2*r00.nlo )*emk0/(1.-emk0);
+      res_L_m += ai*k*.5*(-M2/k2)*(rr00.lo +g2*rr00.nlo )*emk0/(1.-emk0);
     }
     prefactor = 2.*M_PI*pow(T,3.)/(3.*pow(M_PI,3.)*M);
     res_T_e *= prefactor*B_e;
@@ -645,6 +667,7 @@ int hydro_table_integrated_T_L(string mesh_name) {
     res_L_m *= prefactor*B_mu;
 
     fout << scientific << T
+         <<     "    " << muB
          <<     "    " << M*T
          <<     "    " << res_T_e
          <<     "    " << res_T_m
@@ -675,7 +698,7 @@ int hydro_table_unintegrated(string mesh_name) {
   Rho_00 r00;
 
   double T,M;
-  fin.open("mesh_alpha.dat");
+  fin.open("mesh2_alpha.dat");
   //for (int i=0;i<32000;i++) 
   fin.ignore(64,'\n');
 
