@@ -49,6 +49,7 @@ int main(int argc, char *argv[]) {
   //Print_D(.5*M_PI*sqrt(14)); // T=1.2Tc
   //
   /* lattice table */
+  /*
   char  name_in[100];
   char  name_out[100];
   char *tag;
@@ -59,17 +60,17 @@ int main(int argc, char *argv[]) {
   MUq = 3./3.;
   sprintf(name_in ,"coupling_nf%d_{k=%.2f,t=%.2f,mu=%.2f}%s.dat",Nf,k,t,MUq,tag);
   sprintf(name_out,"out/NLO_rho_{k=%.2f,mu=%.2f}.dat",Nf,k,MUq);
-  ReadIn(string(name_in),string(name_out),k,MUq);
+  ReadIn(string(name_in),string(name_out),k,MUq);*/
 
 
   /* for hydro run: */
   //hydro_table_T_L();
 
   /* Others: */
-  //Print_D(.02,1.);
-  //Print_D(.5,1.);
-  //Print_D(1.,1.);
-  //Print_D(1.5,1.);
+  Print_D(.02,2.);
+  Print_D(.5,2.);
+  Print_D(1.,2.);
+  Print_D(1.5,2.);
 
   //Print_D(.3);
   //Print_D(1.5);
@@ -85,7 +86,8 @@ struct Rho_V
 {
   double lo, nlo;
   int S[3];
-  double Nc=3., cF=(Nc*Nc-1.)/(2.*Nc); // group factors
+  //double Nc=3., cF=(Nc*Nc-1.)/(2.*Nc); // group factors
+  double Nc=1., cF=1.; // QED
 
   // notation à la 1310.0164
   Master
@@ -159,7 +161,8 @@ struct Rho_00
 {
   double lo, nlo;
   int S[3];
-  double Nc=3., cF=(Nc*Nc-1.)/(2.*Nc);
+  //double Nc=3., cF=(Nc*Nc-1.)/(2.*Nc); // QCD
+  double Nc=1., cF=1.; // QED
 
   Master
     *rho_b_0, *rho_bb_0,
