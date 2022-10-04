@@ -17,6 +17,8 @@ ofstream fout;
 ifstream fin;
 int Print_D(double); int elapsed; float percentage;
 int Print_D(double,double);
+int Print_HTL(double,double);
+int Print2_HTL(double,double);
 int Print_k2ave(double); 
 void D(double,double);
 
@@ -65,13 +67,20 @@ int main(int argc, char *argv[]) {
 
   /* for hydro run: */
   //hydro_table_T_L();
-  hydro_table_integrated_T_L("mesh_test2_alpha.dat");
+  //hydro_table_integrated_T_L("mesh_test2_alpha.dat");
 
   /* Others: */
-  Print_D(.02,2.);
-  Print_D(.5,2.);
-  Print_D(1.,2.);
-  Print_D(1.5,2.);
+  //Print_D(.02,2.);
+  //Print_D(.25,10.);
+  //Print_D(.25,1.);
+  //Print_D(.25,2.);
+
+  //Print_HTL(1e-1,0.);
+  //Print_HTL(1e-2,0.);
+  //Print_HTL(1e-3,0.);
+
+  Print2_HTL(.3,0.01);
+  Print2_HTL(.4,0.01);
 
   //Print_D(.3);
   //Print_D(1.5);
@@ -306,15 +315,15 @@ int Print_D(double k_curr,double mu=0.) {
   elapsed=0; alarm(1);
 
   // Here are some parameters that can be changed:
-  N_k0=100; 
+  N_k0=50; 
 
-  k0_min=1e-1;
-  k0_max=20.;
+  k0_min=1e-4;
+  k0_max=.5;
   // don't change anything after that.
 
   //s=pow(k0_max/k0_min,1./(N_k0-1));
   s=(k0_max-k0_min)/((double)N_k0-1.);
-  s = 1e-1;
+  //s = 1e-1;
   //k0+=s;
   k0=k0_min;
 
@@ -339,6 +348,152 @@ int Print_D(double k_curr,double mu=0.) {
          << endl;
 
     k0+=s; 
+  }
+  cout << endl << ":: Saved to file [" << fname << "]" << endl;
+  fout.close();
+
+  return 0;
+}
+
+int Print_HTL(double y,double mu=0.) { // k = y.T, k0 = x.y.T
+  int N_x;
+  double res, s, x_min, x_max, x;
+  k=y;
+
+  CHEM_POT=true;
+  MOT1 = mu; MOT2 = -mu;
+  MOT3 = - MOT1 - MOT2; MOT4 = -MOT1; MOT5 = -MOT2;
+  // filename
+  char k_name[20];
+  char mu_name[20];
+  sprintf(k_name,"{y=%.3f}",y);
+  sprintf(mu_name,"{mu=%.2f}",mu);
+  string fname = "NLO_rho_"
+               + string(k_name);
+  if (CHEM_POT) {fname = fname+"."+string(mu_name); }
+  fname = fname + ".dat";
+
+  cout << "\n:: Creating table for k = " << k <<  " ..." << endl << endl;
+  Rho_V rV, rrV;
+  Rho_00 r00, rr00;
+  fout.open(fname);
+  fout << 
+  "# Columns: k0/T, rhoV_LO/T2, rho00_LO/T2, rhoV_NLO/(g2*T2), rho00_NLO/(g2*T2)" 
+       << endl
+       << "# ( k=" << k << " )" << endl;
+
+  signal( SIGALRM, sigalrm_handler );
+  elapsed=0; alarm(1);
+
+  // Here are some parameters that can be changed:
+  N_x=50; 
+
+  x_min=.1;
+  x_max=2.;
+  // don't change anything after that.
+
+  //s=pow(k0_max/k0_min,1./(N_k0-1));
+  s=(x_max-x_min)/((double)N_x-1.);
+  //s = 1e-1;
+  //k0+=s;
+  x=x_min;
+
+  int i=0;
+  //for (int i=0;i<N_k0;i++) { 
+  while (x<x_max) {
+    //percentage=(float)i/((float)N_k0);
+    percentage = (x-x_min)/(x_max-x_min);
+    k0 = x*y;
+
+    MOT1 = mu; MOT2 = -mu;
+    MOT3 = - MOT1 - MOT2; MOT4 = -MOT1; MOT5 = -MOT2;
+    rV(); r00();
+    MOT1 = -mu; MOT2 = mu;
+    MOT3 = - MOT1 - MOT2; MOT4 = -MOT1; MOT5 = -MOT2;
+    rrV(); rr00();
+
+    fout << scientific << x                     // k0/k
+         <<     "    " << .5*(rV.lo+rrV.lo)     // leading-order: rho_V ,
+         <<     "    " << .5*(r00.lo+rr00.lo)   //                rho_00
+         <<     "    " << .5*(rV.nlo+rrV.nlo)   // next-to-LO   : rho_V ,
+         <<     "    " << .5*(r00.nlo+rr00.nlo) //                rho_00
+         << endl;
+
+    x+=s; 
+  }
+  cout << endl << ":: Saved to file [" << fname << "]" << endl;
+  fout.close();
+
+  return 0;
+}
+
+
+
+int Print2_HTL(double x,double y) { // k = y.T, k0 = x.y.T
+  int N_mu;
+  double res, s, mu_min, mu_max, mu;
+  k=y;
+  k0=x*y;
+
+  CHEM_POT=true;
+  //MOT1 = mu; MOT2 = -mu;
+  //MOT3 = - MOT1 - MOT2; MOT4 = -MOT1; MOT5 = -MOT2;
+  // filename
+  char k_name[20];
+  //char mu_name[20];
+  sprintf(k_name,"{x=%.3f,y=%.3f}",x,y);
+  //sprintf(mu_name,"{mu=%.2f}",mu);
+  string fname = "NLO_rho_"
+               + string(k_name);
+  if (CHEM_POT) {fname = fname; }
+  fname = fname + ".dat";
+
+  cout << "\n:: Creating table for k = " << k <<  " ..." << endl << endl;
+  Rho_V rV, rrV;
+  Rho_00 r00, rr00;
+  fout.open(fname);
+  fout << 
+  "# Columns: mu/T, rhoV_LO/T2, rho00_LO/T2, rhoV_NLO/(g2*T2), rho00_NLO/(g2*T2)" 
+       << endl
+       << "# ( k=" << mu << " )" << endl;
+
+  signal( SIGALRM, sigalrm_handler );
+  elapsed=0; alarm(1);
+
+  // Here are some parameters that can be changed:
+  N_mu=60; 
+
+  mu_min=.0;
+  mu_max=30.;
+  // don't change anything after that.
+
+  //s=pow(k0_max/k0_min,1./(N_k0-1));
+  s=(mu_max-mu_min)/((double)N_mu-1.);
+  //s = 1e-1;
+  //k0+=s;
+  mu=mu_min;
+
+  int i=0;
+  //for (int i=0;i<N_k0;i++) { 
+  while (mu<mu_max) {
+    //percentage=(float)i/((float)N_k0);
+    percentage = (mu-mu_min)/(mu_max-mu_min);
+
+    MOT1 = mu; MOT2 = -mu;
+    MOT3 = - MOT1 - MOT2; MOT4 = -MOT1; MOT5 = -MOT2;
+    rV(); r00();
+    MOT1 = -mu; MOT2 = mu;
+    MOT3 = - MOT1 - MOT2; MOT4 = -MOT1; MOT5 = -MOT2;
+    rrV(); rr00();
+
+    fout << scientific << mu                    // mu/T
+         <<     "    " << .5*(rV.lo+rrV.lo)     // leading-order: rho_V ,
+         <<     "    " << .5*(r00.lo+rr00.lo)   //                rho_00
+         <<     "    " << .5*(rV.nlo+rrV.nlo)   // next-to-LO   : rho_V ,
+         <<     "    " << .5*(r00.nlo+rr00.nlo) //                rho_00
+         << endl;
+
+    mu+=s; 
   }
   cout << endl << ":: Saved to file [" << fname << "]" << endl;
   fout.close();
