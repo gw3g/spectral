@@ -37,9 +37,9 @@ struct rho11011 : Master {
   double integrand(double,double) { return 0.; };
   double eval();
 
-  H0 h0;
-  H1 h1;
-  G0 g0;
+  H0 h0, hh0;
+  H1 h1, hh1;
+  G0 g0, gg0;
 
   double h0m, h0n, h1m, h1n, g0m, g0n, g1m, g1n;
   map *S; 
@@ -54,9 +54,13 @@ double rho11011::eval()
 {
   double res=0.;
 
-  h0.muA = MOT1; h0.muB = MOT2;
-  h1.muA = MOT1; h1.muB = MOT2;
-  g0.muA = MOT1; g0.muB = MOT2;
+  h0.muA = MOT1; h0.muB = MOT4;
+  h1.muA = MOT1; h1.muB = MOT4;
+  g0.muA = MOT1; g0.muB = MOT4;
+
+  hh0.muA = MOT2; hh0.muB = MOT5;
+  hh1.muA = MOT2; hh1.muB = MOT5;
+  gg0.muA = MOT2; gg0.muB = MOT5;
 
   double a1=I(0,(this->s)[1],MOT1), b1=I(2,(this->s)[1],MOT1), // tadpole ints
          a2=I(0,(this->s)[2],MOT2), b2=I(2,(this->s)[2],MOT2),
@@ -91,9 +95,9 @@ double rho11011::eval()
   }
   //return (this->OPE)();
 
-  h0m = h0.val(m,s[1],s[4]);  h0n = h0.val(n,s[2],s[5]);
-  h1m = h1.val(m,s[1],s[4]);  h1n = h1.val(n,s[2],s[5]);
-  g0m = g0.val(m,s[1],s[4]);  g0n = g0.val(n,s[2],s[5]);
+  h0m = h0.val(m,s[1],s[4]);  h0n = hh0.val(n,s[2],s[5]);
+  h1m = h1.val(m,s[1],s[4]);  h1n = hh1.val(n,s[2],s[5]);
+  g0m = g0.val(m,s[1],s[4]);  g0n = gg0.val(n,s[2],s[5]);
   g1m = pow(.5,m);            g1n = pow(.5,n);
 
   res += -(2.*g1m-g0m)*h0n+g1m*h1n;
@@ -221,16 +225,20 @@ double G0::operator ()(double x)
 
       pp  = p-kp; pm = p-km;
       if (km>0) pm  = fabs(pm)<1e-1*(+km) ? del : pm; // p=+km (!)
-      lg1 = lga(pm/pp);
-      lg2 = lga(SQR(kp/km))+lg1;
+      //lg1 = lga(pm/pp);
+      //lg2 = lga(SQR(kp/km))+lg1;
+      lg1 = lga(pm*kp/(pp*km));
 
       pp  = p+kp; pm = p+km;
       if (km<0) pm  = fabs(pm)<1e-1*(-km) ? del : pm; // p=-km (!)
-      lg2-= lga(pp/pm);
-      lg1+= lga(pp/pm);
+      //lg2-= lga(pp/pm);
+      //lg1+= lga(pp/pm);
+      lg2 = lga(pp*km/(pm*kp));
 
-      if (nu==0) temp = ( f(p-muA,sA)+f(p-muB,sB) )*lg1;
-      if (nu==1) temp = f(p,sB)*lg1 + (p/k0)*( f(p-muA,sA)-f(p-muB,sB) )*lg2;
+      if (nu==0) temp = ( ( f(p-muA,sA)+f(p-muB,sB) )*lg1
+                        + ( f(p+muA,sA)+f(p+muB,sB) )*lg2 );
+      if (nu==1) temp = ( f(p-muB,sB)*lg1 + (p/k0)*( f(p-muA,sA)-f(p-muB,sB) )*lg1
+                        + f(p+muB,sB)*lg2 - (p/k0)*( f(p+muA,sA)-f(p+muB,sB) )*lg2 );
       return temp;
   }, 0,fabs(km) )(x);                                 //*/
 
@@ -241,16 +249,22 @@ double G0::operator ()(double x)
       pp  = p-kp; pm = p-km; 
       if (km>0) pm = fabs(pm)<1e-1*k ? del : pm;      // p=+km (!)
       pp = fabs(pp)<1e-1*(kp-fabs(km)) ? del : pp;    // p= kp (!)
-      lg1 = lga(pm/pp);
-      lg2 = lga(SQR(kp/km))+lg1;
+      //lg1 = lga(pm/pp);
+      //lg2 = lga(SQR(kp/km))+lg1;
+      lg1 = lga(pm*kp/(pp*km));
 
       pp  = p+kp; pm = p+km;
       if (km<0) pm = fabs(pm)<1e-1*k0 ? del : pm;     // p=-km (!)
-      lg2-= lga(pp/pm);
-      lg1+= lga(pp/pm);
+      //lg2-= lga(pp/pm);
+      //lg1+= lga(pp/pm);
+      lg2 = lga(pp*km/(pm*kp));
 
-      if (nu==0) temp = ( f(p-muA,sA)+f(p-muB,sB) )*lg1;
-      if (nu==1) temp = f(p-muB,sB)*lg1 + (p/k0)*( f(p-muA,sA)-f(p-muB,sB) )*lg2;
+      //if (nu==0) temp = ( f(p-muA,sA)+f(p-muB,sB) )*lg1;
+      if (nu==0) temp = ( ( f(p-muA,sA)+f(p-muB,sB) )*lg1
+                        + ( f(p+muA,sA)+f(p+muB,sB) )*lg2 );
+      //if (nu==1) temp = f(p-muB,sB)*lg1 + (p/k0)*( f(p-muA,sA)-f(p-muB,sB) )*lg2;
+      if (nu==1) temp = ( f(p-muB,sB)*lg1 + (p/k0)*( f(p-muA,sA)-f(p-muB,sB) )*lg1
+                        + f(p+muB,sB)*lg2 - (p/k0)*( f(p+muA,sA)-f(p+muB,sB) )*lg2 );
       return temp;
   }, fabs(km),kp )(x);                                //*/
 
@@ -260,15 +274,21 @@ double G0::operator ()(double x)
 
       pp  = p-kp; pm = p-km;
       pp = fabs(pp)<1e-1*k0 ? del : pp;               // p=+kp (!)
-      lg1 = lga(pm/pp);
-      lg2 = lga(SQR(kp/km))+lg1;
+      //lg1 = lga(pm/pp);
+      //lg2 = lga(SQR(kp/km))+lg1;
+      lg1 = lga(pm*kp/(pp*km));
 
       pp  = p+kp; pm = p+km;
-      lg2-= lga(pp/pm);
-      lg1+= lga(pp/pm);
+      //lg2-= lga(pp/pm);
+      //lg1+= lga(pp/pm);
+      lg2 = lga(pp*km/(pm*kp));
 
-      if (nu==0) temp = ( f(p-muA,sA)+f(p-muB,sB) )*lg1;
-      if (nu==1) temp = f(p-muA,sB)*lg1 + (p/k0)*( f(p-muA,sA)-f(p-muB,sB) )*lg2;
+      //if (nu==0) temp = ( f(p-muA,sA)+f(p-muB,sB) )*lg1;
+      if (nu==0) temp = ( ( f(p-muA,sA)+f(p-muB,sB) )*lg1
+                        + ( f(p+muA,sA)+f(p+muB,sB) )*lg2 );
+      //if (nu==1) temp = f(p-muA,sB)*lg1 + (p/k0)*( f(p-muA,sA)-f(p-muB,sB) )*lg2;
+      if (nu==1) temp = ( f(p-muB,sB)*lg1 + (p/k0)*( f(p-muA,sA)-f(p-muB,sB) )*lg1
+                        + f(p+muB,sB)*lg2 - (p/k0)*( f(p+muA,sA)-f(p+muB,sB) )*lg2 );
       return temp;
   }, kp )(x);                                         //*/
 

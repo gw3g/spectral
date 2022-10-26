@@ -75,12 +75,12 @@ int main(int argc, char *argv[]) {
   //Print_D(.25,1.);
   //Print_D(.25,2.);
 
-  //Print_HTL(1e-1,0.);
-  //Print_HTL(1e-2,0.);
-  //Print_HTL(1e-3,0.);
+  //Print_HTL(1e-1,1.);
+  //Print_HTL(1e-2,1.);
+  Print_HTL(1e-3,1.);
 
-  Print2_HTL(.3,0.01);
-  Print2_HTL(.4,0.01);
+  //Print2_HTL(.3,0.01);
+  //Print2_HTL(.4,0.01);
 
   //Print_D(.3);
   //Print_D(1.5);
@@ -101,9 +101,9 @@ struct Rho_V
 
   // notation à la 1310.0164
   Master
-    *rho_b, *rho_bb, *rho_d, *rho_db, *rho_g, *rho_h, *rho_hp, *rho_j;
+    *rho_b, *rho_bb, *rho_d, *rho_db, *rho_g, *rho_gp, *rho_h, *rho_hp, *rho_j;
   double
-    _b, _bb, _d, _db, _g, _h, _hp, _j;
+    _b, _bb, _d, _db, _g, _gp, _h, _hp, _j;
 
   Rho_V() {
 
@@ -114,6 +114,7 @@ struct Rho_V
     rho_d =  _11010(0,0,S);
     rho_db=  _10110(0,0,S);
     rho_g =  _11011(0,0,S);
+    rho_gp=  _11011(1,1,S);
     rho_h =  _11110(0,0,S);
     rho_hp=  _Star( 0,0,S);
     rho_j =  _11111(0,0,S);
@@ -155,14 +156,15 @@ struct Rho_V
     _bb= (*rho_bb)(k0,k)*K2;
     _d = (*rho_d )(k0,k);
     _db= (*rho_db)(k0,k);
-    _g = (*rho_g )(k0,k)*K2;
+    _g = (*rho_g )(k0,k)*K2*(SQR(k0/k)+3.);
+    _gp= (*rho_gp)(k0,k)*K2/SQR(k);
     //_h = (*rho_h )(k0,k)*K2; // these masters are commented b/c I compute them above
     //_hp= (*rho_hp)(k0,k);
     //_j = (*rho_j )(k0,k)*SQR(K2);
 
     nlo -=
     //8.*Nc*cF*( 2.*(_b-_bb+_d-_db) - 1.5*_g + 2.*(_h+_hp) - _j );
-    8.*Nc*cF*( 2.*(_b-_bb+_d-_db) - 1.5*_g + res*CUBE(OOFP)*SQR(kp) );
+    8.*Nc*cF*( 2.*(_b-_bb+_d-_db) - .5*_g + 2.*_gp + res*CUBE(OOFP)*SQR(kp) );
 
   };
 };
@@ -178,14 +180,14 @@ struct Rho_00
     *rho_b_0, *rho_bb_0,
     *rho_b_1, *rho_bb_1,
     *rho_b_2, *rho_bb_2,
-    *rho_g,
+    *rho_g, *rho_gp,
     *rho_h_0, *rho_h_1,
     *rho_hp,
     *rho_j_0, *rho_j_2;
   double
     _b_1, _bb_1,
     _b_2, _bb_2,
-    _g,
+    _g,   _gp,
     _h_0, _h_1,
     _hp,
     _j_0, _j_2;
@@ -201,6 +203,7 @@ struct Rho_00
     rho_b_2 =  _11020(2,0,S);
     rho_bb_2=  _10120(2,0,S);
     rho_g   =  _11011(0,0,S);
+    rho_gp  =  _11011(1,1,S);
     rho_h_0 =  _11110(0,0,S);
     rho_h_1 =  _11110(0,1,S);
     rho_hp  =  _Star( 0,0,S);
@@ -248,7 +251,8 @@ struct Rho_00
     //_bb_1= (*rho_bb_1)(k0,k)*k0;
     //_b_2 = (*rho_b_2 )(k0,k);
     //_bb_2= (*rho_bb_2)(k0,k);
-    _g   = (*rho_g   )(k0,k)*k*k;
+    _g   = (*rho_g )(k0,k)*( k*k + k0*k0 );
+    _gp  = (*rho_gp)(k0,k)*( -4. );
     //_h_0 = (*rho_h_0 )(k0,k)*K2;
     //_h_1 = (*rho_h_1 )(k0,k)*k0;
     //_hp  = (*rho_hp  )(k0,k);
@@ -259,7 +263,7 @@ struct Rho_00
     4.*Nc*cF*(// 2.*(_b_0-_bb_0-4.*(_b_1-_bb_1)+4.*(_b_2-_bb_2)) // =0  (GJ: when did I write this???)
                                                                  // (GJ: eq(7.1) of your paper, you loskop!)
               //+ _g + 2.*(_h_0+_hp) - 8.*_h_1 + _j_0 - 4.*_j_2 );
-             + _g + res*CUBE(OOFP)*SQR(kp) );
+             + _g + _gp + res*CUBE(OOFP)*SQR(kp) );
 
   };
 };
