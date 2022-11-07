@@ -28,7 +28,7 @@ int ReadIn(string,string,double,double);
 // heavy ion rates:
 int hydro_table_integrated(string);
 int hydro_table_unintegrated(string);
-int hydro_table_integrated_T_L(string);
+int hydro_table_integrated_T_L(string,string);
 
 int main(int argc, char *argv[]) {
 
@@ -67,7 +67,8 @@ int main(int argc, char *argv[]) {
 
   /* for hydro run: */
   //hydro_table_T_L();
-  //hydro_table_integrated_T_L("mesh_test2_alpha.dat");
+  hydro_table_integrated_T_L("meshK_alpha2.dat",
+                             "meshK_NLO_kT_integrated_T_L_2.dat");
 
   /* Others: */
   //Print_D(.02,2.);
@@ -75,9 +76,9 @@ int main(int argc, char *argv[]) {
   //Print_D(.25,1.);
   //Print_D(.25,2.);
 
-  //Print_HTL(1e-1,1.);
-  //Print_HTL(1e-2,1.);
-  Print_HTL(1e-3,1.);
+  //Print_HTL(1e-1,0.);
+  //Print_HTL(1e-2,2.);
+  //Print_HTL(1e-3,0.);
 
   //Print2_HTL(.3,0.01);
   //Print2_HTL(.4,0.01);
@@ -96,8 +97,8 @@ struct Rho_V
 {
   double lo, nlo;
   int S[3];
-  //double Nc=3., cF=(Nc*Nc-1.)/(2.*Nc); // group factors
-  double Nc=1., cF=1.; // QED
+  double Nc=3., cF=(Nc*Nc-1.)/(2.*Nc); // group factors
+  //double Nc=1., cF=1.; // QED
 
   // notation à la 1310.0164
   Master
@@ -114,7 +115,7 @@ struct Rho_V
     rho_d =  _11010(0,0,S);
     rho_db=  _10110(0,0,S);
     rho_g =  _11011(0,0,S);
-    rho_gp=  _11011(1,1,S);
+    rho_gp=  _11011(1,1,S); // (1,1)
     rho_h =  _11110(0,0,S);
     rho_hp=  _Star( 0,0,S);
     rho_j =  _11111(0,0,S);
@@ -173,8 +174,8 @@ struct Rho_00
 {
   double lo, nlo;
   int S[3];
-  //double Nc=3., cF=(Nc*Nc-1.)/(2.*Nc); // QCD
-  double Nc=1., cF=1.; // QED
+  double Nc=3., cF=(Nc*Nc-1.)/(2.*Nc); // QCD
+  //double Nc=1., cF=1.; // QED
 
   Master
     *rho_b_0, *rho_bb_0,
@@ -745,7 +746,7 @@ int hydro_table_integrated(string mesh_name) {
 }
 
 
-int hydro_table_integrated_T_L(string mesh_name) {
+int hydro_table_integrated_T_L(string mesh_name, string fname) {
   int N_kT;
   double res_T_e, res_T_m, 
          res_L_e, res_L_m,
@@ -754,7 +755,7 @@ int hydro_table_integrated_T_L(string mesh_name) {
   double alpha, B_e, B_mu, prefactor;
   double ai, ti;
 
-  string fname = "mesh_NLO_kT_integrated_T_L.dat";
+  //string fname = "mesh_NLO_kT_integrated_T_L.dat";
   fout.open(fname);
   cout << " Opening input file [" << fname << "]\n\n";
   //fout << "# Columns: T/GeV, M/GeV, rate_T(e+e-), rate_T(mu+mu-), rate_L(e+e-), rate_L(mu+mu-)" << endl;
