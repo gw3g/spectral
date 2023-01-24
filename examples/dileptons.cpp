@@ -43,19 +43,30 @@ int main(int argc, char *argv[]) {
   //Print_D(3.*2.*M_PI/3.,0.);     // T=1.1Tc
   //Print_D(1.*2.*M_PI/3.,3./3.);     // T=1.1Tc
   //Print_D(1.*2.*M_PI/3.,3./3.);     // T=1.1Tc
-  //Print_k2ave(2.);     // T=1.1Tc
+  //Print_k2ave(5.);     // T=1.1Tc
   //Print_D(3.*7.*M_PI/12.);    // T=1.3Tc
   // nf=2
   //Print_D(sqrt(1.)*M_PI/2.); // T=1.2Tc
   //Print_D(1.5*M_PI);         // T=1.2Tc
   //Print_D(.5*M_PI*sqrt(14)); // T=1.2Tc
   //
-  /* lattice table */
-  /*
+  //
   char  name_in[100];
   char  name_out[100];
   char *tag;
   double MUq;
+
+  /* fixed alpha */
+
+  tag = ".R1(5)";
+  int Nf=3; k = 2.*M_PI; //double t=1.8; 
+  MUq = 12./3.;
+  sprintf(name_in,"fixed_coupling.dat");
+  sprintf(name_out,"out_for_plot/NLO_rho_{k=%.2f,mu=%.2f}.dat",k,MUq);
+  ReadIn(string(name_in),string(name_out),k,MUq);//*/
+
+  /* lattice table */
+  /*
 
   tag = ".R1(5)";
   int Nf=3; k = 1*2.*M_PI/3.; double t=1.8; 
@@ -67,8 +78,8 @@ int main(int argc, char *argv[]) {
 
   /* for hydro run: */
   //hydro_table_T_L();
-  hydro_table_integrated_T_L("meshK_alpha2.dat",
-                             "meshK_NLO_kT_integrated_T_L_2.dat");
+  //hydro_table_integrated_T_L("meshK_alpha2.dat",
+  //                           "meshK_NLO_kT_integrated_T_L_2.dat");
 
   /* Others: */
   //Print_D(.02,2.);
@@ -546,7 +557,7 @@ int Print_k2ave(double mu=0.) {
   // Here are some parameters that can be changed:
   N_M=20; 
 
-  M_min=1e1;
+  M_min=1e-1;
   M_max=1e2;
   // don't change anything after that.
 
