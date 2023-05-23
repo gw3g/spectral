@@ -9,7 +9,7 @@ double k0,k;
 double mu_q = 0.;
 bool  CHEM_POT = false;
 double MOT1, MOT2, MOT3, MOT4, MOT5;// mu over T
-double tol = 1e-1; // absolute tolerance
+double tol = 1e-4; // absolute tolerance
 
 using namespace std;
 
@@ -29,6 +29,7 @@ int ReadIn(string,string,double,double);
 int hydro_table_integrated(string);
 int hydro_table_unintegrated(string);
 int hydro_table_integrated_T_L(string,string);
+int spf_table(string,string);
 
 int main(int argc, char *argv[]) {
 
@@ -57,7 +58,9 @@ int main(int argc, char *argv[]) {
   double MUq;
 
   /* fixed alpha */
-
+  //spf_table("test3_scaling.dat","scaling3_NLO.dat");
+  spf_table("interp_a_test/test_b11_scaling.dat","interp_a_test/scaling_b11_NLO.dat");
+  /*
   tag = ".R1(5)";
   int Nf=3; k = 2.*M_PI; //double t=1.8; 
   MUq = 12./3.;
@@ -892,6 +895,76 @@ int hydro_table_unintegrated(string mesh_name) {
          <<     "    " << k*T
          <<     "    " << B_e*( rV.lo + alpha*4.*M_PI*rV.nlo )*exp(-k0)/(3.*pow(M_PI,3.)*M*M*(1.-exp(-k0)))
          <<     "    " << B_mu*( rV.lo + alpha*4.*M_PI*rV.nlo )*exp(-k0)/(3.*pow(M_PI,3.)*M*M*(1.-exp(-k0)))
+         << endl;
+
+    //cout << "temp/GeV = " << T << ", M/GeV=" << M << ", k/GeV=" << k << endl;
+  }
+  cout << endl << ":: Saved to file [" << fname << "]" << endl;
+  fout.close();//*/
+
+  return 0;
+}
+
+
+int spf_table(string mesh_name, string fname) {
+  double res_T, res_L, 
+         s;
+  //double alpha, B_e, B_mu, prefactor;
+
+  //string fname = "mesh_NLO_kT_integrated_T_L.dat";
+  fout.open(fname);
+  cout << " Opening output file [" << fname << "]\n\n";
+  fout << "# Columns: alpha, muB/T, M/T, k/T, rho_T/T2, rho_L/T2" << endl;
+
+  Rho_V rV;
+  Rho_00 r00;
+
+  CHEM_POT=true;
+  Rho_V rrV;
+  Rho_00 rr00;
+
+  double alpha,g2,muB,M,M2,k2;
+  fin.open(mesh_name);
+  cout << " Opening input file [" << mesh_name << "]\n\n";
+  //for (int i=0;i<32000;i++) 
+  fin.ignore(128,'\n');
+
+  while (!fin.eof()) {
+    fin >> alpha >> muB >> M >> k;
+    fin.ignore(128,'\n');
+    M2 = M*M; k2 = k*k;
+    k0  = sqrt( M2+k2 );
+    g2  = alpha*4.*M_PI;
+
+    cout << "  al = " << alpha << " ,  mu_B/T = " << muB << " ,  M/T = " << M << " ,  k/T = " << k ;
+
+    res_T = 0.;
+    res_L = 0.;
+
+    MOT1 = muB/(3.); MOT2 = -muB/(3.);
+    MOT3 = - MOT1 - MOT2; MOT4 = -MOT1; MOT5 = -MOT2;
+    rV();
+    r00();
+
+    MOT1 = -muB/(3.); MOT2 = muB/(3.);
+    MOT3 = - MOT1 - MOT2; MOT4 = -MOT1; MOT5 = -MOT2;
+    rrV();
+    rr00();
+
+    res_T += .25*( rV.lo + r00.lo*(M2/k2) + g2*( rV.nlo + r00.nlo*(M2/k2) ) );
+    res_T += .25*(rrV.lo +rr00.lo*(M2/k2) + g2*(rrV.nlo +rr00.nlo*(M2/k2) ) );
+
+    res_L += .5*(-M2/k2)*( r00.lo + g2*r00.nlo );
+    res_L += .5*(-M2/k2)*(rr00.lo +g2*rr00.nlo );
+
+    cout << " , rT = " << res_T << " , rL = " << res_L << endl;
+
+    fout << scientific << alpha
+         <<     "    " << muB
+         <<     "    " << M
+         <<     "    " << k
+         <<     "    " << res_T
+         <<     "    " << res_L
          << endl;
 
     //cout << "temp/GeV = " << T << ", M/GeV=" << M << ", k/GeV=" << k << endl;
