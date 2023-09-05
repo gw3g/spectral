@@ -22,6 +22,9 @@ $(ODIR)/%.o: $(SDIR)/%.$(SRCEXT)
 dileptons: $(OBJ)
 	$(CC) $(CFLAGS) $^ $(INC) examples/dileptons.cpp -o bin/dil
 
+neutrinos: $(OBJ)
+	$(CC) $(CFLAGS) $^ $(INC) examples/neutrinos.cpp -o bin/nu
+
 average: $(OBJ)
 	$(CC) $(CFLAGS) $^ $(INC) examples/average.cpp -o bin/ave
 
