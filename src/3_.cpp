@@ -239,6 +239,8 @@ double G0::operator ()(double x)
                         + ( f(p+muA,sA)+f(p+muB,sB) )*lg2 );
       if (nu==1) temp = ( f(p-muB,sB)*lg1 + (p/k0)*( f(p-muA,sA)-f(p-muB,sB) )*lg1
                         + f(p+muB,sB)*lg2 - (p/k0)*( f(p+muA,sA)-f(p+muB,sB) )*lg2 );
+      if (nu==2) temp = ( SQR(1.-p/k0)*f(p-muB,sB)*lg1 + SQR(+p/k0)*f(p-muA,sA)*lg1
+                        + SQR(1.+p/k0)*f(p+muB,sB)*lg2 + SQR(-p/k0)*f(p+muA,sA)*lg2 );
       return temp;
   }, 0,fabs(km) )(x);                                 //*/
 
@@ -265,6 +267,8 @@ double G0::operator ()(double x)
       //if (nu==1) temp = f(p-muB,sB)*lg1 + (p/k0)*( f(p-muA,sA)-f(p-muB,sB) )*lg2;
       if (nu==1) temp = ( f(p-muB,sB)*lg1 + (p/k0)*( f(p-muA,sA)-f(p-muB,sB) )*lg1
                         + f(p+muB,sB)*lg2 - (p/k0)*( f(p+muA,sA)-f(p+muB,sB) )*lg2 );
+      if (nu==2) temp = ( SQR(1.-p/k0)*f(p-muB,sB)*lg1 + SQR(+p/k0)*f(p-muA,sA)*lg1
+                        + SQR(1.+p/k0)*f(p+muB,sB)*lg2 + SQR(-p/k0)*f(p+muA,sA)*lg2 );
       return temp;
   }, fabs(km),kp )(x);                                //*/
 
@@ -289,6 +293,8 @@ double G0::operator ()(double x)
       //if (nu==1) temp = f(p-muA,sB)*lg1 + (p/k0)*( f(p-muA,sA)-f(p-muB,sB) )*lg2;
       if (nu==1) temp = ( f(p-muB,sB)*lg1 + (p/k0)*( f(p-muA,sA)-f(p-muB,sB) )*lg1
                         + f(p+muB,sB)*lg2 - (p/k0)*( f(p+muA,sA)-f(p+muB,sB) )*lg2 );
+      if (nu==2) temp = ( SQR(1.-p/k0)*f(p-muB,sB)*lg1 + SQR(+p/k0)*f(p-muA,sA)*lg1
+                        + SQR(1.+p/k0)*f(p+muB,sB)*lg2 + SQR(-p/k0)*f(p+muA,sA)*lg2 );
       return temp;
   }, kp )(x);                                         //*/
 
@@ -301,6 +307,7 @@ double G0::val(int _nu, int _sA, int _sB)
   sA=_sA;
   sB=_sB;
   double res, err;
+  //cout << nu << endl;
 
   double epsabs = 1e-5, epsrel = 1e-4;
   size_t limit = 1e5;
@@ -313,3 +320,15 @@ double G0::val(int _nu, int _sA, int _sB)
 
   return res;
 };
+
+/*--------------------------------------------------------------------*/
+
+double chi(int nu, int sA, int sB) {
+  //cout << "((TEST))" << endl;
+  G0 g0;
+  g0.muA = 0.; g0.muB = 0.;
+  double res = g0.val(nu,sA,sB);
+  //double res = 1.;
+  return res/SQR(4.*M_PI);
+}
+

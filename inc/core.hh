@@ -22,6 +22,7 @@ double I(int,int,double); // tadpole
 double psi0(int sA, int sB, double); // moments (last arg is MOT)
 double psi1(int sA, int sB, double);
 double psi2(int sA, int sB, double);
+double chi(int nu, int sA, int sB); // real part of J_{11}^{nu}
 
 void print_integrand(int m, int n, int s[3]); // for checking
 
