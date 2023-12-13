@@ -63,7 +63,7 @@ int main(int argc, char *argv[]) {
 
   /* fixed alpha */
   //SPF_table("test3_scaling.dat","scaling3_NLO.dat");
-  SPF_table("interp_a_test/test_b11_scaling.dat","interp_a_test/scaling_b11_NLO.dat");
+  //SPF_table("interp_a_test/test_b11_scaling.dat","interp_a_test/scaling_b11_NLO.dat");
 
   /*
   tag = ".R1(5)";
