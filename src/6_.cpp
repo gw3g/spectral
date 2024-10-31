@@ -682,7 +682,7 @@ double rho11111::integrand(double x, double y) {
     //},  2.*kp-q,k0+km-q  )(y); },  km,kp    )(x); //*/
     },  max(km,2.*kp-p),min(kp,k0+km-p) )(y); },  kp,k0    )(x); //*/
     //
-  } else if (k0<3.*k) {
+  } else {
     //
     _4B+=
     remap([&](double p, double pd) {                  // p=[kp,k0]
