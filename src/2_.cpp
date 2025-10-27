@@ -157,7 +157,8 @@ double rho11010::eval()
       return (this->integrand)(x);
   } );
   gsl_integration_qag(  outer, .0+1e-13,1., epsabs, epsrel,
-                        limit, 6, wsp, &res, &err  );
+                        //limit, 6, wsp, &res, &err  );
+                        limit, 6, get_thread_workspace(limit), &res, &err  );
 
   return res*a2*.25*OOFP*pow(k0,m);
 }

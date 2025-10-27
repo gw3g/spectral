@@ -103,11 +103,13 @@ double rho11110::eval()
         return (this->integrand)(x,y);
         } );
     gsl_integration_qag(inner, .0+1e-10,1., epsabs, epsrel, 
-                       limit, 6, wsp1, &inner_result, &inner_abserr );
+                       //limit, 6, wsp1, &inner_result, &inner_abserr );
+                       limit, 6, get_thread_workspace(limit), &inner_result, &inner_abserr );
     return inner_result;
   } );
   gsl_integration_qag(  outer, .0+1e-10,1., epsabs, epsrel*2, 
-                        limit, 6, wsp2, &res, &err  );
+                       // limit, 6, wsp2, &res, &err  );
+                       limit, 6, get_thread_workspace(limit), &res, &err );
 
   return (( res*pow(k0,m+n)/K2 ))*CUBE(OOFP);
 }

@@ -1,11 +1,12 @@
 /*
  *    thermal self-energies, NLO Master functions
  *    @author  GJ
- *    @version 0.2
+ *    @version 1.1
  *
  */
 #include "core.hh"
 #include "timer.hh"
+#include <omp.h>
 #include <fstream>
 #include <string>
 
@@ -153,15 +154,25 @@ int Print_k0(Master *rho, double k_curr) {
   s=pow(k0_max/k0_min,1./(N_k0-1));
   k0=k0_min;
 
+  #pragma omp parallel 
+  {
+    #pragma omp master
+    cout << " ~ running w/ " << omp_get_num_threads() << " threads\n";
+  }
+
+  #pragma omp parallel for schedule(dynamic)
   for (int i=0;i<N_k0;i++) { 
     percentage=(float)i/((float)N_k0);
     res = (*rho)(k0,k);
 
-    fout << scientific << k0 
-         <<     "    " << res
-         <<     "    " << (rho->OPE).T2
-         <<     "    " << (rho->OPE).T4 
-         << endl;
+    #pragma omp critical
+    {
+      fout << scientific << k0 
+           <<     "    " << res
+           <<     "    " << (rho->OPE).T2
+           <<     "    " << (rho->OPE).T4 
+           << endl;
+    }
 
     k0*=s; 
   }

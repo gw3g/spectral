@@ -148,7 +148,8 @@ double H0::val(int _nu, int _sA, int _sB)
       return (*this)(x);
       } );
   gsl_integration_qag(  outer, .0,1., epsabs, epsrel, 
-                        limit, 6, wsp, &res, &err  );
+                        //limit, 6, wsp, &res, &err  );
+                        limit, 6, get_thread_workspace(limit), &res, &err  );
   return res;
 }
 
@@ -202,7 +203,8 @@ double H1::val(int _nu, int _sA, int _sB)
 
   auto outer = make_gsl_function( [&](double x) { return (*this)(x); } );
   gsl_integration_qag(  outer, .0,1., epsabs, epsrel,
-                        limit, 6, wsp, &res, &err  ); // 61 pt. Gauss-Konrod
+                        //limit, 6, wsp, &res, &err  ); // 61 pt. Gauss-Konrod
+                        limit, 6, get_thread_workspace(limit), &res, &err  );
   return res;
 }
 
@@ -316,7 +318,8 @@ double G0::val(int _nu, int _sA, int _sB)
 
   auto outer = make_gsl_function( [&](double x) { return (*this)(x); } );
   gsl_integration_qag(  outer, .0,1., epsabs, epsrel, 
-                        limit, 6, wsp, &res, &err  );
+                        //limit, 6, wsp, &res, &err  );
+                        limit, 6, get_thread_workspace(limit), &res, &err  );
 
   return res;
 };

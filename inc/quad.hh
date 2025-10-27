@@ -1,7 +1,16 @@
+#pragma once
 #include <gsl/gsl_integration.h>
 #include <gsl/gsl_errno.h>
+#include <memory>
 /*--------------------------------------------------------------------*/
 // wrapper for GSL ∫ methods
+
+inline gsl_integration_workspace* get_thread_workspace(size_t n=2000) {
+    static thread_local std::unique_ptr<gsl_integration_workspace> ws{
+        gsl_integration_workspace_alloc(n)
+    };
+    return ws.get();
+}
 
 struct quad {
   gsl_integration_workspace * wsp;

@@ -1,5 +1,6 @@
 CC	= g++
-CFLAGS	= -std=c++11 -lm -lgsl -lgslcblas
+CFLAGS	= -O3 -std=c++11 -lm -lgsl -lgslcblas
+CFLAGS += -fopenmp
 TARGET	= bin/rho
 SRCEXT	= cpp
 SDIR	= src
